@@ -27,5 +27,11 @@
   "uzhiny": { "site": "Леди Mail.ru", "title": "7 лучших рецептов белковых ужинов", "author": "Дарья Мокина", "date": "2026-06-23", "url": "https://lady.mail.ru/article/591021-luchshie-retsepty-belkovykh-uzhinov/" },
   "salaty_pp": { "site": "Леди Mail.ru", "title": "5 лучших рецептов ПП-салатов", "author": "Екатерина Королятина", "date": "2026-03-17", "url": "https://lady.mail.ru/article/584364-luchshie-retsepty-pp-salatov/" },
   "zakuski": { "site": "Леди Mail.ru", "title": "5 лучших рецептов ПП-закусок", "author": "Екатерина Королятина", "date": "2026-05-20", "url": "https://lady.mail.ru/article/588657-luchshie-retsepty-pp-zakusok/" },
-  "yagody": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов с ягодами", "author": "Дарья Мокина", "date": "2026-07-27", "url": "https://lady.mail.ru/article/593393-luchshie-pp-retsepty-s-yagodami/" }
+  "yagody": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов с ягодами", "author": "Дарья Мокина", "date": "2026-07-27", "url": "https://lady.mail.ru/article/593393-luchshie-pp-retsepty-s-yagodami/" },
+  "syr": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов с сыром", "author": "Ирина Юрченко", "date": "2026-04-27", "url": "https://lady.mail.ru/article/587128-luchshie-pp-retsepty-s-syrom/" },
+  "farsh": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов с фаршем", "author": "Екатерина Королятина", "date": "2026-05-19", "url": "https://lady.mail.ru/article/588431-luchshie-pp-retsepty-s-farshem/" },
+  "indejka": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов из индейки", "author": "Екатерина Королятина", "date": "2026-04-22", "url": "https://lady.mail.ru/article/586850-luchshie-pp-retsepty-iz-indejki/" },
+  "kabachki": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов из кабачков", "author": "Ирина Юрченко", "date": "2026-04-28", "url": "https://lady.mail.ru/article/587220-luchshie-pp-retsepty-iz-kabachkov/" },
+  "krevetki": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов с креветками", "author": "Дарья Мокина", "date": "2026-06-04", "url": "https://lady.mail.ru/article/589253-luchshie-retsepty-pp-retsepty-s-krevetkami/" },
+  "griby": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов с грибами", "author": "Ирина Юрченко", "date": "2026-05-08", "url": "https://lady.mail.ru/article/587902-luchshie-pp-retsepty-s-gribami/" }
 }
