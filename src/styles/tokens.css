@@ -1,0 +1,86 @@
+:root {
+  /* Основа: шалфейная бумага, белые страницы, тёмно-зелёные чернила */
+  --bg: #e6eee0;
+  --bg-deep: #d7e3cf;
+  --surface: #ffffff;
+  --ink: #1e2a21;
+  --muted: #56655a;
+  --line: #cbd8c3;
+
+  /* Акцент: малиновый — кнопки и сердечко */
+  --accent: #c2185b;
+  --accent-ink: #ffffff;
+  --accent-soft: #f7d5e2;
+
+  /* Макронутриенты */
+  --protein: #2f6fdb;
+  --fat: #c98208;
+  --carb: #3c9a4e;
+
+  /* Акварельные пятна категорий */
+  --tint-breakfast: #f6e3b4;
+  --tint-lunch: #cfe5c6;
+  --tint-dinner: #cfddf2;
+  --tint-snack: #f4d3dc;
+  --tint-dessert: #ead7f0;
+
+  /* Цвета еды в иллюстрациях */
+  --food-red: #e0606a;
+  --food-yolk: #f2b33d;
+  --food-green: #6bb070;
+  --food-crust: #e3b56f;
+  --food-cream: #fbf3e2;
+
+  --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --font-text: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-hand: "Caveat", "Segoe Print", cursive;
+
+  --r-lg: 28px;
+  --r-md: 18px;
+  --r-sm: 12px;
+  --gutter: 16px;
+  --max: 1240px;
+  --nav-h: 64px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111a14;
+    --bg-deep: #0b120d;
+    --surface: #1a251d;
+    --ink: #e9f1e4;
+    --muted: #a3b4a7;
+    --line: #2c3a30;
+
+    --accent: #f06b9b;
+    --accent-ink: #1a0a11;
+    --accent-soft: #46202f;
+
+    --protein: #86adf6;
+    --fat: #f0bd55;
+    --carb: #7ccb8b;
+
+    --tint-breakfast: #3b3420;
+    --tint-lunch: #22382a;
+    --tint-dinner: #1f2c40;
+    --tint-snack: #3d232c;
+    --tint-dessert: #33263b;
+
+    --food-red: #e7787f;
+    --food-yolk: #f2bd52;
+    --food-green: #78bd7d;
+    --food-crust: #d9ab66;
+    --food-cream: #2a3529;
+
+    color-scheme: dark;
+  }
+}
+
+@media (min-width: 720px) {
+  :root {
+    --gutter: 32px;
+  }
+}

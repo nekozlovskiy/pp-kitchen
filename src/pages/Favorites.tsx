@@ -1,0 +1,37 @@
+import { Link } from "react-router-dom";
+import { recipes } from "../data";
+import { plural } from "../lib/format";
+import { RecipeCard } from "../components/RecipeCard";
+import { useStore } from "../hooks/useStore";
+
+export function Favorites() {
+  const { favorites } = useStore();
+  const list = recipes.filter((r) => favorites.has(r.id));
+  return (
+    <main className="wrap">
+      <header className="page-head">
+        <h1 className="page-title">Избранное</h1>
+        <p className="page-sub">
+          {list.length
+            ? `${list.length} ${plural(list.length, ["любимый рецепт", "любимых рецепта", "любимых рецептов"])}`
+            : "Здесь будут рецепты, отмеченные сердечком."}
+        </p>
+      </header>
+      {list.length ? (
+        <div className="grid">
+          {list.map((r) => (
+            <RecipeCard key={r.id} recipe={r} />
+          ))}
+        </div>
+      ) : (
+        <div className="empty">
+          <p className="empty__title">Пока ничего не отмечено</p>
+          <p>Нажмите на сердечко у понравившегося блюда, и оно появится здесь.</p>
+          <Link to="/" className="btn btn--accent">
+            Смотреть рецепты
+          </Link>
+        </div>
+      )}
+    </main>
+  );
+}
