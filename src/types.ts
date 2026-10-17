@@ -22,7 +22,19 @@ export type ArtKind =
   | "roll"
   | "toast"
   | "pancakes"
-  | "fish";
+  | "fish"
+  | "salad"
+  | "cutlets"
+  | "muffin"
+  | "pie"
+  | "cakeslice"
+  | "balls"
+  | "eggs"
+  | "spirals"
+  | "pot"
+  | "casserole"
+  | "bread"
+  | "mousse";
 
 export type Recipe = {
   id: string;

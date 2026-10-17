@@ -163,6 +163,151 @@ const drawings: Record<ArtKind, ReactElement> = {
       <path d="M60 124c6-6 14-6 18 0M84 128c6-6 14-6 18 0" fill="none" stroke="var(--food-green)" strokeWidth={4} strokeLinecap="round" />
     </g>
   ),
+  salad: (
+    <g>
+      <ellipse cx="100" cy="108" rx="76" ry="26" fill={surface} {...ink} />
+      <path d="M50 102c-6-18 12-30 26-20 4-14 24-18 32-6 10-10 30-6 32 8 14 0 20 14 12 22-30 12-80 12-102-4Z" fill="var(--food-green)" {...ink} />
+      <path d="M70 96c6-6 14-8 20-6M110 90c6-4 14-4 18 0" {...ink} fill="none" strokeWidth={1.4} opacity={0.6} />
+      <circle cx="84" cy="98" r="8" fill="var(--food-red)" {...ink} />
+      <circle cx="122" cy="100" r="7" fill="var(--food-red)" {...ink} />
+      <rect x="96" y="92" width="14" height="12" rx="3" fill="var(--food-cream)" {...ink} transform="rotate(-12 103 98)" />
+      <circle cx="140" cy="94" r="4" fill="var(--food-yolk)" {...ink} strokeWidth={1.6} />
+      <path d="M164 58l-30 38M172 62l-32 36" {...ink} />
+    </g>
+  ),
+  cutlets: (
+    <g>
+      <ellipse cx="100" cy="106" rx="76" ry="28" fill={surface} {...ink} />
+      <ellipse cx="78" cy="98" rx="26" ry="14" fill="var(--food-crust)" {...ink} />
+      <ellipse cx="120" cy="106" rx="26" ry="14" fill="var(--food-crust)" {...ink} />
+      <path d="M66 94c6-3 14-3 20 0M108 102c6-3 14-3 20 0" {...ink} fill="none" strokeWidth={1.4} opacity={0.5} />
+      <path d="M140 84c6-12 22-12 24 0-6 6-18 6-24 0Z" fill="var(--food-green)" {...ink} />
+      <circle cx="148" cy="116" r="7" fill="var(--food-red)" {...ink} />
+      <path d="M90 74c-4-6 4-10 0-16M108 78c-4-6 4-10 0-16" {...ink} fill="none" opacity={0.5} />
+    </g>
+  ),
+  muffin: (
+    <g>
+      <path d="M62 92l10 44h56l10-44Z" fill="var(--food-yolk)" {...ink} />
+      <path d="M80 92l4 44M100 92v44M120 92l-4 44" {...ink} strokeWidth={1.4} opacity={0.5} />
+      <path d="M56 94c-8-26 18-46 44-46s52 20 44 46Z" fill="var(--food-crust)" {...ink} />
+      <circle cx="84" cy="74" r="4" fill="var(--food-green)" {...ink} strokeWidth={1.4} />
+      <circle cx="112" cy="66" r="4" fill="var(--food-red)" {...ink} strokeWidth={1.4} />
+      <circle cx="122" cy="82" r="3.4" fill="var(--food-green)" {...ink} strokeWidth={1.4} />
+      <circle cx="98" cy="84" r="3.4" fill="var(--food-red)" {...ink} strokeWidth={1.4} />
+      <path d="M150 60c4-6 10-6 12 0M38 66c4-6 10-6 12 0" {...ink} fill="none" opacity={0.5} />
+    </g>
+  ),
+  pie: (
+    <g>
+      <ellipse cx="100" cy="112" rx="74" ry="24" fill={surface} {...ink} />
+      <path d="M38 98v10c0 12 28 20 62 20s62-8 62-20V98" fill="var(--food-crust)" {...ink} />
+      <ellipse cx="100" cy="98" rx="62" ry="20" fill="var(--food-crust)" {...ink} />
+      <ellipse cx="100" cy="98" rx="50" ry="14" fill="var(--food-cream)" {...ink} strokeWidth={1.6} />
+      <path d="M62 92l76 12M66 104l64-16M100 84v28" {...ink} strokeWidth={3} opacity={0.75} />
+      <path d="M78 96c4-6 10-6 12 0M112 100c4-6 10-6 12 0" fill="none" stroke="var(--food-green)" strokeWidth={3.4} strokeLinecap="round" />
+    </g>
+  ),
+  cakeslice: (
+    <g>
+      <ellipse cx="100" cy="126" rx="70" ry="14" fill={surface} {...ink} />
+      <path d="M56 70l90 14v38l-90-10Z" fill="var(--food-cream)" {...ink} />
+      <path d="M56 84l90 12M56 98l90 12" fill="none" stroke="var(--food-crust)" strokeWidth={7} />
+      <path d="M56 70l90 14v38l-90-10Z" fill="none" {...ink} />
+      <path d="M56 70l40-24 50 38Z" fill="var(--food-cream)" {...ink} />
+      <circle cx="98" cy="60" r="7" fill="var(--food-red)" {...ink} />
+      <circle cx="112" cy="68" r="5.5" fill="var(--food-red)" {...ink} />
+      <path d="M100 54c2-6 8-8 12-4-4 2-8 4-12 4Z" fill="var(--food-green)" {...ink} />
+      <path d="M160 116l20-40" {...ink} />
+    </g>
+  ),
+  balls: (
+    <g>
+      <ellipse cx="100" cy="122" rx="72" ry="18" fill={surface} {...ink} />
+      <circle cx="72" cy="104" r="20" fill="var(--food-cream)" {...ink} />
+      <circle cx="128" cy="104" r="20" fill="var(--food-crust)" {...ink} />
+      <circle cx="100" cy="82" r="20" fill="var(--food-cream)" {...ink} />
+      {[
+        [64, 98], [78, 110], [72, 96], [94, 76], [106, 86], [100, 72],
+      ].map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r="1.8" fill="var(--ink)" opacity={0.6} />
+      ))}
+      <path d="M120 100c4-4 10-4 14 0M118 110c4-4 10-4 14 0" {...ink} fill="none" strokeWidth={1.4} opacity={0.5} />
+      <path d="M100 62c2-6 8-8 12-4-4 2-8 4-12 4Z" fill="var(--food-green)" {...ink} />
+    </g>
+  ),
+  eggs: (
+    <g>
+      <ellipse cx="100" cy="108" rx="76" ry="28" fill={surface} {...ink} />
+      <path d="M50 104c0-20 26-30 50-30s50 10 50 30c-12 10-88 10-100 0Z" fill="var(--food-yolk)" {...ink} />
+      <path d="M58 104c20 6 64 6 84 0" {...ink} fill="none" strokeWidth={1.6} opacity={0.6} />
+      <path d="M76 88c6-8 14-8 20-4-4 4-12 6-20 4Z" fill="var(--food-green)" {...ink} />
+      <circle cx="112" cy="88" r="6" fill="var(--food-red)" {...ink} />
+      <circle cx="128" cy="94" r="5" fill="var(--food-red)" {...ink} />
+      <path d="M150 56c0-10 6-18 12-18s12 8 12 18-6 12-12 12-12-2-12-12Z" fill={surface} {...ink} />
+      <path d="M150 54l5-4 4 5 5-5 4 5 5-4" {...ink} fill="none" strokeWidth={1.6} />
+    </g>
+  ),
+  spirals: (
+    <g>
+      <ellipse cx="100" cy="106" rx="76" ry="28" fill={surface} {...ink} />
+      <ellipse cx="100" cy="100" rx="48" ry="18" fill="var(--food-green)" opacity={0.85} {...ink} />
+      <path d="M64 100c4-10 18-12 22-4s-6 14-12 10M92 92c6-8 20-6 22 2s-8 12-14 8M118 104c4-8 16-8 18 0s-8 10-12 6M80 108c6-4 14-2 14 4" fill="none" stroke="var(--food-cream)" strokeWidth={4} strokeLinecap="round" />
+      <path d="M64 100c4-10 18-12 22-4s-6 14-12 10M92 92c6-8 20-6 22 2s-8 12-14 8M118 104c4-8 16-8 18 0s-8 10-12 6" {...ink} fill="none" strokeWidth={1.4} opacity={0.6} />
+      <rect x="96" y="80" width="14" height="10" rx="3" fill="var(--food-crust)" {...ink} />
+      <circle cx="130" cy="88" r="6" fill="var(--food-red)" {...ink} />
+      <path d="M150 112l24-60M160 114l22-56" {...ink} />
+    </g>
+  ),
+  pot: (
+    <g>
+      <path d="M48 76h104v46c0 12-10 18-22 18H70c-12 0-22-6-22-18Z" fill={surface} {...ink} />
+      <path d="M48 88h-14M152 88h14" {...ink} strokeWidth={5} />
+      <path d="M44 76h112" {...ink} />
+      <path d="M52 76c4-14 20-20 32-12 8-10 26-10 32 0 12-6 28 0 32 12" fill="var(--food-crust)" {...ink} />
+      <path d="M74 70c4-6 10-6 12 0M108 68c4-6 10-6 12 0" fill="none" stroke="var(--food-green)" strokeWidth={3.4} strokeLinecap="round" />
+      <circle cx="98" cy="66" r="4" fill="var(--food-red)" {...ink} strokeWidth={1.6} />
+      <path d="M80 50c-6-8 6-12 0-20M100 46c-6-8 6-12 0-20M120 50c-6-8 6-12 0-20" {...ink} fill="none" opacity={0.55} />
+      <path d="M48 108h104" {...ink} strokeWidth={1.4} opacity={0.4} />
+    </g>
+  ),
+  casserole: (
+    <g>
+      <path d="M36 82h128v38c0 10-8 16-18 16H54c-10 0-18-6-18-16Z" fill={surface} {...ink} />
+      <path d="M36 92h-10M164 92h10" {...ink} strokeWidth={6} />
+      <path d="M44 82c0-10 6-14 14-14h84c8 0 14 4 14 14Z" fill="var(--food-crust)" {...ink} />
+      <path d="M40 82h120v12H40Z" fill="var(--food-yolk)" {...ink} strokeWidth={1.6} />
+      <path d="M64 76c4-4 10-4 14 0M100 72c4-4 10-4 14 0M126 78c4-4 10-4 14 0" {...ink} fill="none" strokeWidth={1.4} opacity={0.6} />
+      <circle cx="88" cy="74" r="4" fill="var(--food-green)" {...ink} strokeWidth={1.4} />
+      <circle cx="120" cy="76" r="3.6" fill="var(--food-red)" {...ink} strokeWidth={1.4} />
+      <path d="M90 58c-4-6 4-10 0-16M110 58c-4-6 4-10 0-16" {...ink} fill="none" opacity={0.5} />
+    </g>
+  ),
+  bread: (
+    <g>
+      <rect x="40" y="114" width="120" height="16" rx="6" fill={surface} {...ink} />
+      <path d="M50 114V86c0-22 22-34 50-34s50 12 50 34v28Z" fill="var(--food-crust)" {...ink} />
+      <path d="M70 78l12-14M92 76l12-14M114 78l12-14" {...ink} strokeWidth={2} opacity={0.7} />
+      {[
+        [62, 96], [80, 92], [100, 98], [120, 92], [138, 98], [72, 106], [110, 106], [130, 108],
+      ].map(([x, y], i) => (
+        <ellipse key={i} cx={x} cy={y} rx="2.6" ry="1.6" fill="var(--food-cream)" stroke="var(--ink)" strokeWidth={1} />
+      ))}
+      <path d="M156 60c4-6 10-6 12 0M32 70c4-6 10-6 12 0" {...ink} fill="none" opacity={0.5} />
+    </g>
+  ),
+  mousse: (
+    <g>
+      <path d="M60 80h80c0 26-16 40-40 40s-40-14-40-40Z" fill={surface} {...ink} />
+      <path d="M100 120v14M80 136h40" {...ink} />
+      <path d="M62 80c-4-16 14-26 26-18 4-14 24-14 28 0 12-8 30 2 24 18Z" fill="var(--food-crust)" {...ink} />
+      <path d="M80 68c6 4 14 4 20 0M104 70c6 4 12 4 18 0" {...ink} fill="none" strokeWidth={1.4} opacity={0.5} />
+      <circle cx="102" cy="54" r="8" fill="var(--food-red)" {...ink} />
+      <path d="M104 46c2-6 8-8 12-4-4 2-8 4-12 4Z" fill="var(--food-green)" {...ink} />
+      <path d="M146 60l20-34" {...ink} />
+      <ellipse cx="168" cy="22" rx="7" ry="4.5" transform="rotate(-58 168 22)" fill={surface} {...ink} />
+    </g>
+  ),
 };
 
 const tint: Record<Category, string> = {

@@ -7,7 +7,7 @@
     "timeMinutes": 15,
     "level": "Легко",
     "servings": 2,
-    "art": "pan",
+    "art": "eggs",
     "source": "zavtrak",
     "ingredients": [
       {
@@ -224,7 +224,7 @@
     "level": "Легко",
     "servings": 3,
     "portionLabel": "1 кусок",
-    "art": "cake",
+    "art": "casserole",
     "source": "zavtrak",
     "ingredients": [
       {
@@ -837,7 +837,7 @@
     "level": "Легко",
     "servings": 4,
     "portionLabel": "1 кусок",
-    "art": "cake",
+    "art": "casserole",
     "source": "ovsyanka",
     "ingredients": [
       {
@@ -1136,7 +1136,7 @@
     "level": "Легко",
     "servings": 4,
     "portionLabel": "1 кусок",
-    "art": "cake",
+    "art": "casserole",
     "source": "zapekanki",
     "ingredients": [
       {
@@ -1185,7 +1185,7 @@
     "timeMinutes": 15,
     "level": "Легко",
     "servings": 2,
-    "art": "pan",
+    "art": "eggs",
     "source": "pohudenie",
     "ingredients": [
       {
@@ -1244,7 +1244,7 @@
     "level": "Легко",
     "servings": 4,
     "portionLabel": "1 кусок",
-    "art": "cake",
+    "art": "casserole",
     "source": "yabloki",
     "ingredients": [
       {
@@ -1504,7 +1504,7 @@
     "timeMinutes": 45,
     "level": "Средне",
     "servings": 3,
-    "art": "bowl",
+    "art": "salad",
     "source": "pohudenie",
     "ingredients": [
       {
@@ -1676,7 +1676,7 @@
     "level": "Легко",
     "servings": 5,
     "portionLabel": "1 кусок",
-    "art": "cake",
+    "art": "casserole",
     "source": "ovoshchi",
     "ingredients": [
       {
@@ -1730,7 +1730,7 @@
     "timeMinutes": 40,
     "level": "Легко",
     "servings": 3,
-    "art": "bowl",
+    "art": "salad",
     "source": "ovoshchi",
     "ingredients": [
       {
@@ -1788,7 +1788,7 @@
     "timeNote": "+ 1 час в холодильнике",
     "level": "Легко",
     "servings": 2,
-    "art": "bowl",
+    "art": "salad",
     "source": "salaty",
     "ingredients": [
       {
@@ -1845,7 +1845,7 @@
     "timeMinutes": 25,
     "level": "Легко",
     "servings": 3,
-    "art": "bowl",
+    "art": "salad",
     "source": "tunec",
     "ingredients": [
       {
@@ -1903,7 +1903,7 @@
     "timeMinutes": 15,
     "level": "Легко",
     "servings": 2,
-    "art": "bowl",
+    "art": "salad",
     "source": "salaty",
     "ingredients": [
       {
@@ -1995,7 +1995,7 @@
     "level": "Средне",
     "servings": 6,
     "portionLabel": "3–4 голубца",
-    "art": "pan",
+    "art": "pot",
     "source": "ris",
     "ingredients": [
       {
@@ -2061,7 +2061,7 @@
     "timeMinutes": 50,
     "level": "Легко",
     "servings": 5,
-    "art": "pan",
+    "art": "casserole",
     "source": "ris",
     "ingredients": [
       {
@@ -2190,7 +2190,7 @@
     "timeMinutes": 25,
     "level": "Легко",
     "servings": 2,
-    "art": "bowl",
+    "art": "salad",
     "source": "grechka",
     "ingredients": [
       {
@@ -2292,7 +2292,7 @@
     "timeMinutes": 50,
     "level": "Легко",
     "servings": 4,
-    "art": "plate",
+    "art": "pot",
     "source": "grechka",
     "ingredients": [
       {
@@ -2351,7 +2351,7 @@
     "level": "Средне",
     "servings": 4,
     "portionLabel": "1 кусок",
-    "art": "cake",
+    "art": "casserole",
     "source": "tvorog",
     "ingredients": [
       {
@@ -2525,7 +2525,7 @@
     "timeMinutes": 10,
     "level": "Легко",
     "servings": 3,
-    "art": "bowl",
+    "art": "salad",
     "source": "salaty",
     "ingredients": [
       {
@@ -2690,7 +2690,7 @@
     "level": "Легко",
     "servings": 4,
     "portionLabel": "3 котлеты",
-    "art": "plate",
+    "art": "cutlets",
     "source": "kotlety",
     "ingredients": [
       {
@@ -2731,7 +2731,7 @@
     "timeMinutes": 35,
     "level": "Средне",
     "servings": 3,
-    "art": "pan",
+    "art": "cutlets",
     "source": "kotlety",
     "ingredients": [
       {
@@ -2776,7 +2776,7 @@
     "timeMinutes": 30,
     "level": "Легко",
     "servings": 3,
-    "art": "plate",
+    "art": "cutlets",
     "source": "kotlety",
     "ingredients": [
       {
@@ -2817,7 +2817,7 @@
     "timeMinutes": 40,
     "level": "Легко",
     "servings": 3,
-    "art": "fish",
+    "art": "cutlets",
     "source": "kotlety",
     "ingredients": [
       {
@@ -2862,7 +2862,7 @@
     "timeMinutes": 25,
     "level": "Легко",
     "servings": 2,
-    "art": "pan",
+    "art": "cutlets",
     "source": "kotlety",
     "ingredients": [
       {
@@ -2907,7 +2907,7 @@
     "timeMinutes": 25,
     "level": "Средне",
     "servings": 3,
-    "art": "bowl",
+    "art": "salad",
     "source": "pechen",
     "ingredients": [
       {
@@ -2973,7 +2973,7 @@
     "timeMinutes": 30,
     "level": "Легко",
     "servings": 4,
-    "art": "pan",
+    "art": "pot",
     "source": "pechen",
     "ingredients": [
       {
@@ -3081,7 +3081,7 @@
     "timeMinutes": 35,
     "level": "Легко",
     "servings": 1,
-    "art": "cake",
+    "art": "casserole",
     "source": "tunec",
     "ingredients": [
       {
@@ -3201,7 +3201,7 @@
     "level": "Средне",
     "servings": 4,
     "portionLabel": "1 кусок",
-    "art": "cake",
+    "art": "casserole",
     "source": "zapekanki",
     "ingredients": [
       {
@@ -3264,7 +3264,7 @@
     "level": "Легко",
     "servings": 4,
     "portionLabel": "1 кусок",
-    "art": "cake",
+    "art": "casserole",
     "source": "zapekanki",
     "ingredients": [
       {
@@ -3322,7 +3322,7 @@
     "level": "Легко",
     "servings": 4,
     "portionLabel": "1 кусок",
-    "art": "cake",
+    "art": "casserole",
     "source": "zapekanki",
     "ingredients": [
       {
@@ -3375,7 +3375,7 @@
     "timeMinutes": 40,
     "level": "Легко",
     "servings": 3,
-    "art": "plate",
+    "art": "cutlets",
     "source": "tvorog",
     "ingredients": [
       {
@@ -3549,7 +3549,7 @@
     "timeMinutes": 25,
     "level": "Легко",
     "servings": 2,
-    "art": "plate",
+    "art": "spirals",
     "source": "prostye",
     "ingredients": [
       {
@@ -3695,7 +3695,7 @@
     "level": "Легко",
     "servings": 4,
     "portionLabel": "2 маффина",
-    "art": "cookies",
+    "art": "muffin",
     "source": "perekus",
     "ingredients": [
       {
@@ -3953,7 +3953,7 @@
     "timeMinutes": 15,
     "level": "Легко",
     "servings": 2,
-    "art": "bowl",
+    "art": "salad",
     "source": "salaty",
     "ingredients": [
       {
@@ -3995,7 +3995,7 @@
     "level": "Легко",
     "servings": 6,
     "portionLabel": "1 кусок",
-    "art": "cake",
+    "art": "pie",
     "source": "tvorog",
     "ingredients": [
       {
@@ -4045,7 +4045,7 @@
     "level": "Легко",
     "servings": 10,
     "portionLabel": "1 ломтик",
-    "art": "toast",
+    "art": "bread",
     "source": "duhovka",
     "ingredients": [
       {
@@ -4089,7 +4089,7 @@
     "level": "Легко",
     "servings": 6,
     "portionLabel": "2 шарика",
-    "art": "cookies",
+    "art": "balls",
     "source": "perekus",
     "ingredients": [
       {
@@ -4178,7 +4178,7 @@
     "level": "Средне",
     "servings": 8,
     "portionLabel": "1 пирожное",
-    "art": "cookies",
+    "art": "balls",
     "source": "deserty",
     "ingredients": [
       {
@@ -4278,7 +4278,7 @@
     "timeNote": "+ 2–3 часа в холодильнике",
     "level": "Средне",
     "servings": 4,
-    "art": "glass",
+    "art": "mousse",
     "source": "deserty",
     "ingredients": [
       {
@@ -4332,7 +4332,7 @@
     "timeNote": "+ 6 часов в холодильнике",
     "level": "Сложно",
     "servings": 6,
-    "art": "cake",
+    "art": "cakeslice",
     "source": "deserty",
     "ingredients": [
       {
@@ -4411,7 +4411,7 @@
     "timeNote": "+ 3–4 часа заморозки",
     "level": "Легко",
     "servings": 3,
-    "art": "glass",
+    "art": "mousse",
     "source": "bezsahara",
     "ingredients": [
       {
@@ -4443,7 +4443,7 @@
     "level": "Средне",
     "servings": 10,
     "portionLabel": "1 кусок",
-    "art": "cake",
+    "art": "cakeslice",
     "source": "bezsahara",
     "ingredients": [
       {
@@ -4587,7 +4587,7 @@
     "level": "Средне",
     "servings": 4,
     "portionLabel": "2 моти",
-    "art": "cookies",
+    "art": "balls",
     "source": "bezsahara",
     "ingredients": [
       {
@@ -5029,7 +5029,7 @@
     "level": "Легко",
     "servings": 4,
     "portionLabel": "2 маффина",
-    "art": "cookies",
+    "art": "muffin",
     "source": "vypechka",
     "ingredients": [
       {
@@ -5135,7 +5135,7 @@
     "timeMinutes": 25,
     "level": "Средне",
     "servings": 4,
-    "art": "cake",
+    "art": "mousse",
     "source": "vypechka",
     "ingredients": [
       {
@@ -5194,7 +5194,7 @@
     "level": "Легко",
     "servings": 6,
     "portionLabel": "1 кусок",
-    "art": "cake",
+    "art": "pie",
     "source": "yabloki",
     "ingredients": [
       {
@@ -5281,7 +5281,7 @@
     "level": "Легко",
     "servings": 8,
     "portionLabel": "1 квадрат",
-    "art": "cake",
+    "art": "cakeslice",
     "source": "yabloki",
     "ingredients": [
       {
@@ -5323,7 +5323,7 @@
     "level": "Легко",
     "servings": 4,
     "portionLabel": "2 кекса",
-    "art": "cookies",
+    "art": "muffin",
     "source": "duhovka",
     "ingredients": [
       {
@@ -5370,7 +5370,7 @@
     "level": "Средне",
     "servings": 8,
     "portionLabel": "1 кусок",
-    "art": "cake",
+    "art": "cakeslice",
     "source": "pohudenie",
     "ingredients": [
       {
@@ -5418,7 +5418,7 @@
     "level": "Легко",
     "servings": 6,
     "portionLabel": "1 кусок",
-    "art": "cake",
+    "art": "casserole",
     "source": "zapekanki",
     "ingredients": [
       {
@@ -5476,7 +5476,7 @@
     "level": "Средне",
     "servings": 4,
     "portionLabel": "1 ватрушка",
-    "art": "cake",
+    "art": "pie",
     "source": "tvorog",
     "ingredients": [
       {
