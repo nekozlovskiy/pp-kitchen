@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { categoryLabel, ingredientMap, recipeMap, servingMacros } from "../data";
+import { categoryLabel, ingredientMap, recipeMap, servingMacros, sources } from "../data";
 import { macroPercents, round } from "../lib/nutrition";
 import { scaleIngredients } from "../lib/nutrition";
 import { formatAmount, formatTime, servingsLabel } from "../lib/format";
@@ -148,6 +148,16 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
           <p className="tip__label">Совет</p>
           <p>{recipe.tip}</p>
         </aside>
+      )}
+
+      {sources[recipe.source] && (
+        <p className="source">
+          Рецепт из подборки «
+          <a href={sources[recipe.source].url} target="_blank" rel="noopener noreferrer">
+            {sources[recipe.source].title}
+          </a>
+          », {sources[recipe.source].site}, автор {sources[recipe.source].author}. КБЖУ посчитано нами по составу.
+        </p>
       )}
     </article>
   );

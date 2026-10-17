@@ -32,7 +32,7 @@ function Masthead() {
         <path d="M2 12c22-10 40 6 62-2s38-10 60 0 40 6 62-2 46-8 70 2" fill="none" stroke="var(--accent)" strokeWidth="3" strokeLinecap="round" />
       </svg>
       <p className="masthead__lede">
-        {recipes.length} рецептов на каждый день. У каждого блюда посчитаны калории, белки, жиры и углеводы на порцию.
+        {recipes.length} ПП-рецептов из редакционных подборок Леди Mail.ru. У каждого блюда посчитаны калории, белки, жиры и углеводы на порцию.
       </p>
     </div>
   );

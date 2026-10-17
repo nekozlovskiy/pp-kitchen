@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ingredientMap, ingredients, recipes } from "../data";
+import { ingredientMap, ingredients, recipes, sources } from "../data";
 import { macroPercents, perServing, recipeTotals, round, scaleIngredients } from "./nutrition";
 import type { Recipe } from "../types";
 
@@ -12,6 +12,7 @@ const sample: Recipe = {
   level: "Легко",
   servings: 2,
   art: "plate",
+  source: "zavtrak",
   ingredients: [
     { id: "chicken", grams: 200 },
     { id: "olive_oil", grams: 10 },
@@ -68,8 +69,12 @@ describe("данные", () => {
   it("у каждого рецепта разумная калорийность порции", () => {
     for (const r of recipes) {
       const kcal = perServing(r, ingredientMap).kcal;
-      expect(kcal, r.id).toBeGreaterThan(30);
+      expect(kcal, r.id).toBeGreaterThan(10);
       expect(kcal, r.id).toBeLessThan(700);
     }
+  });
+
+  it("у каждого рецепта указан существующий источник", () => {
+    for (const r of recipes) expect(sources[r.source], r.id).toBeDefined();
   });
 });

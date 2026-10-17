@@ -40,4 +40,8 @@ export type Recipe = {
   tip?: string;
   image?: string;
   art: ArtKind;
+  /** Ключ в sources.json: откуда взят состав рецепта */
+  source: string;
 };
+
+export type Source = { site: string; title: string; author: string; date: string; url: string };

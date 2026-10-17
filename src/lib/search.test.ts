@@ -13,8 +13,8 @@ describe("поиск", () => {
 
   it("«курица» находит блюда с куриной грудкой, но не всё, где есть яйцо", () => {
     const res = find("курица");
-    expect(res).toContain("caesar");
-    expect(res).not.toContain("syrniki");
+    expect(res).toContain("shawarma-lettuce");
+    expect(res).not.toContain("rice-syrniki-oven");
   });
 
   it("ищет с начала слова", () => {
@@ -23,14 +23,14 @@ describe("поиск", () => {
   });
 
   it("понимает формы слов", () => {
-    expect(find("творога")).toContain("syrniki");
+    expect(find("творога")).toContain("rice-syrniki-oven");
     expect(find("яблоки")).toContain("pp-charlotte");
-    expect(find("индейку")).toContain("turkey-plov");
+    expect(find("индейку")).toContain("chopped-turkey-cutlets");
   });
 
   it("несколько слов сужают выдачу", () => {
-    const res = find("суп тыква");
-    expect(res).toContain("pumpkin-soup");
-    expect(res).not.toContain("borscht");
+    const res = find("суп треска");
+    expect(res).toContain("cod-soup");
+    expect(res).not.toContain("mushroom-cream-soup");
   });
 });
