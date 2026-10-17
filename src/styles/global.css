@@ -960,6 +960,8 @@ i.dot::before {
   color: var(--ink);
   font-size: 15px;
   line-height: 1.3;
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 
 .nutrition {
