@@ -13,7 +13,7 @@ import { useStore } from "../hooks/useStore";
 import type { Recipe } from "../types";
 
 function RecipeBody({ recipe }: { recipe: Recipe }) {
-  const { addToDay, showToast } = useStore();
+  const { addToDay, addToShopping, showToast } = useStore();
   const [servings, setServings] = useState(recipe.servings);
   const [checked, setChecked] = useState<Set<number>>(new Set());
   const m = round(servingMacros[recipe.id]);
@@ -122,6 +122,21 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
             );
           })}
         </ul>
+        <div className="recipe__tools">
+          <button
+            type="button"
+            className="btn btn--ghost"
+            onClick={() => {
+              addToShopping(recipe.id, servings);
+              showToast(`Продукты на ${servingsLabel(servings)} добавлены в покупки`);
+            }}
+          >
+            В покупки
+          </button>
+          <button type="button" className="btn btn--text" onClick={() => window.print()}>
+            Распечатать
+          </button>
+        </div>
         {recipe.extras?.length ? (
           <ul className="extras">
             {recipe.extras.map((e) => (

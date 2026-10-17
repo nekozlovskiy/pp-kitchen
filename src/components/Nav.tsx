@@ -1,12 +1,18 @@
 import { NavLink } from "react-router-dom";
 import { useStore } from "../hooks/useStore";
 
-function Icon({ name }: { name: "book" | "heart" | "sun" }) {
+function Icon({ name }: { name: "book" | "heart" | "sun" | "bag" }) {
   const p = { fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" } as const;
   if (name === "book")
     return (
       <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
         <path {...p} d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5Z M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5Z" />
+      </svg>
+    );
+  if (name === "bag")
+    return (
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path {...p} d="M5 8h14l-1.2 11.2A2 2 0 0 1 15.8 21H8.2a2 2 0 0 1-2-1.8Z M9 8V6.5a3 3 0 0 1 6 0V8" />
       </svg>
     );
   if (name === "heart")
@@ -24,7 +30,7 @@ function Icon({ name }: { name: "book" | "heart" | "sun" }) {
 }
 
 export function Nav() {
-  const { favorites, day } = useStore();
+  const { favorites, day, shopping } = useStore();
   const portions = day.reduce((a, x) => a + x.servings, 0);
   return (
     <nav className="nav" aria-label="Разделы">
@@ -41,6 +47,11 @@ export function Nav() {
         <Icon name="sun" />
         <span>Мой день</span>
         {portions > 0 && <b className="nav__badge">{portions}</b>}
+      </NavLink>
+      <NavLink to="/shopping" className="nav__link">
+        <Icon name="bag" />
+        <span>Покупки</span>
+        {shopping.items.length > 0 && <b className="nav__badge">{shopping.items.length}</b>}
       </NavLink>
     </nav>
   );

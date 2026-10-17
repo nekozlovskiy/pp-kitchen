@@ -130,7 +130,7 @@ button {
   right: 0;
   bottom: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   height: calc(var(--nav-h) + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
   background: color-mix(in srgb, var(--surface) 88%, transparent);
@@ -1077,6 +1077,14 @@ i.dot::before {
   color: var(--muted);
 }
 
+.recipe__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
 .extras {
   margin-top: 14px;
   display: grid;
@@ -1344,6 +1352,113 @@ i.dot::before {
 @media (min-width: 900px) {
   .toast-region {
     bottom: 28px;
+  }
+}
+
+/* ---------- Покупки ---------- */
+
+.shopping {
+  padding-bottom: 48px;
+}
+.shopping__layout {
+  display: grid;
+  gap: 32px;
+}
+@media (min-width: 900px) {
+  .shopping__layout {
+    grid-template-columns: 1fr 1.2fr;
+    align-items: start;
+    gap: 48px;
+  }
+}
+.shopping__h {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+}
+.shopping__list .recipe__section-head .shopping__h {
+  margin-bottom: 0;
+}
+.shopping__left {
+  font-family: var(--font-text);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-left: 6px;
+}
+.shopping__list {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  padding: 22px;
+}
+.shopping__extras {
+  margin: 16px 0 20px;
+  color: var(--muted);
+  font-size: 15px;
+}
+.shopping__extras b {
+  color: var(--ink);
+}
+
+/* ---------- Печать рецепта ---------- */
+
+@media print {
+  body {
+    background: #fff;
+    color: #000;
+    padding: 0;
+  }
+  body::before,
+  .skip,
+  .topbar,
+  .nav,
+  .footer,
+  .toast-region,
+  .sheet__backdrop,
+  .sheet__grip,
+  .sheet__close,
+  .recipe__actions,
+  .recipe__tools,
+  .stepper,
+  .ingredients input {
+    display: none !important;
+  }
+  /* Под листом рецепта лежит каталог — при печати оставляем только рецепт */
+  body:has(.sheet) #content > :not(.sheet) {
+    display: none !important;
+  }
+  .sheet {
+    position: static;
+    display: block;
+  }
+  .sheet__panel {
+    max-height: none;
+    overflow: visible;
+    width: 100%;
+    padding: 0;
+    background: #fff;
+    border-radius: 0;
+    animation: none;
+  }
+  .recipe__art {
+    width: 160px;
+  }
+  .nutrition,
+  .recipe__facts li,
+  .tip {
+    background: none;
+    border: 1px solid #ccc;
+  }
+  .steps li,
+  .ingredients li,
+  .tip {
+    break-inside: avoid;
+  }
+  .source a::after {
+    content: " (" attr(href) ")";
+    font-size: 11px;
   }
 }
 

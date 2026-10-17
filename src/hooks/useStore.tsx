@@ -7,6 +7,7 @@ import { recipeMap } from "../data";
 
 export type DayItem = { id: string; servings: number };
 type DayState = { date: string; items: DayItem[] };
+export type ShoppingState = { items: DayItem[]; checked: string[] };
 
 type Store = {
   favorites: Set<string>;
@@ -18,6 +19,12 @@ type Store = {
   clearDay: () => void;
   goal: number;
   setGoal: (kcal: number) => void;
+  shopping: ShoppingState;
+  addToShopping: (id: string, servings: number) => void;
+  setShoppingServings: (index: number, servings: number) => void;
+  removeFromShopping: (index: number) => void;
+  toggleBought: (ingredientId: string) => void;
+  clearShopping: () => void;
   toast: string | null;
   showToast: (msg: string) => void;
 };
@@ -36,9 +43,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
   const [day, setDay] = useState<DayItem[]>(loadDay);
   const [goal, setGoalState] = useState<number>(() => readJSON<number>("pp.goal", config.defaultGoalKcal));
+  const [shopping, setShopping] = useState<ShoppingState>(() => {
+    const saved = readJSON<ShoppingState>("pp.shopping", { items: [], checked: [] });
+    return {
+      items: Array.isArray(saved.items) ? saved.items.filter((i) => recipeMap[i.id] && i.servings > 0) : [],
+      checked: Array.isArray(saved.checked) ? saved.checked : [],
+    };
+  });
   const [toast, setToast] = useState<string | null>(null);
   const timer = useRef<number | undefined>(undefined);
 
+  useEffect(() => writeJSON("pp.shopping", shopping), [shopping]);
   useEffect(() => writeJSON("pp.favorites", [...favorites]), [favorites]);
   useEffect(() => writeJSON("pp.day", { date: todayKey(), items: day }), [day]);
   useEffect(() => writeJSON("pp.goal", goal), [goal]);
@@ -78,10 +93,29 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       clearDay: () => setDay([]),
       goal,
       setGoal: (kcal) => setGoalState(Math.max(800, Math.min(5000, Math.round(kcal) || config.defaultGoalKcal))),
+      shopping,
+      addToShopping: (id, servings) =>
+        setShopping((s) => {
+          const i = s.items.findIndex((x) => x.id === id);
+          const items =
+            i === -1 ? [...s.items, { id, servings }] : s.items.map((x, j) => (j === i ? { ...x, servings: x.servings + servings } : x));
+          return { ...s, items };
+        }),
+      setShoppingServings: (index, servings) =>
+        setShopping((s) => ({ ...s, items: s.items.map((x, j) => (j === index ? { ...x, servings } : x)) })),
+      removeFromShopping: (index) => setShopping((s) => ({ ...s, items: s.items.filter((_, j) => j !== index) })),
+      toggleBought: (ingredientId) =>
+        setShopping((s) => ({
+          ...s,
+          checked: s.checked.includes(ingredientId)
+            ? s.checked.filter((c) => c !== ingredientId)
+            : [...s.checked, ingredientId],
+        })),
+      clearShopping: () => setShopping({ items: [], checked: [] }),
       toast,
       showToast,
     }),
-    [favorites, toggleFavorite, day, addToDay, goal, toast, showToast],
+    [favorites, toggleFavorite, day, addToDay, goal, shopping, toast, showToast],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
