@@ -24,5 +24,8 @@
   "prostye": { "site": "Леди Mail.ru", "title": "7 простых рецептов для похудения на каждый день", "author": "Дарья Мокина", "date": "2026-06-12", "url": "https://lady.mail.ru/article/589686-prostye-retsepty-dlya-pokhudeniya-na-kazhdyj-den/" },
   "kuritsa": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов с курицей", "author": "Екатерина Королятина", "date": "2026-05-04", "url": "https://lady.mail.ru/article/587557-luchshie-pp-retsepty-s-kuritsej/" },
   "obed": { "site": "Леди Mail.ru", "title": "5 лучших рецептов ПП-обеда", "author": "Дарья Мокина", "date": "2026-07-23", "url": "https://lady.mail.ru/article/593183-luchshie-retsepty-pp-obeda/" },
-  "uzhiny": { "site": "Леди Mail.ru", "title": "7 лучших рецептов белковых ужинов", "author": "Дарья Мокина", "date": "2026-06-23", "url": "https://lady.mail.ru/article/591021-luchshie-retsepty-belkovykh-uzhinov/" }
+  "uzhiny": { "site": "Леди Mail.ru", "title": "7 лучших рецептов белковых ужинов", "author": "Дарья Мокина", "date": "2026-06-23", "url": "https://lady.mail.ru/article/591021-luchshie-retsepty-belkovykh-uzhinov/" },
+  "salaty_pp": { "site": "Леди Mail.ru", "title": "5 лучших рецептов ПП-салатов", "author": "Екатерина Королятина", "date": "2026-03-17", "url": "https://lady.mail.ru/article/584364-luchshie-retsepty-pp-salatov/" },
+  "zakuski": { "site": "Леди Mail.ru", "title": "5 лучших рецептов ПП-закусок", "author": "Екатерина Королятина", "date": "2026-05-20", "url": "https://lady.mail.ru/article/588657-luchshie-retsepty-pp-zakusok/" },
+  "yagody": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов с ягодами", "author": "Дарья Мокина", "date": "2026-07-27", "url": "https://lady.mail.ru/article/593393-luchshie-pp-retsepty-s-yagodami/" }
 }
