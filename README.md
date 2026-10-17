@@ -1,6 +1,6 @@
 # ПП-кухня
 
-Журнал ПП-рецептов для Анюты: 106 блюд, у каждого калории, белки, жиры и углеводы на порцию. Vite + React + TypeScript, данные в JSON, без бэкенда.
+Журнал ПП-рецептов для Анюты: 120 блюд, у каждого калории, белки, жиры и углеводы на порцию. Vite + React + TypeScript, данные в JSON, без бэкенда.
 
 ## Запуск
 
@@ -48,7 +48,7 @@ npm run build    # сборка в dist/
 
    - `category`: `breakfast`, `lunch`, `dinner`, `snack`, `dessert`.
    - `level`: `Легко`, `Средне`, `Сложно`.
-   - `art`: иллюстрация: `plate`, `bowl`, `soup`, `glass`, `jar`, `pan`, `cake`, `cookies`, `roll`, `toast`, `pancakes`, `fish`.
+   - `art`: иллюстрация: `plate`, `bowl`, `soup`, `glass`, `jar`, `pan`, `cake`, `cookies`, `roll`, `toast`, `pancakes`, `fish`, `salad`, `cutlets`, `muffin`, `pie`, `cakeslice`, `balls`, `eggs`, `spirals`, `pot`, `casserole`, `bread`, `mousse`.
    - Необязательные поля: `timeNote` (например `"+ ночь в холодильнике"`), `portionLabel` (`"2 котлеты"`), `image` (путь к фото в `public/img`).
    - `source`: ключ из `src/data/sources.json`. Если рецепт из новой статьи, сначала добавьте её туда (сайт, название, автор, дата, ссылка).
    - Соль, специи и всё «по вкусу» пишите в `extras`: они не участвуют в расчёте.

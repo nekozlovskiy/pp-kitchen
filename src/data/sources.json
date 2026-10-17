@@ -21,5 +21,8 @@
   "tunec": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов с тунцом", "author": "Дарья Мокина", "date": "2026-05-14", "url": "https://lady.mail.ru/article/588164-luchshie-pp-retsepty-s-tuntsom/" },
   "ris": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов с рисом", "author": "Дарья Мокина", "date": "2026-06-11", "url": "https://lady.mail.ru/article/589681-luchshie-pp-retsepty-s-risom/" },
   "grechka": { "site": "Леди Mail.ru", "title": "5 лучших рецептов блюд из гречки", "author": "Екатерина Королятина", "date": "2026-02-18", "url": "https://lady.mail.ru/article/582391-luchshie-retsepty-blyud-iz-grechki/" },
-  "prostye": { "site": "Леди Mail.ru", "title": "7 простых рецептов для похудения на каждый день", "author": "Дарья Мокина", "date": "2026-06-12", "url": "https://lady.mail.ru/article/589686-prostye-retsepty-dlya-pokhudeniya-na-kazhdyj-den/" }
+  "prostye": { "site": "Леди Mail.ru", "title": "7 простых рецептов для похудения на каждый день", "author": "Дарья Мокина", "date": "2026-06-12", "url": "https://lady.mail.ru/article/589686-prostye-retsepty-dlya-pokhudeniya-na-kazhdyj-den/" },
+  "kuritsa": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов с курицей", "author": "Екатерина Королятина", "date": "2026-05-04", "url": "https://lady.mail.ru/article/587557-luchshie-pp-retsepty-s-kuritsej/" },
+  "obed": { "site": "Леди Mail.ru", "title": "5 лучших рецептов ПП-обеда", "author": "Дарья Мокина", "date": "2026-07-23", "url": "https://lady.mail.ru/article/593183-luchshie-retsepty-pp-obeda/" },
+  "uzhiny": { "site": "Леди Mail.ru", "title": "7 лучших рецептов белковых ужинов", "author": "Дарья Мокина", "date": "2026-06-23", "url": "https://lady.mail.ru/article/591021-luchshie-retsepty-belkovykh-uzhinov/" }
 }
