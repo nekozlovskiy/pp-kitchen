@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useStore } from "../hooks/useStore";
 
-function Icon({ name }: { name: "book" | "heart" | "sun" | "bag" }) {
+function Icon({ name }: { name: "book" | "heart" | "sun" | "bag" | "week" }) {
   const p = { fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" } as const;
   if (name === "book")
     return (
@@ -13,6 +13,12 @@ function Icon({ name }: { name: "book" | "heart" | "sun" | "bag" }) {
     return (
       <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
         <path {...p} d="M5 8h14l-1.2 11.2A2 2 0 0 1 15.8 21H8.2a2 2 0 0 1-2-1.8Z M9 8V6.5a3 3 0 0 1 6 0V8" />
+      </svg>
+    );
+  if (name === "week")
+    return (
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path {...p} d="M5 6h14a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z M4 10h16 M8 3.5V7 M16 3.5V7 M8 14h2 M14 14h2 M8 17h2" />
       </svg>
     );
   if (name === "heart")
@@ -30,7 +36,8 @@ function Icon({ name }: { name: "book" | "heart" | "sun" | "bag" }) {
 }
 
 export function Nav() {
-  const { favorites, day, shopping } = useStore();
+  const { favorites, day, shopping, week } = useStore();
+  const plannedDays = week.filter((d) => d.length).length;
   // Число блюд за день: порции бывают дробными, когда вес вводится в граммах.
   const portions = day.length;
   return (
@@ -48,6 +55,11 @@ export function Nav() {
         <Icon name="sun" />
         <span>Мой день</span>
         {portions > 0 && <b className="nav__badge">{portions}</b>}
+      </NavLink>
+      <NavLink to="/week" className="nav__link">
+        <Icon name="week" />
+        <span>Неделя</span>
+        {plannedDays > 0 && <b className="nav__badge">{plannedDays}</b>}
       </NavLink>
       <NavLink to="/shopping" className="nav__link">
         <Icon name="bag" />

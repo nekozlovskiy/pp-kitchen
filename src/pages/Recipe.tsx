@@ -16,10 +16,11 @@ import { CookMode } from "../components/CookMode";
 import { RecipeJournal } from "../components/RecipeJournal";
 import { StepText } from "../components/StepText";
 import { ReelEmbed } from "../components/ReelEmbed";
+import { WEEKDAYS } from "./Week";
 import type { Recipe } from "../types";
 
 function RecipeBody({ recipe }: { recipe: Recipe }) {
-  const { addToDay, addToShopping, showToast, journal, swaps, toggleSwap, servingFor } = useStore();
+  const { addToDay, addToShopping, addToWeek, showToast, journal, swaps, toggleSwap, servingFor } = useStore();
   const [servings, setServings] = useState(recipe.servings);
   const [checked, setChecked] = useState<Set<number>>(new Set());
   const [keepAwake, setKeepAwake] = useState(false);
@@ -176,6 +177,25 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
           >
             В покупки
           </button>
+          <label className="select select--week">
+            <span className="visually-hidden">Добавить в меню недели</span>
+            <select
+              value=""
+              onChange={(e) => {
+                const d = Number(e.target.value);
+                if (e.target.value === "") return;
+                addToWeek(d, recipe.id, 1);
+                showToast(`Добавлено в меню: ${WEEKDAYS[d].toLowerCase()}`);
+              }}
+            >
+              <option value="">В меню недели…</option>
+              {WEEKDAYS.map((name, d) => (
+                <option key={name} value={d}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </label>
           <button type="button" className="btn btn--text" onClick={() => window.print()}>
             Распечатать
           </button>

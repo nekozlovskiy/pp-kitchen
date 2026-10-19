@@ -51,6 +51,12 @@ type Store = {
   toggleSwap: (recipeId: string, key: string) => void;
   /** КБЖУ порции с учётом замен. */
   servingFor: (recipeId: string) => Macros;
+  /** Меню на неделю: семь списков блюд, понедельник — первый. */
+  week: DayItem[][];
+  addToWeek: (day: number, id: string, servings?: number) => void;
+  removeFromWeek: (day: number, index: number) => void;
+  setWeek: (days: DayItem[][]) => void;
+  clearWeek: () => void;
 };
 
 const Ctx = createContext<Store | null>(null);
@@ -101,7 +107,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => writeJSON("pp.exclude", exclude), [exclude]);
   useEffect(() => writeJSON("pp.pantry", pantry), [pantry]);
   useEffect(() => writeJSON("pp.proteinGoal", proteinGoal), [proteinGoal]);
+  const [week, setWeekState] = useState<DayItem[][]>(() => {
+    const saved = readJSON<DayItem[][]>("pp.week", []);
+    return Array.from({ length: 7 }, (_, d) =>
+      Array.isArray(saved?.[d]) ? saved[d].filter((x) => x && recipeMap[x.id] && x.servings > 0) : [],
+    );
+  });
   useEffect(() => writeJSON("pp.swaps", swaps), [swaps]);
+  useEffect(() => writeJSON("pp.week", week), [week]);
   useEffect(() => writeJSON("pp.shopping", shopping), [shopping]);
   useEffect(() => writeJSON("pp.favorites", [...favorites]), [favorites]);
   useEffect(() => writeJSON("pp.day", { date: todayKey(), items: day }), [day]);
@@ -182,10 +195,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           const cur = s[recipeId] ?? [];
           return { ...s, [recipeId]: cur.includes(key) ? cur.filter((k) => k !== key) : [...cur, key] };
         }),
+      week,
+      addToWeek: (d, id, servings = 1) => setWeekState((w) => w.map((items, j) => (j === d ? [...items, { id, servings }] : items))),
+      removeFromWeek: (d, index) => setWeekState((w) => w.map((items, j) => (j === d ? items.filter((_, k) => k !== index) : items))),
+      setWeek: (days) => setWeekState(Array.from({ length: 7 }, (_, d) => days[d] ?? [])),
+      clearWeek: () => setWeekState(Array.from({ length: 7 }, () => [])),
       servingFor: (recipeId) =>
         swaps[recipeId]?.length ? perServing(applySwaps(recipeMap[recipeId], swaps[recipeId]), ingredientMap) : servingMacros[recipeId],
     }),
-    [favorites, toggleFavorite, day, addToDay, goal, shopping, toast, showToast, journal, exclude, pantry, proteinGoal, swaps],
+    [favorites, toggleFavorite, day, addToDay, goal, shopping, toast, showToast, journal, exclude, pantry, proteinGoal, swaps, week],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

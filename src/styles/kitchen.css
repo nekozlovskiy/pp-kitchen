@@ -758,3 +758,102 @@
     display: none;
   }
 }
+
+/* ---------- Меню на неделю ---------- */
+
+.week__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 18px 0 22px;
+}
+.week__days {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 760px) {
+  .week__days {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.week__day {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.week__day.is-today {
+  border-color: var(--accent);
+}
+.week__day-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+.week__day-head h2 {
+  font-size: 17px;
+}
+.week__today {
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+.week__kcal {
+  font-weight: 700;
+  white-space: nowrap;
+}
+.week__list {
+  margin: 10px 0 4px;
+  padding: 0;
+  list-style: none;
+}
+.week__list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 8px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+.week__list a {
+  color: var(--ink);
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+.week__meta {
+  grid-column: 1;
+  font-size: 13px;
+  color: var(--muted);
+}
+.week__remove {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  font-size: 22px;
+  cursor: pointer;
+}
+.week__remove:hover {
+  background: var(--bg);
+  color: var(--ink);
+}
+.week__empty {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.select--week select {
+  min-height: 44px;
+}
