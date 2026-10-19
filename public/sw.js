@@ -1,5 +1,5 @@
 // Офлайн-режим: страницы — сначала сеть, затем кэш; файлы сайта и шрифты — из кэша.
-const CACHE = "pp-kitchen-v1";
+const CACHE = "pp-kitchen-v2";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(["./", "./index.html", "./manifest.webmanifest", "./favicon.svg"])));
@@ -26,14 +26,22 @@ async function fromCacheOrNetwork(request) {
   return response;
 }
 
+// Страница из сети, но не дольше 4 секунд; ошибки хостинга (404, 503) в кэш не попадают.
 async function networkFirstPage(request) {
+  const cached = () => caches.match("./index.html");
   try {
-    const response = await fetch(request);
-    const copy = response.clone();
-    caches.open(CACHE).then((c) => c.put("./index.html", copy));
-    return response;
+    const response = await Promise.race([
+      fetch(request),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 4000)),
+    ]);
+    if (response.ok) {
+      const copy = response.clone();
+      caches.open(CACHE).then((c) => c.put("./index.html", copy));
+      return response;
+    }
+    return (await cached()) ?? response;
   } catch {
-    return (await caches.match("./index.html")) ?? Response.error();
+    return (await cached()) ?? fetch(request);
   }
 }
 

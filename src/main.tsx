@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { HashRouter } from "react-router-dom";
 import { App } from "./App";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { StoreProvider } from "./hooks/useStore";
 import { TimersProvider } from "./hooks/useTimers";
 import "./styles/tokens.css";
@@ -19,12 +20,14 @@ if (import.meta.env.PROD && "serviceWorker" in navigator) {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <HashRouter>
-      <StoreProvider>
-        <TimersProvider>
-          <App />
-        </TimersProvider>
-      </StoreProvider>
-    </HashRouter>
+    <ErrorBoundary>
+      <HashRouter>
+        <StoreProvider>
+          <TimersProvider>
+            <App />
+          </TimersProvider>
+        </StoreProvider>
+      </HashRouter>
+    </ErrorBoundary>
   </StrictMode>,
 );
