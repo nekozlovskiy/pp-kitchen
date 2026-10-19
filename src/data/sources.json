@@ -75,5 +75,10 @@
   "fr_uzhin_figura": { "site": "Food.ru", "title": "Что съесть на ужин без вреда для фигуры", "author": "редакция Food.ru", "date": "2026-03-16", "url": "https://food.ru/articles/12478-chto-sest-na-uzhin-bez-vreda-dlya-figury" },
   "fr_legkij_uzhin": { "site": "Food.ru", "title": "10 рецептов для легкого ужина", "author": "Екатерина Морголь", "date": "2026-04-22", "url": "https://food.ru/articles/5761-7-receptov-dlja-legkogo-uzhina" },
   "fr_top10": { "site": "Food.ru", "title": "Топ-10 простых ПП-рецептов", "author": "Гюзель Аглиуллина", "date": "2022-02-01", "url": "https://food.ru/articles/6153-top-10-prostyh-pp-receptov" },
-  "fr_postnye": { "site": "Food.ru", "title": "Постные ПП-обеды", "author": "редакция Food.ru", "date": "2022-12-16", "url": "https://food.ru/articles/6643-postnye-pp-obedy" }
+  "fr_postnye": { "site": "Food.ru", "title": "Постные ПП-обеды", "author": "редакция Food.ru", "date": "2022-12-16", "url": "https://food.ru/articles/6643-postnye-pp-obedy" },
+  "gs_zavtraki": { "site": "Гастроном.ру", "title": "Вкусные ПП-завтраки: 10 рецептов на каждый день", "author": "Лариса Мариночкина", "date": "2025-10-01", "url": "https://www.gastronom.ru/text/vkusnye-pp-zavtraki-10-receptov-na-kazhdyj-den-1027061" },
+  "gs_obedy": { "site": "Гастроном.ру", "title": "ПП-обеды: 10 рецептов полезных и вкусных блюд", "author": "Роман Рыжов", "date": "2025-08-28", "url": "https://www.gastronom.ru/text/pp-obedy-10-receptov-poleznyh-i-vkusnyh-blyud-1026834" },
+  "gs_uzhiny": { "site": "Гастроном.ру", "title": "Низкокалорийные ужины: 10 простых рецептов для похудения", "author": "Роман Рыжов", "date": "2026-04-03", "url": "https://www.gastronom.ru/text/nizkokalorijnye-uzhiny-10-prostyh-receptov-dlya-pohudeniya-1028336" },
+  "gs_supy": { "site": "Гастроном.ру", "title": "Диетические супы без лишних калорий: 10 легких рецептов на каждый день", "author": "Анастасия Разумовская", "date": "2026-03-03", "url": "https://www.gastronom.ru/text/dieticheskie-supy-bez-lishnih-kalorij-10-legkih-receptov-na-kazhdyj-den-1028086" },
+  "gs_salaty": { "site": "Гастроном.ру", "title": "9 рецептов белковых салатов, которые сделают ваш рацион разнообразнее", "author": "Роман Рыжов", "date": "2026-04-01", "url": "https://www.gastronom.ru/text/9-receptov-belkovyh-salatov-kotorye-sdelayut-racion-raznoobraznee-1028440" }
 }
