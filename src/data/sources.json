@@ -33,5 +33,14 @@
   "indejka": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов из индейки", "author": "Екатерина Королятина", "date": "2026-04-22", "url": "https://lady.mail.ru/article/586850-luchshie-pp-retsepty-iz-indejki/" },
   "kabachki": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов из кабачков", "author": "Ирина Юрченко", "date": "2026-04-28", "url": "https://lady.mail.ru/article/587220-luchshie-pp-retsepty-iz-kabachkov/" },
   "krevetki": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов с креветками", "author": "Дарья Мокина", "date": "2026-06-04", "url": "https://lady.mail.ru/article/589253-luchshie-retsepty-pp-retsepty-s-krevetkami/" },
-  "griby": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов с грибами", "author": "Ирина Юрченко", "date": "2026-05-08", "url": "https://lady.mail.ru/article/587902-luchshie-pp-retsepty-s-gribami/" }
+  "griby": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов с грибами", "author": "Ирина Юрченко", "date": "2026-05-08", "url": "https://lady.mail.ru/article/587902-luchshie-pp-retsepty-s-gribami/" },
+  "uzhin400": { "site": "Леди Mail.ru", "title": "5 лучших рецептов ужина на 400 ккал", "author": "Екатерина Королятина", "date": "2026-05-13", "url": "https://lady.mail.ru/article/588094-luchshie-retsepty-uzhina-na-400-kkal/" },
+  "uzhin_hudeem": { "site": "Леди Mail.ru", "title": "6 лучших рецептов ужина для похудения", "author": "Дарья Мокина", "date": "2026-04-27", "url": "https://lady.mail.ru/article/587136-luchshie-retsepty-uzhina-dlya-pokhudeniya/" },
+  "yajca": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов с яйцами", "author": "Екатерина Королятина", "date": "2026-05-04", "url": "https://lady.mail.ru/article/587558-luchshie-pp-retsepty-s-yajtsami/" },
+  "bezmuki": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов без муки", "author": "Дарья Мокина", "date": "2026-06-16", "url": "https://lady.mail.ru/article/590535-luchshie-pp-retsepty-bez-muki/" },
+  "skovoroda": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов на сковороде", "author": "Екатерина Королятина", "date": "2026-05-04", "url": "https://lady.mail.ru/article/587562-luchshie-pp-retsepty-na-skovorode/" },
+  "zavtrak_yajca": { "site": "Леди Mail.ru", "title": "5 лучших рецептов ПП-завтраков с яйцами", "author": "Дарья Мокина", "date": "2026-10-08", "url": "https://lady.mail.ru/article/599599-luchshie-retsepty-pp-zavtrakov-s-yajtsami/" },
+  "oladi": { "site": "Леди Mail.ru", "title": "5 лучших рецептов ПП-оладий", "author": "Дарья Мокина", "date": "2026-03-13", "url": "https://lady.mail.ru/article/584111-luchshie-retsepty-pp-oladij/" },
+  "kurica_ovoshchi": { "site": "Леди Mail.ru", "title": "5 лучших рецептов курицы с овощами", "author": "Ирина Юрченко", "date": "2026-05-13", "url": "https://lady.mail.ru/article/588089-luchshie-retsepty-kuritsy-s-ovoshhami/" },
+  "multivarka": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов в мультиварке", "author": "Ирина Юрченко", "date": "2026-05-07", "url": "https://lady.mail.ru/article/587796-luchshie-pp-retsepty-v-multivarke/" }
 }
