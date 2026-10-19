@@ -25,7 +25,7 @@ const tagged: Record<DietTag, string[]> = {
   dairy: [
     "cottage0", "cottage2", "cottage5", "yogurt", "yogurt0", "yogurt_natural", "kefir", "milk", "milk25",
     "sour_cream", "sour_cream15", "cream10", "dry_milk", "butter", "cheese_light", "cheese_hard", "feta",
-    "mozzarella", "parmesan", "ricotta", "cream_cheese", "suluguni", "protein",
+    "mozzarella", "parmesan", "ricotta", "cream_cheese", "suluguni", "protein", "yogurt_greek_fat", "ryazhenka",
   ],
   egg: ["egg", "egg_white", "egg_yolk", "quail_egg"],
   gluten: [
