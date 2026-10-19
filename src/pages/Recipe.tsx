@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { categoryLabel, ingredientMap, per100Macros, recipeMap, servingMacros, sources } from "../data";
+import { categoryLabel, ingredientMap, per100Macros, portionGrams, recipeMap, servingMacros, sources } from "../data";
 import { macroPercents, round } from "../lib/nutrition";
 import { scaleIngredients } from "../lib/nutrition";
 import { formatAmount, formatTime, servingsLabel } from "../lib/format";
@@ -66,6 +66,7 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
           <li>
             <span>Порция</span>
             <b>{recipe.portionLabel ?? `1 из ${recipe.servings}`}</b>
+            <small>≈ {portionGrams[recipe.id]} г</small>
           </li>
         </ul>
       </header>

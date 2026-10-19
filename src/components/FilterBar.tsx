@@ -4,12 +4,14 @@ import { dietLabels } from "../lib/diet";
 import type { DietTag } from "../lib/diet";
 import { useStore } from "../hooks/useStore";
 
-export type SortKey = "default" | "kcal" | "protein" | "time" | "rating";
+export type SortKey = "default" | "kcal" | "per100" | "protein" | "time" | "rating";
 
 export type Filters = {
   query: string;
   category: Category | "all";
   highProtein: boolean;
+  dense: boolean;
+  videoOnly: boolean;
   quick: boolean;
   favOnly: boolean;
   cookedOnly: boolean;
@@ -23,6 +25,8 @@ export const defaultFilters: Filters = {
   query: "",
   category: "all",
   highProtein: false,
+  dense: false,
+  videoOnly: false,
   quick: false,
   favOnly: false,
   cookedOnly: false,
@@ -70,6 +74,9 @@ export function FilterBar({ value, onChange }: { value: Filters; onChange: (f: F
           <button type="button" className={`toggle ${value.highProtein ? "is-on" : ""}`} aria-pressed={value.highProtein} onClick={() => set("highProtein", !value.highProtein)}>
             Белка от 20 г
           </button>
+          <button type="button" className={`toggle ${value.dense ? "is-on" : ""}`} aria-pressed={value.dense} onClick={() => set("dense", !value.dense)} title="От 10 г белка на каждые 100 ккал">
+            Белковое
+          </button>
           <button type="button" className={`toggle ${value.quick ? "is-on" : ""}`} aria-pressed={value.quick} onClick={() => set("quick", !value.quick)}>
             До 20 минут
           </button>
@@ -78,6 +85,9 @@ export function FilterBar({ value, onChange }: { value: Filters; onChange: (f: F
           </button>
           <button type="button" className={`toggle ${value.cookedOnly ? "is-on" : ""}`} aria-pressed={value.cookedOnly} onClick={() => set("cookedOnly", !value.cookedOnly)}>
             Готовила
+          </button>
+          <button type="button" className={`toggle ${value.videoOnly ? "is-on" : ""}`} aria-pressed={value.videoOnly} onClick={() => set("videoOnly", !value.videoOnly)}>
+            С видео
           </button>
         </div>
 
@@ -121,6 +131,7 @@ export function FilterBar({ value, onChange }: { value: Filters; onChange: (f: F
           <select value={value.sort} onChange={(e) => set("sort", e.target.value as SortKey)}>
             <option value="default">По порядку</option>
             <option value="kcal">Сначала лёгкие</option>
+            <option value="per100">Меньше ккал в 100 г</option>
             <option value="protein">Больше белка</option>
             <option value="time">Быстрее готовить</option>
             <option value="rating">Мои оценки</option>

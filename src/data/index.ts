@@ -2,7 +2,7 @@ import ingredientsJson from "./ingredients.json";
 import recipesJson from "./recipes.json";
 import sourcesJson from "./sources.json";
 import type { Category, Ingredient, Recipe, Source } from "../types";
-import { per100g, perServing } from "../lib/nutrition";
+import { dishWeight, per100g, perServing } from "../lib/nutrition";
 
 export const ingredients = ingredientsJson as Ingredient[];
 export const ingredientMap: Record<string, Ingredient> = Object.fromEntries(
@@ -19,6 +19,17 @@ export const servingMacros = Object.fromEntries(
 
 // КБЖУ на 100 г готового блюда: вес оценивается с приваром круп и ужаркой мяса.
 export const per100Macros = Object.fromEntries(recipes.map((r) => [r.id, per100g(r, ingredientMap)]));
+
+/** Примерный вес одной порции готового блюда, округлённый до 10 г. */
+export const portionGrams: Record<string, number> = Object.fromEntries(
+  recipes.map((r) => [r.id, Math.max(10, Math.round(dishWeight(r) / Math.max(1, r.servings) / 10) * 10)]),
+);
+
+/** Белковое блюдо: от 10 г белка на каждые 100 ккал. */
+export const isProteinDense = (id: string) => {
+  const m = servingMacros[id];
+  return m.kcal > 0 && (m.p / m.kcal) * 100 >= 10;
+};
 
 export const categories: { id: Category; label: string; plural: string }[] = [
   { id: "breakfast", label: "Завтрак", plural: "Завтраки" },

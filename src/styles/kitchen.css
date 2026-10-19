@@ -637,7 +637,7 @@
   background: var(--surface);
 }
 
-.card__video {
+.card__badge {
   margin-left: 8px;
   padding: 1px 8px;
   border-radius: 999px;
@@ -676,4 +676,27 @@
 .per100 span {
   margin-left: auto;
   font-variant-numeric: tabular-nums;
+}
+
+.card__badge + .card__badge {
+  margin-left: 4px;
+}
+.card__badge--protein {
+  background: color-mix(in srgb, var(--protein) 16%, transparent);
+  color: var(--protein);
+}
+.kcal__per100 {
+  flex-basis: 100%;
+  font-family: var(--font-text);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.recipe__facts small {
+  font-size: 13px;
+  color: var(--muted);
+}
+.card__foot .kcal {
+  flex-wrap: wrap;
+  row-gap: 4px;
 }

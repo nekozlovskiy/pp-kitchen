@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { fitsDiet } from "../lib/diet";
 import { Link, useLocation } from "react-router-dom";
 import { config } from "../config";
-import { categoryLabel, ingredientMap, recipes, servingMacros } from "../data";
+import { categoryLabel, ingredientMap, isProteinDense, per100Macros, recipes, servingMacros } from "../data";
 import { round } from "../lib/nutrition";
 import { formatTime, plural } from "../lib/format";
 import { matches, searchText } from "../lib/search";
@@ -33,7 +33,7 @@ function Masthead() {
         <path d="M2 12c22-10 40 6 62-2s38-10 60 0 40 6 62-2 46-8 70 2" fill="none" stroke="var(--accent)" strokeWidth="3" strokeLinecap="round" />
       </svg>
       <p className="masthead__lede">
-        {recipes.length} ПП-рецептов из редакционных подборок Леди Mail.ru. У каждого блюда посчитаны калории, белки, жиры и углеводы на порцию.
+        {recipes.length} ПП-рецептов из редакционных подборок Леди Mail.ru, Food.ru и журнала «Гастроном» и любимых рилсов. У каждого блюда посчитаны калории, белки, жиры и углеводы на порцию и на 100 г.
       </p>
     </div>
   );
@@ -84,6 +84,8 @@ export function Home() {
       const m = servingMacros[r.id];
       if (filters.category !== "all" && r.category !== filters.category) return false;
       if (filters.highProtein && m.p < 20) return false;
+      if (filters.dense && !isProteinDense(r.id)) return false;
+      if (filters.videoOnly && !r.video) return false;
       if (filters.quick && r.timeMinutes > 20) return false;
       if (filters.favOnly && !favorites.has(r.id)) return false;
       if (filters.cookedOnly && !journal[r.id]?.cooked) return false;
@@ -95,6 +97,7 @@ export function Home() {
     const by = {
       default: (a: string, b: string) => recipeRank[a] - recipeRank[b],
       kcal: (a: string, b: string) => servingMacros[a].kcal - servingMacros[b].kcal,
+      per100: (a: string, b: string) => per100Macros[a].kcal - per100Macros[b].kcal,
       protein: (a: string, b: string) => servingMacros[b].p - servingMacros[a].p,
       time: (a: string, b: string) => recipeTime[a] - recipeTime[b],
       // Сначала с высокой оценкой, при равной — что готовила чаще, остальное как «по порядку».

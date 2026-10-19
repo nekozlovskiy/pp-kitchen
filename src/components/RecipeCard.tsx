@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import type { Recipe } from "../types";
-import { categoryLabel, servingMacros } from "../data";
+import { categoryLabel, isProteinDense, per100Macros, servingMacros } from "../data";
 import { round } from "../lib/nutrition";
 import { formatTime } from "../lib/format";
 import { Art } from "../art/Art";
@@ -49,7 +49,8 @@ export function RecipeCard({ recipe, wide = false }: { recipe: Recipe; wide?: bo
       <div className="card__body">
         <p className="card__meta">
           {categoryLabel[recipe.category]}, {formatTime(recipe.timeMinutes)}
-          {recipe.video && <span className="card__video">видео</span>}
+          {isProteinDense(recipe.id) && <span className="card__badge card__badge--protein">белок</span>}
+          {recipe.video && <span className="card__badge">видео</span>}
         </p>
         <h3 className="card__title">
           <Link to={`/recipe/${recipe.id}`} state={{ background: location }} className="card__link">
@@ -61,6 +62,7 @@ export function RecipeCard({ recipe, wide = false }: { recipe: Recipe; wide?: bo
           <p className="kcal">
             <span className="kcal__num">{m.kcal}</span>
             <span className="kcal__unit">ккал</span>
+            <span className="kcal__per100">{Math.round(per100Macros[recipe.id].kcal)} в 100 г</span>
           </p>
           <MacroRing macros={m} size={34} />
           <dl className="macros-mini">
