@@ -13,6 +13,7 @@ import { NotFound } from "./pages/NotFound";
 import { Shopping } from "./pages/Shopping";
 import { Pantry } from "./pages/Pantry";
 import { Week } from "./pages/Week";
+import { Transfer } from "./pages/Transfer";
 import { TimerDock } from "./components/TimerDock";
 
 function useTitle(location: Location) {
@@ -21,7 +22,7 @@ function useTitle(location: Location) {
     const r = m ? recipeMap[decodeURIComponent(m[1])] : undefined;
     const page =
       r?.title ??
-      ({ "/day": "Мой день", "/favorites": "Избранное", "/shopping": "Покупки", "/pantry": "Из того, что есть", "/week": "Меню на неделю" } as Record<string, string>)[
+      ({ "/day": "Мой день", "/favorites": "Избранное", "/shopping": "Покупки", "/pantry": "Из того, что есть", "/week": "Меню на неделю", "/transfer": "Перенос" } as Record<string, string>)[
         location.pathname
       ];
     document.title = page ? `${page} | ПП-кухня` : `ПП-кухня ${config.herNameGenitive}`;
@@ -65,6 +66,7 @@ export function App() {
           <Route path="/shopping" element={<Shopping />} />
           <Route path="/pantry" element={<Pantry />} />
           <Route path="/week" element={<Week />} />
+          <Route path="/transfer" element={<Transfer />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         {background && (
@@ -76,6 +78,9 @@ export function App() {
       <footer className="footer wrap">
         <p className="footer__love">Сделано с любовью для {config.herNameGenitive}</p>
         <p className="disclaimer">{config.disclaimer}</p>
+        <p className="footer__links">
+          <Link to="/transfer">Перенести избранное и отметки на другой телефон</Link>
+        </p>
       </footer>
       <TimerDock />
       <Toast />

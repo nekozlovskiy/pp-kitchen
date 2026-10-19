@@ -92,3 +92,21 @@ describe("меню на день", () => {
     expect(a.slots.map((s) => s.recipe.id)).not.toEqual(c.slots.map((s) => s.recipe.id));
   });
 });
+
+describe("перенос на другое устройство", () => {
+  it("код разворачивается обратно без потерь, кириллица сохраняется", async () => {
+    const { encodeBundle, decodeBundle } = await import("./transfer");
+    const bundle = { v: 1 as const, at: "2026-10-19", data: { "pp.favorites": ["a", "b"], "pp.journal": { a: { note: "Вкусно, но солоно" } } } };
+    const code = encodeBundle(bundle);
+    expect(code.startsWith("PP1:")).toBe(true);
+    expect(decodeBundle(code)).toEqual(bundle);
+    expect(decodeBundle(JSON.stringify(bundle))).toEqual(bundle);
+  });
+
+  it("чужой текст не принимается", async () => {
+    const { decodeBundle } = await import("./transfer");
+    expect(decodeBundle("привет")).toBeNull();
+    expect(decodeBundle("PP1:@@@")).toBeNull();
+    expect(decodeBundle('{"v":2,"data":{}}')).toBeNull();
+  });
+});

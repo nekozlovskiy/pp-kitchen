@@ -857,3 +857,62 @@
 .select--week select {
   min-height: 44px;
 }
+
+/* ---------- Перенос на другое устройство ---------- */
+
+.transfer__block {
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.transfer__block h2 {
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+.transfer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.transfer__file {
+  position: relative;
+  cursor: pointer;
+}
+.transfer__file input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.transfer__code {
+  display: grid;
+  gap: 6px;
+  margin: 14px 0 12px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.transfer__code textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  color: var(--ink);
+  font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  resize: vertical;
+}
+.transfer__error {
+  margin-bottom: 10px;
+  color: var(--accent);
+  font-size: 14px;
+}
+.footer__links {
+  margin-top: 10px;
+  font-size: 14px;
+}
+.footer__links a {
+  color: var(--ink);
+  text-underline-offset: 3px;
+}
