@@ -51,6 +51,8 @@ export type Recipe = {
   steps: string[];
   tip?: string;
   image?: string;
+  /** Ссылка на пост или рилс в Instagram, если рецепт взят из видео */
+  video?: string;
   art: ArtKind;
   /** Ключ в sources.json: откуда взят состав рецепта */
   source: string;

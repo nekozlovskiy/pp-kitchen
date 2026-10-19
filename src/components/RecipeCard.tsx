@@ -49,6 +49,7 @@ export function RecipeCard({ recipe, wide = false }: { recipe: Recipe; wide?: bo
       <div className="card__body">
         <p className="card__meta">
           {categoryLabel[recipe.category]}, {formatTime(recipe.timeMinutes)}
+          {recipe.video && <span className="card__video">видео</span>}
         </p>
         <h3 className="card__title">
           <Link to={`/recipe/${recipe.id}`} state={{ background: location }} className="card__link">

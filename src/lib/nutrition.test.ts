@@ -77,4 +77,10 @@ describe("данные", () => {
   it("у каждого рецепта указан существующий источник", () => {
     for (const r of recipes) expect(sources[r.source], r.id).toBeDefined();
   });
+
+  it("видео — ссылка на пост Instagram без меток отслеживания", () => {
+    for (const r of recipes) {
+      if (r.video) expect(r.video, r.id).toMatch(/^https:\/\/www\.instagram\.com\/(reel|p)\/[\w-]+\/$/);
+    }
+  });
 });

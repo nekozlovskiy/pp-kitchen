@@ -16,7 +16,7 @@ export const dietLabels: Record<DietTag, string> = {
 const tagged: Record<DietTag, string[]> = {
   meat: [
     "chicken", "chicken_thigh", "chicken_liver", "chicken_mince", "chicken_boiled",
-    "turkey", "turkey_mince", "turkey_smoked", "turkey_thigh", "beef", "beef_mince", "gelatin",
+    "turkey", "turkey_mince", "turkey_smoked", "turkey_thigh", "beef", "beef_mince", "gelatin", "chicken_smoked",
   ],
   fish: [
     "cod", "pollock", "salmon", "salmon_salted", "pink_salmon_boiled", "trout", "tuna", "tuna_fresh",
@@ -26,11 +26,12 @@ const tagged: Record<DietTag, string[]> = {
     "cottage0", "cottage2", "cottage5", "yogurt", "yogurt0", "yogurt_natural", "kefir", "milk", "milk25",
     "sour_cream", "sour_cream15", "cream10", "dry_milk", "butter", "cheese_light", "cheese_hard", "feta",
     "mozzarella", "parmesan", "ricotta", "cream_cheese", "suluguni", "protein", "yogurt_greek_fat", "ryazhenka",
+    "cottage_grain", "pesto",
   ],
   egg: ["egg", "egg_white", "egg_yolk", "quail_egg"],
   gluten: [
     "wheat_flour", "whole_flour", "whole_bread", "lavash", "tortilla", "whole_pasta", "lasagna", "bulgur",
-    "semolina", "soy_sauce", "crab_sticks", "oats", "oat_flour", "oat_bran", "granola", "rye_flour", "wheat_bran",
+    "semolina", "soy_sauce", "crab_sticks", "oats", "oat_flour", "oat_bran", "granola", "rye_flour", "wheat_bran", "teriyaki",
   ],
 };
 

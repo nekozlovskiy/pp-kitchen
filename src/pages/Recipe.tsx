@@ -15,6 +15,7 @@ import { usePhotoUrl } from "../hooks/usePhoto";
 import { CookMode } from "../components/CookMode";
 import { RecipeJournal } from "../components/RecipeJournal";
 import { StepText } from "../components/StepText";
+import { ReelEmbed } from "../components/ReelEmbed";
 import type { Recipe } from "../types";
 
 function RecipeBody({ recipe }: { recipe: Recipe }) {
@@ -67,6 +68,8 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
           </li>
         </ul>
       </header>
+
+      {recipe.video && <ReelEmbed url={recipe.video} title={recipe.title} />}
 
       <section className="nutrition" aria-label="Пищевая ценность одной порции">
         <MacroRing macros={servingMacros[recipe.id]} size={148} stroke={14}>
@@ -198,7 +201,15 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
 
       <RecipeJournal recipe={recipe} />
 
-      {sources[recipe.source] && (
+      {sources[recipe.source]?.site === "Instagram" ? (
+        <p className="source">
+          Рецепт из видео{" "}
+          <a href={sources[recipe.source].url} target="_blank" rel="noopener noreferrer">
+            {sources[recipe.source].author}
+          </a>{" "}
+          в Instagram. КБЖУ посчитано нами по составу.
+        </p>
+      ) : sources[recipe.source] && (
         <p className="source">
           Рецепт из подборки «
           <a href={sources[recipe.source].url} target="_blank" rel="noopener noreferrer">
