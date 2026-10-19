@@ -26,7 +26,7 @@ const tagged: Record<DietTag, string[]> = {
     "cottage0", "cottage2", "cottage5", "yogurt", "yogurt0", "yogurt_natural", "kefir", "milk", "milk25",
     "sour_cream", "sour_cream15", "cream10", "dry_milk", "butter", "cheese_light", "cheese_hard", "feta",
     "mozzarella", "parmesan", "ricotta", "cream_cheese", "suluguni", "protein", "yogurt_greek_fat", "ryazhenka",
-    "cottage_grain", "pesto", "gorgonzola", "cottage9", "sour_cream20", "processed_cheese",
+    "cottage_grain", "pesto", "gorgonzola", "cottage9", "sour_cream20", "processed_cheese", "ghee", "yogurt6",
   ],
   egg: ["egg", "egg_white", "egg_yolk", "quail_egg"],
   gluten: [
