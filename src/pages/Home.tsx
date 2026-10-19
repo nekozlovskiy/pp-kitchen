@@ -159,9 +159,13 @@ const PAGE = 24;
 
 const recipeTime = Object.fromEntries(recipes.map((r) => [r.id, r.timeMinutes]));
 
-// «По порядку»: сначала по разделам (завтраки → десерты), внутри раздела — как в recipes.json.
-// Новые рецепты дописываются в конец файла, без этого они шли бы вперемешку после десертов.
+// «По порядку»: разделы по кругу (завтрак, обед, ужин, перекус, десерт, снова завтрак…),
+// внутри раздела — как в recipes.json. Так уже первая страница показывает всё понемногу.
 const categoryOrder = ["breakfast", "lunch", "dinner", "snack", "dessert"];
+const seen: Record<string, number> = {};
 const recipeRank = Object.fromEntries(
-  recipes.map((r, i) => [r.id, categoryOrder.indexOf(r.category) * recipes.length + i]),
+  recipes.map((r) => {
+    const n = (seen[r.category] = (seen[r.category] ?? -1) + 1);
+    return [r.id, n * categoryOrder.length + categoryOrder.indexOf(r.category)];
+  }),
 );
