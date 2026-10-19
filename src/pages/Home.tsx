@@ -83,12 +83,12 @@ export function Home() {
       return true;
     });
     const by = {
-      default: () => 0,
+      default: (a: string, b: string) => recipeRank[a] - recipeRank[b],
       kcal: (a: string, b: string) => servingMacros[a].kcal - servingMacros[b].kcal,
       protein: (a: string, b: string) => servingMacros[b].p - servingMacros[a].p,
       time: (a: string, b: string) => recipeTime[a] - recipeTime[b],
     }[filters.sort];
-    return filters.sort === "default" ? out : [...out].sort((a, b) => by(a.id, b.id));
+    return [...out].sort((a, b) => by(a.id, b.id));
   }, [filters, favorites]);
 
   const touched = JSON.stringify(filters) !== JSON.stringify(defaultFilters);
@@ -136,3 +136,10 @@ export function Home() {
 }
 
 const recipeTime = Object.fromEntries(recipes.map((r) => [r.id, r.timeMinutes]));
+
+// «По порядку»: сначала по разделам (завтраки → десерты), внутри раздела — как в recipes.json.
+// Новые рецепты дописываются в конец файла, без этого они шли бы вперемешку после десертов.
+const categoryOrder = ["breakfast", "lunch", "dinner", "snack", "dessert"];
+const recipeRank = Object.fromEntries(
+  recipes.map((r, i) => [r.id, categoryOrder.indexOf(r.category) * recipes.length + i]),
+);
