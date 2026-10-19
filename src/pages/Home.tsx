@@ -21,6 +21,13 @@ function recipeOfTheDay() {
   return recipes[(days * 37) % recipes.length];
 }
 
+/** Записка дня: своя на каждый день, по кругу. Сдвиг, чтобы не совпадала по ритму с рецептом дня. */
+function noteOfTheDay() {
+  const d = new Date();
+  const days = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86_400_000);
+  return config.notes[(days + 3) % config.notes.length];
+}
+
 function Masthead() {
   return (
     <div className="masthead">
@@ -32,6 +39,12 @@ function Masthead() {
       <svg className="masthead__squiggle" viewBox="0 0 260 18" aria-hidden="true">
         <path d="M2 12c22-10 40 6 62-2s38-10 60 0 40 6 62-2 46-8 70 2" fill="none" stroke="var(--accent)" strokeWidth="3" strokeLinecap="round" />
       </svg>
+      {config.notes.length > 0 && (
+        <p className="masthead__note">
+          <span>Записка дня</span>
+          {noteOfTheDay()}
+        </p>
+      )}
       <p className="masthead__lede">
         {recipes.length} ПП-рецептов из редакционных подборок Леди Mail.ru, Food.ru и журнала «Гастроном» и любимых рилсов. У каждого блюда посчитаны калории, белки, жиры и углеводы на порцию и на 100 г.
       </p>
