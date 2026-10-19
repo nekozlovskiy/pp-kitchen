@@ -101,6 +101,16 @@ describe("меню на день", () => {
     expect(a.slots.map((s) => s.recipe.id)).toEqual(b.slots.map((s) => s.recipe.id));
     expect(a.slots.map((s) => s.recipe.id)).not.toEqual(c.slots.map((s) => s.recipe.id));
   });
+
+  it("избранное не попадает в каждое меню", () => {
+    const favorites = new Set(["salmon-lavash-rolls"]);
+    const withFav = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].filter((seed) =>
+      buildMenu(recipes, servingMacros, { kcal: 1600, minProtein: 90, seed, favorites })!.slots.some(
+        (s) => s.recipe.id === "salmon-lavash-rolls",
+      ),
+    );
+    expect(withFav.length).toBeLessThan(5);
+  });
 });
 
 describe("перенос на другое устройство", () => {
