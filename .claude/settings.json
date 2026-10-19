@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in */src/data/*.json) cd \"$CLAUDE_PROJECT_DIR\" && npx vitest run src/lib/nutrition.test.ts --reporter=dot >/tmp/pp-data-test.log 2>&1 || { echo 'Тесты данных упали после правки '\"$f\"':' >&2; tail -40 /tmp/pp-data-test.log >&2; exit 2; } ;; esac",
+            "timeout": 120
+          }
+        ]
+      }
+    ]
+  }
+}
