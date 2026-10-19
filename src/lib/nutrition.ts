@@ -64,7 +64,7 @@ export function macroPercents(m: Macros): { p: number; f: number; c: number } {
  */
 const COOKED_FACTOR: Record<string, number> = {
   buckwheat: 2.5, green_buckwheat: 2.5, rice_white: 2.8, rice_brown: 2.8, bulgur: 2.5, quinoa: 2.7,
-  millet: 2.5, whole_pasta: 2.2, spaghetti: 2.2, soba: 2.2, funchoza: 3, lentil: 2.3, lentil_green: 2.5,
+  millet: 2.5, pearl_barley: 2.8, whole_pasta: 2.2, spaghetti: 2.2, soba: 2.2, funchoza: 3, lentil: 2.3, lentil_green: 2.5,
   beans_dry: 2.5, chickpeas_dry: 2.3,
   chicken: 0.75, chicken_thigh: 0.75, turkey: 0.75, turkey_thigh: 0.75, beef: 0.65, beef_mince: 0.75,
   chicken_mince: 0.8, turkey_mince: 0.8, chicken_liver: 0.8, beef_liver: 0.8, veal_mince: 0.8, cod: 0.8, pollock: 0.8, salmon: 0.8,
