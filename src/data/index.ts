@@ -10,6 +10,12 @@ export const ingredientMap: Record<string, Ingredient> = Object.fromEntries(
 );
 export const recipes = recipesJson as Recipe[];
 export const recipeMap: Record<string, Recipe> = Object.fromEntries(recipes.map((r) => [r.id, r]));
+
+/** Старые адреса рецептов, убранных как дубли: ссылка ведёт на оставшийся рецепт. */
+export const recipeAliases: Record<string, string> = {
+  "gs-pp-curd-bake-berries": "gs-cottage-berry-souffle-bake",
+  "gs-pp-zucchini-fritters": "gs-zucchini-oat-fritters",
+};
 export const sources = sourcesJson as Record<string, Source>;
 
 // Посчитанные один раз КБЖУ на порцию, чтобы не пересчитывать в каждом рендере.

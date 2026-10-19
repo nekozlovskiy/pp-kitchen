@@ -48,6 +48,19 @@ describe("расчёт КБЖУ", () => {
 });
 
 describe("данные", () => {
+  it("нет дублей: одинаковых названий и одинакового состава с граммами", () => {
+    const titles = new Set<string>();
+    const sets = new Map<string, string>();
+    for (const r of recipes) {
+      const t = r.title.toLowerCase().replace(/ё/g, "е");
+      expect(titles.has(t), r.id).toBe(false);
+      titles.add(t);
+      const key = r.ingredients.map((i) => `${i.id}:${i.grams}`).sort().join(",");
+      expect(sets.get(key), r.id).toBeUndefined();
+      sets.set(key, r.id);
+    }
+  });
+
   it("каждый продукт сходится с формулой 4·Б + 9·Ж + 4·У (±8%)", () => {
     for (const i of ingredients) {
       if (i.per100.kcal === 0) continue;

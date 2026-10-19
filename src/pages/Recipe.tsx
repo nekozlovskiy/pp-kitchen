@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { categoryLabel, ingredientMap, per100Macros, portionGrams, recipeMap, sources } from "../data";
+import { categoryLabel, ingredientMap, per100Macros, portionGrams, recipeAliases, recipeMap, sources } from "../data";
 import { macroPercents, per100g, round, scale, scaleIngredients } from "../lib/nutrition";
 import { applySwaps, availableSwaps } from "../lib/swaps";
 import { formatAmount, formatTime, servingsLabel } from "../lib/format";
@@ -313,7 +313,7 @@ export function RecipeSheet() {
   const { id = "" } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const recipe = recipeMap[id];
+  const recipe = recipeMap[recipeAliases[id] ?? id];
   const hasBackground = Boolean((location.state as { background?: unknown } | null)?.background);
 
   const close = useCallback(() => {
