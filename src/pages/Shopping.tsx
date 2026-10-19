@@ -24,9 +24,9 @@ async function copyText(text: string): Promise<boolean> {
 }
 
 export function Shopping() {
-  const { shopping, setShoppingServings, removeFromShopping, toggleBought, clearShopping, showToast } = useStore();
+  const { shopping, setShoppingServings, removeFromShopping, toggleBought, clearShopping, showToast, swaps } = useStore();
   const location = useLocation();
-  const { lines, extras } = buildShoppingList(shopping.items);
+  const { lines, extras } = buildShoppingList(shopping.items, swaps);
   const bought = new Set(shopping.checked);
   const left = lines.filter((l) => !bought.has(l.id)).length;
 

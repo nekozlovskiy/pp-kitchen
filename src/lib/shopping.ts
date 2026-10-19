@@ -1,15 +1,17 @@
 import { ingredientMap, recipeMap } from "../data";
 import { scaleIngredients } from "./nutrition";
+import { applySwaps } from "./swaps";
 
 export type ShoppingLine = { id: string; name: string; grams: number };
 
 /** Сводный список: граммы одинаковых продуктов из разных рецептов складываются. */
-export function buildShoppingList(items: { id: string; servings: number }[]) {
+export function buildShoppingList(items: { id: string; servings: number }[], swaps: Record<string, string[]> = {}) {
   const sums = new Map<string, number>();
   const extras = new Set<string>();
   for (const it of items) {
-    const r = recipeMap[it.id];
-    if (!r) continue;
+    const base = recipeMap[it.id];
+    if (!base) continue;
+    const r = applySwaps(base, swaps[it.id]);
     for (const ing of scaleIngredients(r, it.servings)) sums.set(ing.id, (sums.get(ing.id) ?? 0) + ing.grams);
     // «Соль, чёрный перец» → «соль» и «чёрный перец», чтобы не было повторов
     for (const e of r.extras ?? [])

@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { config } from "../config";
-import { portionGrams, recipeMap, servingMacros } from "../data";
+import { portionGrams, recipeMap } from "../data";
 import { round, scale, sum } from "../lib/nutrition";
 import { plural } from "../lib/format";
 import { MacroRing } from "../components/MacroRing";
@@ -9,9 +9,9 @@ import { useStore } from "../hooks/useStore";
 import { MenuBuilder } from "../components/MenuBuilder";
 
 export function Day() {
-  const { day, setDayServings, toggleDayUnit, removeFromDay, clearDay, goal, setGoal } = useStore();
+  const { day, setDayServings, toggleDayUnit, removeFromDay, clearDay, goal, setGoal, servingFor } = useStore();
   const location = useLocation();
-  const totalsRaw = sum(day.map((x) => scale(servingMacros[x.id], x.servings)));
+  const totalsRaw = sum(day.map((x) => scale(servingFor(x.id), x.servings)));
   const t = round(totalsRaw);
   const left = goal - t.kcal;
   const progress = Math.min(100, (t.kcal / goal) * 100);
@@ -76,7 +76,7 @@ export function Day() {
           <ul className="day__list">
             {day.map((x, i) => {
               const r = recipeMap[x.id];
-              const kcal = Math.round(servingMacros[x.id].kcal * x.servings);
+              const kcal = Math.round(servingFor(x.id).kcal * x.servings);
               return (
                 <li key={x.id} className="day__item">
                   <div className="day__item-main">

@@ -3,7 +3,10 @@ import type { ReactNode } from "react";
 import { readJSON, writeJSON } from "../lib/storage";
 import { todayKey } from "../lib/format";
 import { config } from "../config";
-import { ingredientMap, recipeMap } from "../data";
+import { ingredientMap, recipeMap, servingMacros } from "../data";
+import { perServing } from "../lib/nutrition";
+import { SWAPS, applySwaps } from "../lib/swaps";
+import type { Macros } from "../types";
 import { dietLabels } from "../lib/diet";
 import type { DietTag } from "../lib/diet";
 
@@ -43,6 +46,11 @@ type Store = {
   clearPantry: () => void;
   proteinGoal: number;
   setProteinGoal: (g: number) => void;
+  /** Включённые замены продуктов по рецептам. */
+  swaps: Record<string, string[]>;
+  toggleSwap: (recipeId: string, key: string) => void;
+  /** КБЖУ порции с учётом замен. */
+  servingFor: (recipeId: string) => Macros;
 };
 
 const Ctx = createContext<Store | null>(null);
@@ -79,11 +87,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     readJSON<string[]>("pp.pantry", []).filter((id) => ingredientMap[id]),
   );
   const [proteinGoal, setProteinGoalState] = useState<number>(() => readJSON<number>("pp.proteinGoal", 90));
+  const [swaps, setSwaps] = useState<Record<string, string[]>>(() => {
+    const saved = readJSON<Record<string, string[]>>("pp.swaps", {});
+    const known = new Set(SWAPS.map((s) => s.key));
+    return Object.fromEntries(
+      Object.entries(saved && typeof saved === "object" ? saved : {})
+        .filter(([id, keys]) => recipeMap[id] && Array.isArray(keys))
+        .map(([id, keys]) => [id, keys.filter((k) => known.has(k))]),
+    );
+  });
 
   useEffect(() => writeJSON("pp.journal", journal), [journal]);
   useEffect(() => writeJSON("pp.exclude", exclude), [exclude]);
   useEffect(() => writeJSON("pp.pantry", pantry), [pantry]);
   useEffect(() => writeJSON("pp.proteinGoal", proteinGoal), [proteinGoal]);
+  useEffect(() => writeJSON("pp.swaps", swaps), [swaps]);
   useEffect(() => writeJSON("pp.shopping", shopping), [shopping]);
   useEffect(() => writeJSON("pp.favorites", [...favorites]), [favorites]);
   useEffect(() => writeJSON("pp.day", { date: todayKey(), items: day }), [day]);
@@ -158,8 +176,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       clearPantry: () => setPantry([]),
       proteinGoal,
       setProteinGoal: (g) => setProteinGoalState(Math.max(30, Math.min(250, Math.round(g) || 90))),
+      swaps,
+      toggleSwap: (recipeId, key) =>
+        setSwaps((s) => {
+          const cur = s[recipeId] ?? [];
+          return { ...s, [recipeId]: cur.includes(key) ? cur.filter((k) => k !== key) : [...cur, key] };
+        }),
+      servingFor: (recipeId) =>
+        swaps[recipeId]?.length ? perServing(applySwaps(recipeMap[recipeId], swaps[recipeId]), ingredientMap) : servingMacros[recipeId],
     }),
-    [favorites, toggleFavorite, day, addToDay, goal, shopping, toast, showToast, journal, exclude, pantry, proteinGoal],
+    [favorites, toggleFavorite, day, addToDay, goal, shopping, toast, showToast, journal, exclude, pantry, proteinGoal, swaps],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

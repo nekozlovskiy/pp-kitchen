@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { categoryLabel, ingredientMap, per100Macros, portionGrams, recipeMap, servingMacros, sources } from "../data";
-import { macroPercents, round } from "../lib/nutrition";
-import { scaleIngredients } from "../lib/nutrition";
+import { categoryLabel, ingredientMap, per100Macros, portionGrams, recipeMap, sources } from "../data";
+import { macroPercents, per100g, round, scaleIngredients } from "../lib/nutrition";
+import { applySwaps, availableSwaps } from "../lib/swaps";
 import { formatAmount, formatTime, servingsLabel } from "../lib/format";
 import { Art } from "../art/Art";
 import { MacroRing } from "../components/MacroRing";
@@ -19,7 +19,7 @@ import { ReelEmbed } from "../components/ReelEmbed";
 import type { Recipe } from "../types";
 
 function RecipeBody({ recipe }: { recipe: Recipe }) {
-  const { addToDay, addToShopping, showToast, journal } = useStore();
+  const { addToDay, addToShopping, showToast, journal, swaps, toggleSwap, servingFor } = useStore();
   const [servings, setServings] = useState(recipe.servings);
   const [checked, setChecked] = useState<Set<number>>(new Set());
   const [keepAwake, setKeepAwake] = useState(false);
@@ -27,10 +27,15 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
   const wake = useWakeLock(keepAwake);
   const photo = usePhotoUrl(recipe.id, journal[recipe.id]?.photo);
   const closeCook = useCallback(() => setCooking(false), []);
-  const m = round(servingMacros[recipe.id]);
-  const m100 = round(per100Macros[recipe.id]);
-  const pc = macroPercents(servingMacros[recipe.id]);
-  const items = scaleIngredients(recipe, servings);
+  const active = swaps[recipe.id] ?? [];
+  const options = availableSwaps(recipe);
+  // Рецепт с заменами продуктов: от него считаются КБЖУ, граммы и шаги готовки.
+  const cooked = applySwaps(recipe, active);
+  const serving = servingFor(recipe.id);
+  const m = round(serving);
+  const m100 = round(active.length ? per100g(cooked, ingredientMap) : per100Macros[recipe.id]);
+  const pc = macroPercents(serving);
+  const items = scaleIngredients(cooked, servings);
 
   const toggle = (i: number) =>
     setChecked((prev) => {
@@ -74,7 +79,7 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
       {recipe.video && <ReelEmbed url={recipe.video} title={recipe.title} />}
 
       <section className="nutrition" aria-label="Пищевая ценность одной порции">
-        <MacroRing macros={servingMacros[recipe.id]} size={148} stroke={14}>
+        <MacroRing macros={serving} size={148} stroke={14}>
           <span className="kcal kcal--ring">
             <span className="kcal__num">{m.kcal}</span>
             <span className="kcal__unit">ккал</span>
@@ -139,7 +144,7 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
           </label>
         )}
       </div>
-      {cooking && <CookMode recipe={recipe} servings={servings} onClose={closeCook} />}
+      {cooking && <CookMode recipe={cooked} servings={servings} onClose={closeCook} />}
 
       <section className="recipe__section">
         <div className="recipe__section-head">
@@ -184,6 +189,25 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
               </li>
             ))}
           </ul>
+        ) : null}
+        {options.length ? (
+          <div className="swaps">
+            <p className="swaps__title">Заменить продукты</p>
+            <div className="toggles">
+              {options.map((s) => (
+                <button
+                  key={s.key}
+                  type="button"
+                  className={`toggle ${active.includes(s.key) ? "is-on" : ""}`}
+                  aria-pressed={active.includes(s.key)}
+                  onClick={() => toggleSwap(recipe.id, s.key)}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+            <p className="swaps__hint">КБЖУ и продукты пересчитаются. Замена запомнится и попадёт в «Мой день» и покупки.</p>
+          </div>
         ) : null}
       </section>
 

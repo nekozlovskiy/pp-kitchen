@@ -736,3 +736,25 @@
 .day__item-ctrl .btn--text {
   white-space: nowrap;
 }
+
+/* ---------- Замены продуктов ---------- */
+
+.swaps {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
+}
+.swaps__title {
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+.swaps__hint {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+@media print {
+  .swaps {
+    display: none;
+  }
+}
