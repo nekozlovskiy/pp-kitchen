@@ -540,6 +540,20 @@ button {
   font-weight: 600;
 }
 
+.more {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  margin-top: 28px;
+}
+.more .btn {
+  min-width: min(100%, 280px);
+}
+.more__note {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr));

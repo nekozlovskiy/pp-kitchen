@@ -70,6 +70,13 @@ function Feature() {
 export function Home() {
   const { favorites } = useStore();
   const [filters, setFilters] = useState<Filters>(defaultFilters);
+  const [limit, setLimit] = useState(PAGE);
+
+  // Новый поиск или фильтр снова показывает первую страницу результатов.
+  const changeFilters = (next: Filters) => {
+    setFilters(next);
+    setLimit(PAGE);
+  };
 
   const list = useMemo(() => {
     const out = recipes.filter((r) => {
@@ -104,7 +111,7 @@ export function Home() {
         <h2 id="catalog-title" className="section-title">
           Все рецепты
         </h2>
-        <FilterBar value={filters} onChange={setFilters} />
+        <FilterBar value={filters} onChange={changeFilters} />
         <p className="count" aria-live="polite">
           {list.length > 0
             ? `${plural(list.length, ["Нашёлся", "Нашлось", "Нашлось"])} ${list.length} ${plural(list.length, ["рецепт", "рецепта", "рецептов"])}`
@@ -112,11 +119,23 @@ export function Home() {
         </p>
 
         {list.length ? (
-          <div className="grid">
-            {list.map((r, i) => (
-              <RecipeCard key={r.id} recipe={r} wide={!touched && i % 7 === 0} />
-            ))}
-          </div>
+          <>
+            <div className="grid">
+              {list.slice(0, limit).map((r, i) => (
+                <RecipeCard key={r.id} recipe={r} wide={!touched && i % 7 === 0} />
+              ))}
+            </div>
+            {list.length > limit && (
+              <div className="more">
+                <button type="button" className="btn btn--ghost" onClick={() => setLimit(limit + PAGE)}>
+                  Показать ещё {Math.min(PAGE, list.length - limit)}
+                </button>
+                <p className="more__note">
+                  Показано {limit} из {list.length}
+                </p>
+              </div>
+            )}
+          </>
         ) : (
           <div className="empty">
             <p className="empty__title">Ничего не нашлось</p>
@@ -125,7 +144,7 @@ export function Home() {
                 ? "В избранном пока пусто. Нажмите на сердечко у рецепта, чтобы сохранить его."
                 : "Попробуйте другое слово или ослабьте фильтры."}
             </p>
-            <button type="button" className="btn btn--ghost" onClick={() => setFilters(defaultFilters)}>
+            <button type="button" className="btn btn--ghost" onClick={() => changeFilters(defaultFilters)}>
               Сбросить фильтры
             </button>
           </div>
@@ -134,6 +153,9 @@ export function Home() {
     </main>
   );
 }
+
+/** Сколько карточек показывать за раз: 190 рецептов одним списком — больше сотни экранов на телефоне. */
+const PAGE = 24;
 
 const recipeTime = Object.fromEntries(recipes.map((r) => [r.id, r.timeMinutes]));
 
