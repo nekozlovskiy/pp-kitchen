@@ -16,17 +16,17 @@ export const dietLabels: Record<DietTag, string> = {
 const tagged: Record<DietTag, string[]> = {
   meat: [
     "chicken", "chicken_thigh", "chicken_liver", "chicken_mince", "chicken_boiled",
-    "turkey", "turkey_mince", "turkey_smoked", "turkey_thigh", "beef", "beef_mince", "gelatin", "chicken_smoked", "pork_lean", "turkey_ham", "turkey_boiled",
+    "turkey", "turkey_mince", "turkey_smoked", "turkey_thigh", "beef", "beef_mince", "gelatin", "chicken_smoked", "pork_lean", "turkey_ham", "turkey_boiled", "beef_liver", "veal_mince",
   ],
   fish: [
     "cod", "pollock", "salmon", "salmon_salted", "pink_salmon_boiled", "trout", "tuna", "tuna_fresh",
-    "shrimp", "squid", "crab_sticks", "mackerel", "mussels",
+    "shrimp", "squid", "crab_sticks", "mackerel", "mussels", "herring_salted",
   ],
   dairy: [
     "cottage0", "cottage2", "cottage5", "yogurt", "yogurt0", "yogurt_natural", "kefir", "milk", "milk25",
     "sour_cream", "sour_cream15", "cream10", "dry_milk", "butter", "cheese_light", "cheese_hard", "feta",
     "mozzarella", "parmesan", "ricotta", "cream_cheese", "suluguni", "protein", "yogurt_greek_fat", "ryazhenka",
-    "cottage_grain", "pesto", "gorgonzola", "cottage9", "sour_cream20", "processed_cheese", "ghee", "yogurt6", "adyghe_cheese",
+    "cottage_grain", "pesto", "gorgonzola", "cottage9", "sour_cream20", "processed_cheese", "ghee", "yogurt6", "adyghe_cheese", "kefir25",
   ],
   egg: ["egg", "egg_white", "egg_yolk", "quail_egg"],
   gluten: [
