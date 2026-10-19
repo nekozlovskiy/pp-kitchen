@@ -10,12 +10,22 @@ import { Sheet } from "../components/Sheet";
 import { Stepper } from "../components/Stepper";
 import { HeartButton } from "../components/RecipeCard";
 import { useStore } from "../hooks/useStore";
+import { useWakeLock } from "../hooks/useWakeLock";
+import { usePhotoUrl } from "../hooks/usePhoto";
+import { CookMode } from "../components/CookMode";
+import { RecipeJournal } from "../components/RecipeJournal";
+import { StepText } from "../components/StepText";
 import type { Recipe } from "../types";
 
 function RecipeBody({ recipe }: { recipe: Recipe }) {
-  const { addToDay, addToShopping, showToast } = useStore();
+  const { addToDay, addToShopping, showToast, journal } = useStore();
   const [servings, setServings] = useState(recipe.servings);
   const [checked, setChecked] = useState<Set<number>>(new Set());
+  const [keepAwake, setKeepAwake] = useState(false);
+  const [cooking, setCooking] = useState(false);
+  const wake = useWakeLock(keepAwake);
+  const photo = usePhotoUrl(recipe.id, journal[recipe.id]?.photo);
+  const closeCook = useCallback(() => setCooking(false), []);
   const m = round(servingMacros[recipe.id]);
   const pc = macroPercents(servingMacros[recipe.id]);
   const items = scaleIngredients(recipe, servings);
@@ -31,7 +41,11 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
   return (
     <article className="recipe">
       <header className="recipe__head">
-        <Art className="recipe__art" kind={recipe.art} category={recipe.category} seed={recipe.id} />
+        {photo ? (
+          <img className="recipe__art recipe__photo" src={photo} alt={`Моё фото: ${recipe.title}`} />
+        ) : (
+          <Art className="recipe__art" kind={recipe.art} category={recipe.category} seed={recipe.id} />
+        )}
         <p className="recipe__cat">{categoryLabel[recipe.category]}</p>
         <h1 className="recipe__title">{recipe.title}</h1>
         <p className="recipe__desc">{recipe.description}</p>
@@ -103,6 +117,19 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
         <HeartButton id={recipe.id} title={recipe.title} className="heart--big" />
       </div>
 
+      <div className="cook-bar">
+        <button type="button" className="btn btn--ghost" onClick={() => setCooking(true)}>
+          Готовить по шагам
+        </button>
+        {wake.supported && (
+          <label className="switch">
+            <input type="checkbox" checked={keepAwake} onChange={(e) => setKeepAwake(e.target.checked)} />
+            <span>Не гасить экран</span>
+          </label>
+        )}
+      </div>
+      {cooking && <CookMode recipe={recipe} servings={servings} onClose={closeCook} />}
+
       <section className="recipe__section">
         <div className="recipe__section-head">
           <h2>Продукты</h2>
@@ -153,7 +180,11 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
         <h2>Как готовить</h2>
         <ol className="steps">
           {recipe.steps.map((s, i) => (
-            <li key={i}>{s}</li>
+            <li key={i}>
+              <span>
+                <StepText text={s} recipeTitle={recipe.title} />
+              </span>
+            </li>
           ))}
         </ol>
       </section>
@@ -164,6 +195,8 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
           <p>{recipe.tip}</p>
         </aside>
       )}
+
+      <RecipeJournal recipe={recipe} />
 
       {sources[recipe.source] && (
         <p className="source">

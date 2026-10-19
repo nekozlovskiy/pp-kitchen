@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { fitsDiet } from "../lib/diet";
 import { Link, useLocation } from "react-router-dom";
 import { config } from "../config";
 import { categoryLabel, ingredientMap, recipes, servingMacros } from "../data";
@@ -68,7 +69,7 @@ function Feature() {
 }
 
 export function Home() {
-  const { favorites } = useStore();
+  const { favorites, exclude, journal } = useStore();
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [limit, setLimit] = useState(PAGE);
 
@@ -85,6 +86,8 @@ export function Home() {
       if (filters.highProtein && m.p < 20) return false;
       if (filters.quick && r.timeMinutes > 20) return false;
       if (filters.favOnly && !favorites.has(r.id)) return false;
+      if (filters.cookedOnly && !journal[r.id]?.cooked) return false;
+      if (!fitsDiet(r, exclude)) return false;
       if (filters.maxKcal < KCAL_MAX && m.kcal > filters.maxKcal) return false;
       if (filters.query.trim() && !matches(texts[r.id], filters.query)) return false;
       return true;
@@ -94,9 +97,17 @@ export function Home() {
       kcal: (a: string, b: string) => servingMacros[a].kcal - servingMacros[b].kcal,
       protein: (a: string, b: string) => servingMacros[b].p - servingMacros[a].p,
       time: (a: string, b: string) => recipeTime[a] - recipeTime[b],
+      // Сначала с высокой оценкой, при равной — что готовила чаще, остальное как «по порядку».
+      rating: (a: string, b: string) =>
+        (journal[b]?.rating ?? 0) - (journal[a]?.rating ?? 0) ||
+        (journal[b]?.cooked ?? 0) - (journal[a]?.cooked ?? 0) ||
+        recipeRank[a] - recipeRank[b],
     }[filters.sort];
     return [...out].sort((a, b) => by(a.id, b.id));
-  }, [filters, favorites]);
+  }, [filters, favorites, exclude, journal]);
+
+  // Смена ограничений в еде тоже возвращает к первой странице.
+  useEffect(() => setLimit(PAGE), [exclude]);
 
   const touched = JSON.stringify(filters) !== JSON.stringify(defaultFilters);
 
@@ -111,6 +122,13 @@ export function Home() {
         <h2 id="catalog-title" className="section-title">
           Все рецепты
         </h2>
+        <Link to="/pantry" className="pantry-link">
+          <span>
+            <b>Что приготовить из того, что есть</b>
+            <span>Отметьте продукты дома, а мы подберём рецепты</span>
+          </span>
+          <span aria-hidden="true">→</span>
+        </Link>
         <FilterBar value={filters} onChange={changeFilters} />
         <p className="count" aria-live="polite">
           {list.length > 0

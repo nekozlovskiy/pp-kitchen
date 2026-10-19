@@ -1,7 +1,10 @@
 import type { Category } from "../types";
 import { categories } from "../data";
+import { dietLabels } from "../lib/diet";
+import type { DietTag } from "../lib/diet";
+import { useStore } from "../hooks/useStore";
 
-export type SortKey = "default" | "kcal" | "protein" | "time";
+export type SortKey = "default" | "kcal" | "protein" | "time" | "rating";
 
 export type Filters = {
   query: string;
@@ -9,6 +12,7 @@ export type Filters = {
   highProtein: boolean;
   quick: boolean;
   favOnly: boolean;
+  cookedOnly: boolean;
   maxKcal: number;
   sort: SortKey;
 };
@@ -21,12 +25,14 @@ export const defaultFilters: Filters = {
   highProtein: false,
   quick: false,
   favOnly: false,
+  cookedOnly: false,
   maxKcal: KCAL_MAX,
   sort: "default",
 };
 
 export function FilterBar({ value, onChange }: { value: Filters; onChange: (f: Filters) => void }) {
   const set = <K extends keyof Filters>(k: K, v: Filters[K]) => onChange({ ...value, [k]: v });
+  const { exclude, toggleExclude } = useStore();
   return (
     <div className="filters">
       <label className="search">
@@ -70,7 +76,30 @@ export function FilterBar({ value, onChange }: { value: Filters; onChange: (f: F
           <button type="button" className={`toggle ${value.favOnly ? "is-on" : ""}`} aria-pressed={value.favOnly} onClick={() => set("favOnly", !value.favOnly)}>
             Избранное
           </button>
+          <button type="button" className={`toggle ${value.cookedOnly ? "is-on" : ""}`} aria-pressed={value.cookedOnly} onClick={() => set("cookedOnly", !value.cookedOnly)}>
+            Готовила
+          </button>
         </div>
+
+        <details className="diet">
+          <summary>
+            Ограничения в еде{exclude.length ? `: ${exclude.length}` : ""}
+          </summary>
+          <div className="toggles">
+            {(Object.keys(dietLabels) as DietTag[]).map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                className={`toggle ${exclude.includes(tag) ? "is-on" : ""}`}
+                aria-pressed={exclude.includes(tag)}
+                onClick={() => toggleExclude(tag)}
+              >
+                {dietLabels[tag]}
+              </button>
+            ))}
+          </div>
+          <p className="diet__hint">Запоминается на этом телефоне. Овсянку считаем с глютеном.</p>
+        </details>
 
         <label className="range">
           <span>
@@ -94,6 +123,7 @@ export function FilterBar({ value, onChange }: { value: Filters; onChange: (f: F
             <option value="kcal">Сначала лёгкие</option>
             <option value="protein">Больше белка</option>
             <option value="time">Быстрее готовить</option>
+            <option value="rating">Мои оценки</option>
           </select>
         </label>
       </div>

@@ -1,0 +1,579 @@
+/* Инструменты для готовки и личные отметки: таймеры, пошаговый режим, заметки, фото,
+   «из того, что есть», меню на день, ограничения в еде. Токены — из tokens.css. */
+
+/* ---------- Таймер в тексте шага ---------- */
+
+.timer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 0 10px;
+  margin: 2px 1px;
+  border-radius: 999px;
+  border: 1.5px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+.timer-chip svg {
+  color: var(--accent);
+}
+.timer-chip:active {
+  transform: scale(0.96);
+}
+
+/* ---------- Запущенные таймеры ---------- */
+
+.timers {
+  position: fixed;
+  z-index: 95;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 8px);
+  padding-inline: var(--gutter);
+  pointer-events: none;
+}
+.timers ul {
+  display: grid;
+  gap: 6px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.timer {
+  pointer-events: auto;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 14px;
+  border-radius: var(--r-md);
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+}
+.timer.is-done {
+  background: var(--accent);
+  color: var(--accent-ink);
+  animation: pulse 1s ease-in-out infinite alternate;
+}
+.timer__text {
+  display: grid;
+  min-width: 0;
+}
+.timer__clock {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+.timer__label {
+  font-size: 13px;
+  opacity: 0.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.timer__close {
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  color: inherit;
+  font-weight: 700;
+  font-size: 18px;
+}
+@keyframes pulse {
+  to {
+    transform: scale(1.02);
+  }
+}
+@media (min-width: 900px) {
+  .timers {
+    bottom: 24px;
+  }
+}
+
+/* ---------- Кнопки готовки на странице рецепта ---------- */
+
+.cook-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin-top: 12px;
+}
+.cook-bar .btn {
+  flex: 1 1 200px;
+}
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.switch input {
+  appearance: none;
+  width: 46px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--line);
+  position: relative;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+.switch input::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+  transition: transform 0.15s var(--ease);
+}
+.switch input:checked {
+  background: var(--accent);
+}
+.switch input:checked::after {
+  transform: translateX(18px);
+}
+
+/* ---------- Пошаговый режим ---------- */
+
+.cook {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  /* minmax(0, …): длинное название в одну строку не должно распирать экран */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  padding: calc(12px + env(safe-area-inset-top)) var(--gutter) calc(16px + env(safe-area-inset-bottom));
+  background: var(--bg);
+  animation: rise 0.25s var(--ease) both;
+}
+.cook:focus {
+  outline: none;
+}
+.cook__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cook__title {
+  min-width: 0;
+  font-weight: 700;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cook__close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink);
+}
+.cook__progress {
+  display: flex;
+  gap: 4px;
+}
+.cook__progress span {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+}
+.cook__progress span.is-on {
+  background: var(--accent);
+}
+.cook__body {
+  overflow-y: auto;
+  align-self: center;
+  max-width: 34ch;
+  width: 100%;
+  margin: 0 auto;
+}
+.cook__kicker {
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.cook__step {
+  font-size: clamp(24px, 7vw, 34px);
+  line-height: 1.3;
+  font-weight: 600;
+}
+.cook__step .timer-chip {
+  min-height: 40px;
+  font-size: 0.8em;
+}
+.cook__ingredients {
+  display: grid;
+  gap: 10px;
+  font-size: 19px;
+}
+.cook__ingredients li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.cook__ingredients b {
+  white-space: nowrap;
+}
+.cook__foot {
+  display: grid;
+  gap: 8px;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+}
+.cook__lock {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+.cook__nav {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 10px;
+}
+.cook__nav .btn {
+  min-height: 56px;
+}
+.cook__nav .btn:disabled {
+  opacity: 0.4;
+}
+
+/* ---------- Мои отметки ---------- */
+
+.journal__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+}
+.stars {
+  display: flex;
+}
+.star {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: none;
+  color: var(--line);
+}
+.star path {
+  fill: currentColor;
+}
+.star.is-on {
+  color: var(--fat);
+}
+.journal__cooked {
+  min-height: 44px;
+}
+.journal__meta {
+  margin-top: 8px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.journal__note {
+  display: grid;
+  gap: 6px;
+  margin-top: 18px;
+  font-weight: 600;
+}
+.journal__note textarea {
+  width: 100%;
+  min-height: 88px;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 400;
+  resize: vertical;
+}
+.journal__note textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.journal__photo {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+.journal__photo img,
+.recipe__photo {
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--r-md);
+}
+.recipe__photo {
+  margin: 0 auto;
+  width: min(420px, 100%);
+}
+.journal__photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.journal__hint {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- Карточка: своё фото и оценка ---------- */
+
+.card__art {
+  position: relative;
+}
+.card__photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 5 / 4;
+  object-fit: cover;
+  border-radius: var(--r-md);
+}
+.card__rating {
+  position: absolute;
+  left: 22px;
+  top: 22px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--fat);
+  font-weight: 800;
+  font-size: 14px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.12);
+}
+
+/* ---------- Ограничения в еде ---------- */
+
+.diet summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+.diet summary::-webkit-details-marker {
+  display: none;
+}
+.diet summary::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.15s var(--ease);
+}
+.diet[open] summary::after {
+  transform: translateY(2px) rotate(-135deg);
+}
+.diet[open] summary {
+  margin-bottom: 8px;
+}
+.diet__hint {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- Из того, что есть ---------- */
+
+.pantry-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 4px 0 18px;
+  padding: 16px 20px;
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 22px;
+}
+.pantry-link span:first-child {
+  display: grid;
+  gap: 2px;
+  font-size: 15px;
+}
+.pantry-link span span {
+  color: var(--muted);
+  font-size: 14px;
+}
+.pantry {
+  padding-bottom: 48px;
+}
+.pantry__pick {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.pantry__have {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+.pantry__h {
+  font-weight: 700;
+}
+.chips--wrap {
+  flex-wrap: wrap;
+  overflow: visible;
+  margin-inline: 0;
+  padding: 0;
+}
+.chips--wrap .chip {
+  flex: none;
+  max-width: 100%;
+  min-height: 40px;
+  font-size: 14px;
+  padding: 6px 14px;
+  line-height: 1.25;
+  text-align: left;
+}
+.matches {
+  display: grid;
+  gap: 10px;
+}
+.match {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.match__title {
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.match__title::after {
+  content: " →";
+  color: var(--accent);
+}
+.match__meta {
+  font-size: 14px;
+  color: var(--muted);
+}
+.match__need {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fat);
+}
+.match__need.is-ready {
+  color: var(--carb);
+}
+
+/* ---------- Меню на день ---------- */
+
+.menu {
+  margin: 36px 0 24px;
+  padding: 22px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.menu__title {
+  font-family: var(--font-display);
+  font-size: 24px;
+}
+.menu__goal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 16px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.menu__list {
+  display: grid;
+  gap: 2px;
+  margin-top: 18px;
+}
+.menu__item {
+  display: grid;
+  gap: 2px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.menu__slot {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.menu__dish {
+  font-weight: 700;
+  color: var(--ink);
+}
+.menu__kcal {
+  color: var(--muted);
+  font-size: 14px;
+}
+.menu__total {
+  margin-top: 12px;
+}
+.menu__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+@media print {
+  .timers,
+  .cook-bar,
+  .journal,
+  .card__rating {
+    display: none !important;
+  }
+  .timer-chip {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    min-height: 0;
+  }
+  .timer-chip svg {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timer.is-done,
+  .cook {
+    animation: none;
+  }
+}

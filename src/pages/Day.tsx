@@ -6,6 +6,7 @@ import { plural } from "../lib/format";
 import { MacroRing } from "../components/MacroRing";
 import { Stepper } from "../components/Stepper";
 import { useStore } from "../hooks/useStore";
+import { MenuBuilder } from "../components/MenuBuilder";
 
 export function Day() {
   const { day, setDayServings, removeFromDay, clearDay, goal, setGoal } = useStore();
@@ -115,6 +116,8 @@ export function Day() {
           </Link>
         </div>
       )}
+
+      <MenuBuilder />
 
       <p className="disclaimer">{config.disclaimer}</p>
     </main>

@@ -11,6 +11,8 @@ import { Day } from "./pages/Day";
 import { Favorites } from "./pages/Favorites";
 import { NotFound } from "./pages/NotFound";
 import { Shopping } from "./pages/Shopping";
+import { Pantry } from "./pages/Pantry";
+import { TimerDock } from "./components/TimerDock";
 
 function useTitle(location: Location) {
   useEffect(() => {
@@ -18,7 +20,7 @@ function useTitle(location: Location) {
     const r = m ? recipeMap[decodeURIComponent(m[1])] : undefined;
     const page =
       r?.title ??
-      ({ "/day": "Мой день", "/favorites": "Избранное", "/shopping": "Покупки" } as Record<string, string>)[
+      ({ "/day": "Мой день", "/favorites": "Избранное", "/shopping": "Покупки", "/pantry": "Из того, что есть" } as Record<string, string>)[
         location.pathname
       ];
     document.title = page ? `${page} | ПП-кухня` : `ПП-кухня ${config.herNameGenitive}`;
@@ -60,6 +62,7 @@ export function App() {
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/day" element={<Day />} />
           <Route path="/shopping" element={<Shopping />} />
+          <Route path="/pantry" element={<Pantry />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         {background && (
@@ -72,6 +75,7 @@ export function App() {
         <p className="footer__love">Сделано с любовью для {config.herNameGenitive}</p>
         <p className="disclaimer">{config.disclaimer}</p>
       </footer>
+      <TimerDock />
       <Toast />
     </>
   );

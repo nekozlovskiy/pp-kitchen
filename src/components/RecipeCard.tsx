@@ -6,6 +6,7 @@ import { formatTime } from "../lib/format";
 import { Art } from "../art/Art";
 import { MacroRing } from "./MacroRing";
 import { useStore } from "../hooks/useStore";
+import { usePhotoUrl } from "../hooks/usePhoto";
 
 export function HeartButton({ id, title, className = "" }: { id: string; title: string; className?: string }) {
   const { favorites, toggleFavorite } = useStore();
@@ -27,11 +28,23 @@ export function HeartButton({ id, title, className = "" }: { id: string; title: 
 
 export function RecipeCard({ recipe, wide = false }: { recipe: Recipe; wide?: boolean }) {
   const location = useLocation();
+  const { journal } = useStore();
+  const entry = journal[recipe.id];
+  const photo = usePhotoUrl(recipe.id, entry?.photo);
   const m = round(servingMacros[recipe.id]);
   return (
     <article className={`card ${wide ? "card--wide" : ""}`}>
       <div className="card__art">
-        <Art kind={recipe.art} category={recipe.category} seed={recipe.id} />
+        {photo ? (
+          <img className="card__photo" src={photo} alt="" loading="lazy" />
+        ) : (
+          <Art kind={recipe.art} category={recipe.category} seed={recipe.id} />
+        )}
+        {entry?.rating ? (
+          <span className="card__rating" aria-label={`Моя оценка ${entry.rating} из 5`}>
+            ★ {entry.rating}
+          </span>
+        ) : null}
       </div>
       <div className="card__body">
         <p className="card__meta">

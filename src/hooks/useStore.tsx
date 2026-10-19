@@ -3,11 +3,15 @@ import type { ReactNode } from "react";
 import { readJSON, writeJSON } from "../lib/storage";
 import { todayKey } from "../lib/format";
 import { config } from "../config";
-import { recipeMap } from "../data";
+import { ingredientMap, recipeMap } from "../data";
+import { dietLabels } from "../lib/diet";
+import type { DietTag } from "../lib/diet";
 
 export type DayItem = { id: string; servings: number };
 type DayState = { date: string; items: DayItem[] };
 export type ShoppingState = { items: DayItem[]; checked: string[] };
+/** Личные отметки к рецепту. Всё хранится только в этом браузере. */
+export type JournalEntry = { note?: string; cooked?: number; last?: string; rating?: number; photo?: number };
 
 type Store = {
   favorites: Set<string>;
@@ -27,6 +31,16 @@ type Store = {
   clearShopping: () => void;
   toast: string | null;
   showToast: (msg: string) => void;
+  journal: Record<string, JournalEntry>;
+  updateJournal: (id: string, patch: Partial<JournalEntry>) => void;
+  markCooked: (id: string) => void;
+  exclude: DietTag[];
+  toggleExclude: (tag: DietTag) => void;
+  pantry: string[];
+  togglePantry: (ingredientId: string) => void;
+  clearPantry: () => void;
+  proteinGoal: number;
+  setProteinGoal: (g: number) => void;
 };
 
 const Ctx = createContext<Store | null>(null);
@@ -52,7 +66,22 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   });
   const [toast, setToast] = useState<string | null>(null);
   const timer = useRef<number | undefined>(undefined);
+  const [journal, setJournal] = useState<Record<string, JournalEntry>>(() => {
+    const saved = readJSON<Record<string, JournalEntry>>("pp.journal", {});
+    return saved && typeof saved === "object" ? saved : {};
+  });
+  const [exclude, setExclude] = useState<DietTag[]>(() =>
+    readJSON<DietTag[]>("pp.exclude", []).filter((t) => t in dietLabels),
+  );
+  const [pantry, setPantry] = useState<string[]>(() =>
+    readJSON<string[]>("pp.pantry", []).filter((id) => ingredientMap[id]),
+  );
+  const [proteinGoal, setProteinGoalState] = useState<number>(() => readJSON<number>("pp.proteinGoal", 90));
 
+  useEffect(() => writeJSON("pp.journal", journal), [journal]);
+  useEffect(() => writeJSON("pp.exclude", exclude), [exclude]);
+  useEffect(() => writeJSON("pp.pantry", pantry), [pantry]);
+  useEffect(() => writeJSON("pp.proteinGoal", proteinGoal), [proteinGoal]);
   useEffect(() => writeJSON("pp.shopping", shopping), [shopping]);
   useEffect(() => writeJSON("pp.favorites", [...favorites]), [favorites]);
   useEffect(() => writeJSON("pp.day", { date: todayKey(), items: day }), [day]);
@@ -114,8 +143,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       clearShopping: () => setShopping({ items: [], checked: [] }),
       toast,
       showToast,
+      journal,
+      updateJournal: (id, patch) => setJournal((j) => ({ ...j, [id]: { ...j[id], ...patch } })),
+      markCooked: (id) =>
+        setJournal((j) => ({ ...j, [id]: { ...j[id], cooked: (j[id]?.cooked ?? 0) + 1, last: todayKey() } })),
+      exclude,
+      toggleExclude: (tag) => setExclude((e) => (e.includes(tag) ? e.filter((t) => t !== tag) : [...e, tag])),
+      pantry,
+      togglePantry: (ingredientId) =>
+        setPantry((p) => (p.includes(ingredientId) ? p.filter((x) => x !== ingredientId) : [...p, ingredientId])),
+      clearPantry: () => setPantry([]),
+      proteinGoal,
+      setProteinGoal: (g) => setProteinGoalState(Math.max(30, Math.min(250, Math.round(g) || 90))),
     }),
-    [favorites, toggleFavorite, day, addToDay, goal, shopping, toast, showToast],
+    [favorites, toggleFavorite, day, addToDay, goal, shopping, toast, showToast, journal, exclude, pantry, proteinGoal],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
