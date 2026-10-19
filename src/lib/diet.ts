@@ -32,7 +32,7 @@ const tagged: Record<DietTag, string[]> = {
   gluten: [
     "wheat_flour", "whole_flour", "whole_bread", "lavash", "tortilla", "whole_pasta", "lasagna", "bulgur",
     "semolina", "soy_sauce", "crab_sticks", "oats", "oat_flour", "oat_bran", "granola", "rye_flour", "wheat_bran", "teriyaki",
-    "burger_bun", "breadcrumbs", "spaghetti", "white_bread", "rye_crisps", "pearl_barley", "soba", "miso",
+    "burger_bun", "breadcrumbs", "spaghetti", "white_bread", "rye_crisps", "pearl_barley", "soba", "miso", "udon",
   ],
 };
 

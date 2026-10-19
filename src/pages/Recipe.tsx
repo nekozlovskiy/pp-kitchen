@@ -363,7 +363,7 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
       ) : sources[recipe.source] && (
         <p className="source">
           {/* Ссылка на отдельную страницу рецепта, а не на статью-подборку */}
-          {sources[recipe.source].url.includes("/recipe/") ? "Рецепт «" : "Рецепт из подборки «"}
+          {/\/recipe\/|\/recepty\/[^/]+\/[^/]+-\d+$/.test(sources[recipe.source].url) ? "Рецепт «" : "Рецепт из подборки «"}
           <a href={sources[recipe.source].url} target="_blank" rel="noopener noreferrer">
             {sources[recipe.source].title}
           </a>
