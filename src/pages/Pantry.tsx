@@ -29,10 +29,14 @@ export function Pantry() {
     return showAll || q ? list : list.slice(0, 36);
   }, [query, showAll]);
 
-  const found = useMemo(
-    () => pantryMatches(recipes.filter((r) => fitsDiet(r, exclude)), have, { maxMissing: 2 }),
-    [have, exclude],
-  );
+  // Если с двумя докупками ничего не складывается, показываем все рецепты с выбранными продуктами.
+  const { found, loose } = useMemo(() => {
+    const pool = recipes.filter((r) => fitsDiet(r, exclude));
+    const strict = pantryMatches(pool, have, { maxMissing: 2 });
+    return strict.length > 0
+      ? { found: strict, loose: false }
+      : { found: pantryMatches(pool, have, { maxMissing: Infinity }), loose: true };
+  }, [have, exclude]);
   const ready = found.filter((m) => m.missing.length === 0).length;
 
   return (
@@ -95,10 +99,13 @@ export function Pantry() {
         ) : found.length === 0 ? (
           <div className="empty">
             <p className="empty__title">Пока ничего не складывается</p>
-            <p>Добавьте ещё продукты: показываем рецепты, где не хватает не больше двух.</p>
+            <p>Ни в одном рецепте нет выбранных продуктов. Попробуйте другие.</p>
           </div>
         ) : (
           <>
+            {loose && (
+              <p className="count">Сразу не складывается: вот рецепты с этими продуктами, сверху — где докупать меньше.</p>
+            )}
             <p className="count">
               {ready > 0 ? `Можно приготовить сразу: ${ready}. ` : ""}
               Всего {found.length} {plural(found.length, ["рецепт", "рецепта", "рецептов"])}

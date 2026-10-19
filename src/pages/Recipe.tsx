@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { categoryLabel, ingredientMap, per100Macros, portionGrams, recipeMap, sources } from "../data";
-import { macroPercents, per100g, round, scaleIngredients } from "../lib/nutrition";
+import { macroPercents, per100g, round, scale, scaleIngredients } from "../lib/nutrition";
 import { applySwaps, availableSwaps } from "../lib/swaps";
 import { formatAmount, formatTime, servingsLabel } from "../lib/format";
 import { Art } from "../art/Art";
@@ -32,7 +32,11 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
   const options = availableSwaps(recipe);
   // Рецепт с заменами продуктов: от него считаются КБЖУ, граммы и шаги готовки.
   const cooked = applySwaps(recipe, active);
-  const serving = servingFor(recipe.id);
+  // Своя порция в граммах: КБЖУ пересчитываются от веса стандартной порции.
+  const [myGrams, setMyGrams] = useState<number | null>(null);
+  const baseGrams = portionGrams[recipe.id];
+  const portionK = myGrams ? myGrams / baseGrams : 1;
+  const serving = scale(servingFor(recipe.id), portionK);
   const m = round(serving);
   const m100 = round(active.length ? per100g(cooked, ingredientMap) : per100Macros[recipe.id]);
   const pc = macroPercents(serving);
@@ -79,7 +83,33 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
 
       {recipe.video && <ReelEmbed url={recipe.video} title={recipe.title} />}
 
-      <section className="nutrition" aria-label="Пищевая ценность одной порции">
+      <section className="nutrition" aria-label={myGrams ? `Пищевая ценность ${myGrams} г` : "Пищевая ценность одной порции"}>
+        <div className="my-portion">
+          <label className="grams-input">
+            <span>Моя порция</span>
+            <input
+              key={myGrams === null ? "base" : "own"}
+              type="number"
+              inputMode="numeric"
+              min={1}
+              max={3000}
+              defaultValue={myGrams ?? baseGrams}
+              onChange={(e) => {
+                const v = Math.round(Number(e.target.value));
+                if (v > 0 && v <= 3000) setMyGrams(v === baseGrams ? null : v);
+              }}
+              aria-label="Вес моей порции в граммах"
+            />
+            <span>г</span>
+          </label>
+          {myGrams ? (
+            <button type="button" className="btn btn--text" onClick={() => setMyGrams(null)}>
+              Как в рецепте, {baseGrams} г
+            </button>
+          ) : (
+            <small>Взвесьте тарелку и впишите свой вес</small>
+          )}
+        </div>
         <MacroRing macros={serving} size={148} stroke={14}>
           <span className="kcal kcal--ring">
             <span className="kcal__num">{m.kcal}</span>
@@ -125,8 +155,13 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
           type="button"
           className="btn btn--accent"
           onClick={() => {
-            addToDay(recipe.id, 1);
-            showToast("Порция добавлена в «Мой день»");
+            if (myGrams) {
+              addToDay(recipe.id, portionK, true);
+              showToast(`${myGrams} г добавлено в «Мой день»`);
+            } else {
+              addToDay(recipe.id, 1);
+              showToast("Порция добавлена в «Мой день»");
+            }
           }}
         >
           В мой день

@@ -658,6 +658,17 @@
 .nutrition {
   flex-wrap: wrap;
 }
+.my-portion {
+  flex: 1 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.my-portion small {
+  color: var(--muted);
+  font-size: 13px;
+}
 .per100 {
   flex: 1 0 100%;
   display: flex;

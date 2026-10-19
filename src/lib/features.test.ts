@@ -64,6 +64,16 @@ describe("из того, что есть", () => {
     expect(found[0].missing).toEqual([]);
     for (let i = 1; i < found.length; i++) expect(found[i].missing.length).toBeGreaterThanOrEqual(found[i - 1].missing.length);
   });
+
+  it("показывает только рецепты с выбранными продуктами, масло совпадением не считается", () => {
+    for (const maxMissing of [2, Infinity]) {
+      for (const m of pantryMatches(recipes, new Set(["beef_mince"]), { maxMissing })) {
+        expect(m.recipe.ingredients.map((i) => i.id)).toContain("beef_mince");
+      }
+    }
+    const all = pantryMatches(recipes, new Set(["beef_mince"]), { maxMissing: Infinity });
+    expect(all.length).toBe(recipes.filter((r) => r.ingredients.some((i) => i.id === "beef_mince")).length);
+  });
 });
 
 describe("меню на день", () => {

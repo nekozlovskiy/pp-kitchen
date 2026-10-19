@@ -25,7 +25,8 @@ export function pantryMatches(
   return recipes
     .map((recipe) => {
       const missing = missingFor(recipe, have, assumeStaples);
-      return { recipe, missing, have: recipe.ingredients.length - missing.length };
+      // Совпадением считаем только выбранные продукты: масло «по умолчанию» само рецепт не подбирает.
+      return { recipe, missing, have: recipe.ingredients.filter((i) => have.has(i.id)).length };
     })
     .filter((m) => m.missing.length <= maxMissing && m.have > 0)
     .sort((a, b) => a.missing.length - b.missing.length || b.have - a.have);

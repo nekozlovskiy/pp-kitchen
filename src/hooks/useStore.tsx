@@ -21,7 +21,7 @@ type Store = {
   favorites: Set<string>;
   toggleFavorite: (id: string) => void;
   day: DayItem[];
-  addToDay: (id: string, servings?: number) => void;
+  addToDay: (id: string, servings?: number, grams?: boolean) => void;
   setDayServings: (index: number, servings: number) => void;
   toggleDayUnit: (index: number) => void;
   removeFromDay: (index: number) => void;
@@ -135,11 +135,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const addToDay = useCallback((id: string, servings = 1) => {
+  const addToDay = useCallback((id: string, servings = 1, grams?: boolean) => {
     setDay((prev) => {
       const i = prev.findIndex((x) => x.id === id);
-      if (i === -1) return [...prev, { id, servings }];
-      return prev.map((x, j) => (j === i ? { ...x, servings: x.servings + servings } : x));
+      if (i === -1) return [...prev, grams ? { id, servings, grams } : { id, servings }];
+      return prev.map((x, j) => (j === i ? { ...x, servings: x.servings + servings, grams: x.grams || grams } : x));
     });
   }, []);
 
