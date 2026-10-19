@@ -19,8 +19,32 @@ import { ReelEmbed } from "../components/ReelEmbed";
 import { WEEKDAYS } from "./Week";
 import type { Recipe } from "../types";
 
+/** Поделиться ссылкой на рецепт: системное меню на телефоне, копирование ссылки на компьютере. */
+function ShareButton({ recipe, onCopied }: { recipe: Recipe; onCopied: () => void }) {
+  const share = async () => {
+    const url = `${location.origin}${location.pathname}#/recipe/${recipe.id}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: recipe.title, text: recipe.description, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      onCopied();
+    } catch {
+      /* пользователь закрыл меню «Поделиться» */
+    }
+  };
+  return (
+    <button type="button" className="heart heart--big" aria-label={`Поделиться рецептом «${recipe.title}»`} onClick={share}>
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path d="M12 15V4M8 8l4-4 4 4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" />
+      </svg>
+    </button>
+  );
+}
+
 function RecipeBody({ recipe }: { recipe: Recipe }) {
-  const { addToDay, addToShopping, addToWeek, showToast, journal, swaps, toggleSwap, servingFor } = useStore();
+  const { addToDay, addToShopping, addToWeek, showToast, journal, swaps, toggleSwap, servingFor, goal, proteinGoal } = useStore();
   const [servings, setServings] = useState(recipe.servings);
   const [checked, setChecked] = useState<Set<number>>(new Set());
   const [keepAwake, setKeepAwake] = useState(false);
@@ -148,6 +172,16 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
             Б {m100.p} · Ж {m100.f} · У {m100.c} г
           </span>
         </p>
+        {goal > 0 && (
+          <p className="goal-share">
+            {myGrams ? `${myGrams} г` : "Порция"} — это <b>{Math.round((serving.kcal / goal) * 100)}%</b> цели на день по калориям
+            {proteinGoal > 0 && (
+              <>
+                {" "}и <b>{Math.round((serving.p / proteinGoal) * 100)}%</b> по белку
+              </>
+            )}
+          </p>
+        )}
       </section>
 
       <div className="recipe__actions">
@@ -166,6 +200,7 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
         >
           В мой день
         </button>
+        <ShareButton recipe={recipe} onCopied={() => showToast("Ссылка на рецепт скопирована")} />
         <HeartButton id={recipe.id} title={recipe.title} className="heart--big" />
       </div>
 
