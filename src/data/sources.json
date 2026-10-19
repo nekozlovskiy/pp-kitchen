@@ -69,5 +69,11 @@
   "ig_belkovyj_uzhin": { "site": "Instagram", "title": "Мега-белковый ужин", "author": "@alena_bliss", "date": "2026-08-07", "url": "https://www.instagram.com/reel/Dbuv-TxMMdL/" },
   "ig_salat_ozempik": { "site": "Instagram", "title": "Салат Оземпик", "author": "@_dmitriifit", "date": "2026-09-18", "url": "https://www.instagram.com/reel/DdbIwmGII-j/" },
   "ig_salat_tunec": { "site": "Instagram", "title": "За раз и не съешь", "author": "@alena.evlina", "date": "2026-09-19", "url": "https://www.instagram.com/p/Ddd3AZxiO8H/" },
-  "ig_lahmajun": { "site": "Instagram", "title": "А вы и дальше сидите на своем ПП", "author": "@ochkarik_na_kuhne", "date": "2025-04-19", "url": "https://www.instagram.com/reel/DIoQoHZMj4N/" }
+  "ig_lahmajun": { "site": "Instagram", "title": "А вы и дальше сидите на своем ПП", "author": "@ochkarik_na_kuhne", "date": "2025-04-19", "url": "https://www.instagram.com/reel/DIoQoHZMj4N/" },
+  "fr_zavtraki": { "site": "Food.ru", "title": "12 полезных завтраков без сахара", "author": "Елена Минина", "date": "2026-07-28", "url": "https://food.ru/articles/10159-12-poleznyh-zavtrakov-bez-sahara" },
+  "fr_deserty": { "site": "Food.ru", "title": "Как приготовить ПП-десерты", "author": "Ирина Белая", "date": "2024-12-19", "url": "https://food.ru/articles/10213-kak-prigotovit-pp-deserty" },
+  "fr_uzhin_figura": { "site": "Food.ru", "title": "Что съесть на ужин без вреда для фигуры", "author": "редакция Food.ru", "date": "2026-03-16", "url": "https://food.ru/articles/12478-chto-sest-na-uzhin-bez-vreda-dlya-figury" },
+  "fr_legkij_uzhin": { "site": "Food.ru", "title": "10 рецептов для легкого ужина", "author": "Екатерина Морголь", "date": "2026-04-22", "url": "https://food.ru/articles/5761-7-receptov-dlja-legkogo-uzhina" },
+  "fr_top10": { "site": "Food.ru", "title": "Топ-10 простых ПП-рецептов", "author": "Гюзель Аглиуллина", "date": "2022-02-01", "url": "https://food.ru/articles/6153-top-10-prostyh-pp-receptov" },
+  "fr_postnye": { "site": "Food.ru", "title": "Постные ПП-обеды", "author": "редакция Food.ru", "date": "2022-12-16", "url": "https://food.ru/articles/6643-postnye-pp-obedy" }
 }
