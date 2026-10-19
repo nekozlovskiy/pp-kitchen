@@ -4,6 +4,7 @@ import { dietIngredients, fitsDiet } from "./diet";
 import { formatClock, splitStep } from "./steptime";
 import { missingFor, pantryMatches } from "./pantry";
 import { buildMenu } from "./menu";
+import { collections, hasProduct, products } from "./collections";
 
 const timers = (s: string) => splitStep(s).filter((p) => p.seconds).map((p) => [p.text, p.seconds]);
 
@@ -128,5 +129,29 @@ describe("перенос на другое устройство", () => {
     expect(decodeBundle("привет")).toBeNull();
     expect(decodeBundle("PP1:@@@")).toBeNull();
     expect(decodeBundle('{"v":2,"data":{}}')).toBeNull();
+  });
+});
+
+describe("подборки и главный продукт", () => {
+  it("все продукты в группах есть в таблице", () => {
+    for (const p of products) for (const id of p.ids) expect(ingredientMap[id], `${p.id}: ${id}`).toBeDefined();
+  });
+
+  it("каждая группа продуктов и каждая подборка находят рецепты", () => {
+    for (const p of products) expect(recipes.some((r) => hasProduct(r, p.id)), p.id).toBe(true);
+    for (const c of collections.filter((c) => c.id !== "loved")) {
+      expect(recipes.some((r) => c.test(r, { macros: servingMacros[r.id] })), c.id).toBe(true);
+    }
+  });
+
+  it("«Без духовки» не берёт рецепты с духовкой, «Любимое» — только по дневнику", () => {
+    const noOven = collections.find((c) => c.id === "no-oven")!;
+    for (const r of recipes.filter((r) => noOven.test(r, { macros: servingMacros[r.id] }))) {
+      expect(r.steps.join(" "), r.id).not.toMatch(/духовк/i);
+    }
+    const loved = collections.find((c) => c.id === "loved")!;
+    const r = recipes[0];
+    expect(loved.test(r, { macros: servingMacros[r.id] })).toBe(false);
+    expect(loved.test(r, { macros: servingMacros[r.id], journal: { rating: 5 } })).toBe(true);
   });
 });

@@ -3,6 +3,7 @@ import { categories } from "../data";
 import { dietLabels } from "../lib/diet";
 import type { DietTag } from "../lib/diet";
 import { useStore } from "../hooks/useStore";
+import { collectionMap, products } from "../lib/collections";
 
 export type SortKey = "default" | "kcal" | "per100" | "protein" | "time" | "rating";
 
@@ -15,6 +16,10 @@ export type Filters = {
   quick: boolean;
   favOnly: boolean;
   cookedOnly: boolean;
+  /** Главный продукт из lib/collections, "" — любой */
+  product: string;
+  /** Подборка с главной, "" — без подборки */
+  collection: string;
   maxKcal: number;
   sort: SortKey;
 };
@@ -30,6 +35,8 @@ export const defaultFilters: Filters = {
   quick: false,
   favOnly: false,
   cookedOnly: false,
+  product: "",
+  collection: "",
   maxKcal: KCAL_MAX,
   sort: "default",
 };
@@ -69,8 +76,28 @@ export function FilterBar({ value, onChange }: { value: Filters; onChange: (f: F
         ))}
       </div>
 
+      <div className="chips" role="radiogroup" aria-label="Главный продукт">
+        {[{ id: "", label: "Любой продукт" }, ...products].map((p) => (
+          <button
+            key={p.id || "any"}
+            type="button"
+            role="radio"
+            aria-checked={value.product === p.id}
+            className={`chip chip--soft ${value.product === p.id ? "is-on" : ""}`}
+            onClick={() => set("product", value.product === p.id ? "" : p.id)}
+          >
+            {p.label}
+          </button>
+        ))}
+      </div>
+
       <div className="filters__row">
         <div className="toggles">
+          {value.collection && collectionMap[value.collection] && (
+            <button type="button" className="toggle is-on" aria-pressed="true" onClick={() => set("collection", "")} aria-label={`Убрать подборку «${collectionMap[value.collection].title}»`}>
+              {collectionMap[value.collection].title} ×
+            </button>
+          )}
           <button type="button" className={`toggle ${value.highProtein ? "is-on" : ""}`} aria-pressed={value.highProtein} onClick={() => set("highProtein", !value.highProtein)}>
             Белка от 20 г
           </button>

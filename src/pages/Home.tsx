@@ -11,6 +11,7 @@ import { FilterBar, KCAL_MAX, defaultFilters } from "../components/FilterBar";
 import type { Filters } from "../components/FilterBar";
 import { RecipeCard } from "../components/RecipeCard";
 import { useStore } from "../hooks/useStore";
+import { collectionMap, collections, hasProduct } from "../lib/collections";
 
 const texts = Object.fromEntries(recipes.map((r) => [r.id, searchText(r, ingredientMap)]));
 
@@ -81,6 +82,41 @@ function Feature() {
   );
 }
 
+/** Лента подборок: готовые сочетания фильтров. «Любимое» появляется, когда есть оценки или повторы. */
+function Collections({ onPick }: { onPick: (id: string) => void }) {
+  const { journal, exclude } = useStore();
+  const items = useMemo(
+    () =>
+      collections
+        .map((c) => ({
+          ...c,
+          count: recipes.filter((r) => fitsDiet(r, exclude) && c.test(r, { macros: servingMacros[r.id], journal: journal[r.id] })).length,
+        }))
+        .filter((c) => c.count > 0),
+    [journal, exclude],
+  );
+  return (
+    <section className="collections wrap" aria-labelledby="collections-title">
+      <h2 id="collections-title" className="section-title">
+        Подборки
+      </h2>
+      <ul className="collections__list">
+        {items.map((c) => (
+          <li key={c.id}>
+            <button type="button" className={`collection collection--${c.id}`} onClick={() => onPick(c.id)}>
+              <b>{c.title}</b>
+              <span>{c.hint}</span>
+              <small>
+                {c.count} {plural(c.count, ["рецепт", "рецепта", "рецептов"])}
+              </small>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 export function Home() {
   const { favorites, exclude, journal } = useStore();
   const [filters, setFilters] = useState<Filters>(defaultFilters);
@@ -102,6 +138,9 @@ export function Home() {
       if (filters.quick && r.timeMinutes > 20) return false;
       if (filters.favOnly && !favorites.has(r.id)) return false;
       if (filters.cookedOnly && !journal[r.id]?.cooked) return false;
+      if (filters.product && !hasProduct(r, filters.product)) return false;
+      const col = collectionMap[filters.collection];
+      if (col && !col.test(r, { macros: m, journal: journal[r.id] })) return false;
       if (!fitsDiet(r, exclude)) return false;
       if (filters.maxKcal < KCAL_MAX && m.kcal > filters.maxKcal) return false;
       if (filters.query.trim() && !matches(texts[r.id], filters.query)) return false;
@@ -133,6 +172,13 @@ export function Home() {
         <Masthead />
         <Feature />
       </header>
+
+      <Collections
+        onPick={(id) => {
+          changeFilters({ ...defaultFilters, collection: id });
+          document.getElementById("catalog-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }}
+      />
 
       <section className="catalog wrap" aria-labelledby="catalog-title">
         <h2 id="catalog-title" className="section-title">
