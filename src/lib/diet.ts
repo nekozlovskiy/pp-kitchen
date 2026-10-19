@@ -30,7 +30,7 @@ const tagged: Record<DietTag, string[]> = {
   egg: ["egg", "egg_white", "egg_yolk", "quail_egg"],
   gluten: [
     "wheat_flour", "whole_flour", "whole_bread", "lavash", "tortilla", "whole_pasta", "lasagna", "bulgur",
-    "semolina", "soy_sauce", "crab_sticks", "oats", "oat_flour", "oat_bran", "granola",
+    "semolina", "soy_sauce", "crab_sticks", "oats", "oat_flour", "oat_bran", "granola", "rye_flour", "wheat_bran",
   ],
 };
 

@@ -42,5 +42,12 @@
   "zavtrak_yajca": { "site": "Леди Mail.ru", "title": "5 лучших рецептов ПП-завтраков с яйцами", "author": "Дарья Мокина", "date": "2026-10-08", "url": "https://lady.mail.ru/article/599599-luchshie-retsepty-pp-zavtrakov-s-yajtsami/" },
   "oladi": { "site": "Леди Mail.ru", "title": "5 лучших рецептов ПП-оладий", "author": "Дарья Мокина", "date": "2026-03-13", "url": "https://lady.mail.ru/article/584111-luchshie-retsepty-pp-oladij/" },
   "kurica_ovoshchi": { "site": "Леди Mail.ru", "title": "5 лучших рецептов курицы с овощами", "author": "Ирина Юрченко", "date": "2026-05-13", "url": "https://lady.mail.ru/article/588089-luchshie-retsepty-kuritsy-s-ovoshhami/" },
-  "multivarka": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов в мультиварке", "author": "Ирина Юрченко", "date": "2026-05-07", "url": "https://lady.mail.ru/article/587796-luchshie-pp-retsepty-v-multivarke/" }
+  "multivarka": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов в мультиварке", "author": "Ирина Юрченко", "date": "2026-05-07", "url": "https://lady.mail.ru/article/587796-luchshie-pp-retsepty-v-multivarke/" },
+  "khleb": { "site": "Леди Mail.ru", "title": "5 лучших рецептов ПП-хлеба", "author": "Дарья Мокина", "date": "2026-05-25", "url": "https://lady.mail.ru/article/588909-luchshie-retsepty-pp-khleba/" },
+  "lavash_pp": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов из лаваша", "author": "Екатерина Королятина", "date": "2026-05-19", "url": "https://lady.mail.ru/article/588532-luchshie-pp-retsepty-iz-lavasha/" },
+  "aerogril": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов в аэрогриле", "author": "Екатерина Королятина", "date": "2026-05-27", "url": "https://lady.mail.ru/article/589202-luchshie-pp-retsepty-v-aehrogrile/" },
+  "okroshka": { "site": "Леди Mail.ru", "title": "6 лучших рецептов ПП-окрошки", "author": "Жанна Зырянова", "date": "2026-06-26", "url": "https://lady.mail.ru/article/564085-luchshie-retsepty-pp-okroshki/" },
+  "kurica_brokkoli": { "site": "Леди Mail.ru", "title": "5 лучших рецептов курицы с брокколи", "author": "Ирина Юрченко", "date": "2026-09-10", "url": "https://lady.mail.ru/article/596836-luchshie-retsepty-kuritsy-s-brokkoli/" },
+  "paskha": { "site": "Леди Mail.ru", "title": "5 лучших ПП-рецептов на Пасху", "author": "Ирина Юрченко", "date": "2026-03-30", "url": "https://lady.mail.ru/article/585267-luchshie-pp-retsepty-na-paskhu/" },
+  "novyj_god": { "site": "Леди Mail.ru", "title": "7 лучших ПП-рецептов на Новый год", "author": "Ольга Толкачева", "date": "2025-12-09", "url": "https://lady.mail.ru/article/554795-luchshie-pp-retsepty-na-noviy-god/" }
 }
