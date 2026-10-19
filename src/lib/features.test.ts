@@ -5,6 +5,7 @@ import { formatClock, splitStep } from "./steptime";
 import { missingFor, pantryMatches } from "./pantry";
 import { buildMenu } from "./menu";
 import { collections, hasProduct, products } from "./collections";
+import { cleanHistory, lastDays, withDay } from "./history";
 
 const timers = (s: string) => splitStep(s).filter((p) => p.seconds).map((p) => [p.text, p.seconds]);
 
@@ -153,5 +154,29 @@ describe("подборки и главный продукт", () => {
     const r = recipes[0];
     expect(loved.test(r, { macros: servingMacros[r.id] })).toBe(false);
     expect(loved.test(r, { macros: servingMacros[r.id], journal: { rating: 5 } })).toBe(true);
+  });
+});
+
+describe("история дней", () => {
+  const m = (kcal: number) => ({ kcal, p: 10, f: 5, c: 20 });
+
+  it("хранит 14 последних дней, пустой день убирает", () => {
+    let h = {};
+    for (let d = 1; d <= 20; d++) h = withDay(h, `2026-10-${String(d).padStart(2, "0")}`, m(1000 + d));
+    expect(Object.keys(h)).toHaveLength(14);
+    expect(Object.keys(h)[0]).toBe("2026-10-07");
+    expect(withDay(h, "2026-10-20", m(0))["2026-10-20"]).toBeUndefined();
+  });
+
+  it("неделя заканчивается сегодняшним днём, пропуски — null", () => {
+    const days = lastDays({ "2026-10-19": m(1500), "2026-10-17": m(1400) }, 7, new Date(2026, 9, 19));
+    expect(days.map((d) => d.date)).toEqual(["2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17", "2026-10-18", "2026-10-19"]);
+    expect(days[4].totals?.kcal).toBe(1400);
+    expect(days[5].totals).toBeNull();
+  });
+
+  it("чужие данные в хранилище отбрасываются", () => {
+    expect(cleanHistory({ "2026-10-19": m(1500), junk: m(1), "2026-10-18": { kcal: "много" } })).toEqual({ "2026-10-19": m(1500) });
+    expect(cleanHistory(null)).toEqual({});
   });
 });

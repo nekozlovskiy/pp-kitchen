@@ -1052,3 +1052,55 @@
     transition: none;
   }
 }
+
+/* ---------- График за неделю в «Моём дне» ---------- */
+
+.week-chart {
+  margin: 36px 0 0;
+  padding: 22px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.week-chart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 14px;
+  overflow: visible;
+}
+.week-chart__bar {
+  fill: color-mix(in srgb, var(--ink) 28%, var(--surface));
+}
+.week-chart__bar.is-today {
+  fill: var(--accent);
+}
+.week-chart__goal {
+  stroke: var(--muted);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+.week-chart__axis {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.week-chart__goal-label,
+.week-chart__day {
+  fill: var(--muted);
+  font-size: 11px;
+}
+.week-chart__day.is-today,
+.week-chart__value {
+  fill: var(--ink);
+  font-weight: 700;
+}
+.week-chart__value {
+  font-size: 12px;
+}
+.week-chart__sum {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.week-chart__sum b {
+  color: var(--ink);
+}

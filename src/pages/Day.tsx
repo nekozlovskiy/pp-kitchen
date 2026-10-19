@@ -7,6 +7,7 @@ import { MacroRing } from "../components/MacroRing";
 import { Stepper } from "../components/Stepper";
 import { useStore } from "../hooks/useStore";
 import { MenuBuilder } from "../components/MenuBuilder";
+import { WeekChart } from "../components/WeekChart";
 
 export function Day() {
   const { day, setDayServings, toggleDayUnit, removeFromDay, clearDay, goal, setGoal, servingFor } = useStore();
@@ -20,7 +21,7 @@ export function Day() {
     <main className="day wrap">
       <header className="page-head">
         <h1 className="page-title">Мой день</h1>
-        <p className="page-sub">Что вы съели сегодня. Можно считать порциями или взвесить тарелку и ввести граммы. Список очищается сам в полночь.</p>
+        <p className="page-sub">Что вы съели сегодня. Можно считать порциями или взвесить тарелку и ввести граммы. Список очищается сам в полночь, а итог дня остаётся на графике за неделю.</p>
       </header>
 
       <section className="day__summary" aria-label="Итог дня">
@@ -145,6 +146,8 @@ export function Day() {
           </Link>
         </div>
       )}
+
+      <WeekChart />
 
       <MenuBuilder />
 

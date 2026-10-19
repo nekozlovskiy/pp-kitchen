@@ -2,9 +2,11 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { ReactNode } from "react";
 import { readJSON, writeJSON } from "../lib/storage";
 import { todayKey } from "../lib/format";
+import { cleanHistory, withDay } from "../lib/history";
+import type { History } from "../lib/history";
 import { config } from "../config";
 import { ingredientMap, recipeMap, servingMacros } from "../data";
-import { perServing } from "../lib/nutrition";
+import { perServing, scale, sum } from "../lib/nutrition";
 import { SWAPS, applySwaps } from "../lib/swaps";
 import type { Macros } from "../types";
 import { dietLabels } from "../lib/diet";
@@ -52,6 +54,8 @@ type Store = {
   /** КБЖУ порции с учётом замен. */
   servingFor: (recipeId: string) => Macros;
   /** Меню на неделю: семь списков блюд, понедельник — первый. */
+  /** Итоги прошлых дней для графика в «Моём дне» */
+  history: History;
   week: DayItem[][];
   addToWeek: (day: number, id: string, servings?: number) => void;
   removeFromWeek: (day: number, index: number) => void;
@@ -118,6 +122,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => writeJSON("pp.shopping", shopping), [shopping]);
   useEffect(() => writeJSON("pp.favorites", [...favorites]), [favorites]);
   useEffect(() => writeJSON("pp.day", { date: todayKey(), items: day }), [day]);
+  const [history, setHistory] = useState<History>(() => cleanHistory(readJSON<unknown>("pp.history", {})));
+  useEffect(() => writeJSON("pp.history", history), [history]);
+  // Итог сегодняшнего дня сразу попадает в историю: завтра «Мой день» очистится, а график останется.
+  useEffect(() => {
+    const totals = sum(
+      day.map((x) =>
+        scale(swaps[x.id]?.length ? perServing(applySwaps(recipeMap[x.id], swaps[x.id]), ingredientMap) : servingMacros[x.id], x.servings),
+      ),
+    );
+    setHistory((h) => withDay(h, todayKey(), totals));
+  }, [day, swaps]);
   useEffect(() => writeJSON("pp.goal", goal), [goal]);
 
   const showToast = useCallback((msg: string) => {
@@ -195,6 +210,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           const cur = s[recipeId] ?? [];
           return { ...s, [recipeId]: cur.includes(key) ? cur.filter((k) => k !== key) : [...cur, key] };
         }),
+      history,
       week,
       addToWeek: (d, id, servings = 1) => setWeekState((w) => w.map((items, j) => (j === d ? [...items, { id, servings }] : items))),
       removeFromWeek: (d, index) => setWeekState((w) => w.map((items, j) => (j === d ? items.filter((_, k) => k !== index) : items))),
@@ -203,7 +219,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       servingFor: (recipeId) =>
         swaps[recipeId]?.length ? perServing(applySwaps(recipeMap[recipeId], swaps[recipeId]), ingredientMap) : servingMacros[recipeId],
     }),
-    [favorites, toggleFavorite, day, addToDay, goal, shopping, toast, showToast, journal, exclude, pantry, proteinGoal, swaps, week],
+    [favorites, toggleFavorite, day, addToDay, goal, shopping, toast, showToast, journal, exclude, pantry, proteinGoal, swaps, week, history],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

@@ -12,6 +12,7 @@ export const TRANSFER_KEYS = [
   "pp.exclude",
   "pp.pantry",
   "pp.swaps",
+  "pp.history",
 ] as const;
 
 export type Bundle = { v: 1; at: string; data: Record<string, unknown> };
