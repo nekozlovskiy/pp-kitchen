@@ -16,7 +16,7 @@ export const dietLabels: Record<DietTag, string> = {
 const tagged: Record<DietTag, string[]> = {
   meat: [
     "chicken", "chicken_thigh", "chicken_liver", "chicken_mince", "chicken_boiled",
-    "turkey", "turkey_mince", "turkey_smoked", "turkey_thigh", "beef", "beef_mince", "gelatin", "chicken_smoked", "pork_lean", "turkey_ham", "turkey_boiled", "beef_liver", "veal_mince",
+    "turkey", "turkey_mince", "turkey_smoked", "turkey_thigh", "beef", "beef_mince", "gelatin", "chicken_smoked", "pork_lean", "turkey_ham", "turkey_boiled", "beef_liver", "veal_mince", "beef_heart",
   ],
   fish: [
     "cod", "pollock", "salmon", "salmon_salted", "pink_salmon_boiled", "trout", "tuna", "tuna_fresh",
