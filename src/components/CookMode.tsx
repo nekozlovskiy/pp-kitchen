@@ -12,10 +12,27 @@ import { StepText } from "./StepText";
  * Пошаговый режим: один шаг на экран крупным шрифтом, листается свайпом или кнопками.
  * Пока он открыт, экран не гаснет.
  */
-export function CookMode({ recipe, servings, onClose }: { recipe: Recipe; servings: number; onClose: () => void }) {
+export function CookMode({
+  recipe,
+  servings,
+  onClose,
+  initialStep = 0,
+  onStep,
+  onFinish,
+}: {
+  recipe: Recipe;
+  servings: number;
+  onClose: () => void;
+  /** С какого шага открыть: продолжение прерванной готовки. */
+  initialStep?: number;
+  onStep?: (step: number) => void;
+  /** «Готово!» на последнем шаге: готовка закончена. */
+  onFinish?: () => void;
+}) {
   const { markCooked, showToast } = useStore();
-  const [step, setStep] = useState(0); // 0 — продукты, дальше шаги
   const total = recipe.steps.length + 1;
+  const [step, setStep] = useState(() => Math.min(initialStep, total - 1)); // 0 — продукты, дальше шаги
+  useEffect(() => onStep?.(step), [step, onStep]);
   const { active } = useWakeLock(true);
   const box = useRef<HTMLDivElement>(null);
   const touch = useRef<number | null>(null);
@@ -52,6 +69,7 @@ export function CookMode({ recipe, servings, onClose }: { recipe: Recipe; servin
   }, [onClose]);
 
   const finish = () => {
+    onFinish?.();
     markCooked(recipe.id);
     showToast("Записала: приготовлено сегодня");
     onClose();

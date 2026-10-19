@@ -15,6 +15,7 @@ import { Pantry } from "./pages/Pantry";
 import { Week } from "./pages/Week";
 import { Transfer } from "./pages/Transfer";
 import { TimerDock } from "./components/TimerDock";
+import { CookingBanner } from "./components/CookingBanner";
 
 function useTitle(location: Location) {
   useEffect(() => {
@@ -49,6 +50,7 @@ export function App() {
         </Link>
         <Nav />
       </div>
+      <CookingBanner />
       <div id="content">
         <Routes location={background ?? location}>
           <Route path="/" element={<Home />} />

@@ -1,4 +1,5 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { clearCooking, readCooking, saveCooking } from "../lib/cooking";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { categoryLabel, ingredientMap, per100Macros, portionGrams, recipeAliases, recipeMap, sources } from "../data";
 import { macroPercents, per100g, round, scale, scaleIngredients } from "../lib/nutrition";
@@ -45,8 +46,29 @@ function ShareButton({ recipe, onCopied }: { recipe: Recipe; onCopied: () => voi
 
 function RecipeBody({ recipe }: { recipe: Recipe }) {
   const { addToDay, addToShopping, addToWeek, showToast, journal, swaps, toggleSwap, servingFor, goal, proteinGoal } = useStore();
-  const [servings, setServings] = useState(recipe.servings);
-  const [checked, setChecked] = useState<Set<number>>(new Set());
+  // Если этот рецепт уже готовится — продолжаем с тех же отметок, шага и числа порций.
+  const [resume] = useState(() => {
+    const c = readCooking();
+    return c?.id === recipe.id ? c : null;
+  });
+  const [servings, setServings] = useState(resume?.servings ?? recipe.servings);
+  const [checked, setChecked] = useState<Set<number>>(() => new Set(resume?.checked ?? []));
+  const [cookStep, setCookStep] = useState(resume?.step ?? 0);
+  // Готовка начинается с первой отметки продукта или с пошагового режима, а не с открытия рецепта.
+  const started = useRef(Boolean(resume));
+  useEffect(() => {
+    if (started.current) saveCooking({ id: recipe.id, checked: [...checked], step: cookStep, servings });
+  }, [recipe.id, checked, cookStep, servings]);
+  const onCookStep = useCallback((s: number) => {
+    started.current = true;
+    setCookStep(s);
+  }, []);
+  const resetCooking = () => {
+    started.current = false;
+    clearCooking();
+    setChecked(new Set());
+    setCookStep(0);
+  };
   const [keepAwake, setKeepAwake] = useState(false);
   const [cooking, setCooking] = useState(false);
   const wake = useWakeLock(keepAwake);
@@ -66,13 +88,15 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
   const pc = macroPercents(serving);
   const items = scaleIngredients(cooked, servings);
 
-  const toggle = (i: number) =>
+  const toggle = (i: number) => {
+    started.current = true;
     setChecked((prev) => {
       const next = new Set(prev);
       if (next.has(i)) next.delete(i);
       else next.add(i);
       return next;
     });
+  };
 
   return (
     <article className="recipe">
@@ -206,8 +230,13 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
 
       <div className="cook-bar">
         <button type="button" className="btn btn--ghost" onClick={() => setCooking(true)}>
-          Готовить по шагам
+          {cookStep > 0 ? `Продолжить с шага ${Math.min(cookStep, recipe.steps.length)}` : "Готовить по шагам"}
         </button>
+        {(cookStep > 0 || checked.size > 0) && (
+          <button type="button" className="btn btn--text" onClick={resetCooking}>
+            Начать заново
+          </button>
+        )}
         {wake.supported && (
           <label className="switch">
             <input type="checkbox" checked={keepAwake} onChange={(e) => setKeepAwake(e.target.checked)} />
@@ -215,7 +244,7 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
           </label>
         )}
       </div>
-      {cooking && <CookMode recipe={cooked} servings={servings} onClose={closeCook} />}
+      {cooking && <CookMode recipe={cooked} servings={servings} onClose={closeCook} initialStep={cookStep} onStep={onCookStep} onFinish={resetCooking} />}
 
       <section className="recipe__section">
         <div className="recipe__section-head">

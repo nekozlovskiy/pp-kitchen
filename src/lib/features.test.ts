@@ -145,6 +145,19 @@ describe("подборки и главный продукт", () => {
     }
   });
 
+  it("«На пару» и «Супы» не путаются со словами «на пару секунд» и «в бульоне»", () => {
+    const pick = (id: string) => {
+      const c = collections.find((c) => c.id === id)!;
+      return new Set(recipes.filter((r) => c.test(r, { macros: servingMacros[r.id] })).map((r) => r.id));
+    };
+    const steamed = pick("steamed");
+    expect(steamed.has("gs-steamed-tilapia-cucumber-sauce")).toBe(true);
+    expect(steamed.has("gs-fruit-popsicles-no-sugar")).toBe(false);
+    const soups = pick("soups");
+    expect(soups.has("gs-miso-soup-veg-tofu")).toBe(true);
+    expect([...soups].some((id) => /скумбри/i.test(recipes.find((r) => r.id === id)!.title))).toBe(false);
+  });
+
   it("«Без духовки» не берёт рецепты с духовкой, «Любимое» — только по дневнику", () => {
     const noOven = collections.find((c) => c.id === "no-oven")!;
     for (const r of recipes.filter((r) => noOven.test(r, { macros: servingMacros[r.id] }))) {

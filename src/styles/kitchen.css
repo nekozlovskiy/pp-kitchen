@@ -1017,7 +1017,7 @@
   line-height: 1.15;
 }
 .collection span {
-  color: var(--muted);
+  color: color-mix(in srgb, var(--muted) 85%, var(--ink));
   font-size: 14px;
   line-height: 1.3;
 }
@@ -1033,14 +1033,59 @@
 .collection--protein {
   background: var(--tint-breakfast);
 }
+.collection--steamed {
+  background: color-mix(in srgb, var(--food-green) 22%, var(--surface));
+}
+.collection--soups {
+  background: color-mix(in srgb, var(--food-red) 18%, var(--surface));
+}
 .collection--autumn {
-  background: color-mix(in srgb, var(--food-yolk) 32%, var(--surface));
+  background: color-mix(in srgb, var(--food-yolk) 20%, var(--surface));
 }
 .collection--no-sugar {
   background: var(--tint-dessert);
 }
 .collection--loved {
   background: var(--accent-soft);
+}
+
+/* ---------- «Готовлю сейчас» ---------- */
+.cooking-now {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-block: 4px 12px;
+}
+.cooking-now__link {
+  flex: 1;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  color: var(--ink);
+  text-decoration: none;
+}
+.cooking-now__link b {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.cooking-now__kicker {
+  color: color-mix(in srgb, var(--accent) 80%, var(--ink));
+  font-size: 13px;
+  font-weight: 700;
+}
+.cooking-now__close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
 }
 
 .chip--soft {
