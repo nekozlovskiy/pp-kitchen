@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { config } from "../config";
-import { recipeMap, servingMacros } from "../data";
+import { portionGrams, recipeMap, servingMacros } from "../data";
 import { round, scale, sum } from "../lib/nutrition";
 import { plural } from "../lib/format";
 import { MacroRing } from "../components/MacroRing";
@@ -9,7 +9,7 @@ import { useStore } from "../hooks/useStore";
 import { MenuBuilder } from "../components/MenuBuilder";
 
 export function Day() {
-  const { day, setDayServings, removeFromDay, clearDay, goal, setGoal } = useStore();
+  const { day, setDayServings, toggleDayUnit, removeFromDay, clearDay, goal, setGoal } = useStore();
   const location = useLocation();
   const totalsRaw = sum(day.map((x) => scale(servingMacros[x.id], x.servings)));
   const t = round(totalsRaw);
@@ -20,7 +20,7 @@ export function Day() {
     <main className="day wrap">
       <header className="page-head">
         <h1 className="page-title">Мой день</h1>
-        <p className="page-sub">Что вы съели сегодня. Список очищается сам в полночь.</p>
+        <p className="page-sub">Что вы съели сегодня. Можно считать порциями или взвесить тарелку и ввести граммы. Список очищается сам в полночь.</p>
       </header>
 
       <section className="day__summary" aria-label="Итог дня">
@@ -86,15 +86,44 @@ export function Day() {
                     <span className="day__item-kcal">{kcal} ккал</span>
                   </div>
                   <div className="day__item-ctrl">
-                    <Stepper
-                      value={x.servings}
-                      onChange={(v) => setDayServings(i, v)}
-                      min={0.5}
-                      max={10}
-                      step={0.5}
-                      label={`Порции: ${r.title}`}
-                      format={(v) => `${String(v).replace(".", ",")} ${plural(Math.ceil(v), ["порция", "порции", "порций"])}`}
-                    />
+                    {x.grams ? (
+                      <label className="grams-input">
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min={1}
+                          max={3000}
+                          defaultValue={Math.round(x.servings * portionGrams[x.id])}
+                          onChange={(e) => {
+                            const v = Number(e.target.value);
+                            if (v > 0 && v <= 3000) setDayServings(i, v / portionGrams[x.id]);
+                          }}
+                          aria-label={`Сколько граммов: ${r.title}`}
+                        />
+                        <span>г</span>
+                      </label>
+                    ) : (
+                      <Stepper
+                        value={x.servings}
+                        onChange={(v) => setDayServings(i, v)}
+                        min={0.5}
+                        max={10}
+                        step={0.5}
+                        label={`Порции: ${r.title}`}
+                        format={(v) => `${String(Math.round(v * 100) / 100).replace(".", ",")} ${plural(Math.ceil(v), ["порция", "порции", "порций"])}`}
+                      />
+                    )}
+                    <button
+                      type="button"
+                      className="btn btn--text"
+                      onClick={() => {
+                        // При переходе на порции округляем до половинки, чтобы степпер шагал ровно.
+                        if (x.grams) setDayServings(i, Math.max(0.5, Math.round(x.servings * 2) / 2));
+                        toggleDayUnit(i);
+                      }}
+                    >
+                      {x.grams ? "В порциях" : "В граммах"}
+                    </button>
                     <button type="button" className="btn btn--text" onClick={() => removeFromDay(i)} aria-label={`Убрать «${r.title}»`}>
                       Убрать
                     </button>

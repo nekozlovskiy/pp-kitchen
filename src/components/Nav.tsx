@@ -31,7 +31,8 @@ function Icon({ name }: { name: "book" | "heart" | "sun" | "bag" }) {
 
 export function Nav() {
   const { favorites, day, shopping } = useStore();
-  const portions = day.reduce((a, x) => a + x.servings, 0);
+  // Число блюд за день: порции бывают дробными, когда вес вводится в граммах.
+  const portions = day.length;
   return (
     <nav className="nav" aria-label="Разделы">
       <NavLink to="/" end className="nav__link">

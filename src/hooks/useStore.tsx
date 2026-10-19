@@ -7,7 +7,8 @@ import { ingredientMap, recipeMap } from "../data";
 import { dietLabels } from "../lib/diet";
 import type { DietTag } from "../lib/diet";
 
-export type DayItem = { id: string; servings: number };
+/** servings — доля порции; grams — показывать и менять в граммах вместо порций. */
+export type DayItem = { id: string; servings: number; grams?: boolean };
 type DayState = { date: string; items: DayItem[] };
 export type ShoppingState = { items: DayItem[]; checked: string[] };
 /** Личные отметки к рецепту. Всё хранится только в этом браузере. */
@@ -19,6 +20,7 @@ type Store = {
   day: DayItem[];
   addToDay: (id: string, servings?: number) => void;
   setDayServings: (index: number, servings: number) => void;
+  toggleDayUnit: (index: number) => void;
   removeFromDay: (index: number) => void;
   clearDay: () => void;
   goal: number;
@@ -118,6 +120,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addToDay,
       setDayServings: (index, servings) =>
         setDay((prev) => prev.map((x, j) => (j === index ? { ...x, servings } : x))),
+      toggleDayUnit: (index) => setDay((prev) => prev.map((x, j) => (j === index ? { ...x, grams: !x.grams } : x))),
       removeFromDay: (index) => setDay((prev) => prev.filter((_, j) => j !== index)),
       clearDay: () => setDay([]),
       goal,
