@@ -58,6 +58,53 @@ export function macroPercents(m: Macros): { p: number; f: number; c: number } {
   return out;
 }
 
+/**
+ * Как меняется вес продукта при готовке: крупы, макароны и бобовые впитывают воду,
+ * мясо и рыба теряют сок. Остальное считаем без изменений.
+ */
+const COOKED_FACTOR: Record<string, number> = {
+  buckwheat: 2.5, green_buckwheat: 2.5, rice_white: 2.8, rice_brown: 2.8, bulgur: 2.5, quinoa: 2.7,
+  millet: 2.5, whole_pasta: 2.2, spaghetti: 2.2, soba: 2.2, funchoza: 3, lentil: 2.3, lentil_green: 2.5,
+  beans_dry: 2.5, chickpeas_dry: 2.3,
+  chicken: 0.75, chicken_thigh: 0.75, turkey: 0.75, turkey_thigh: 0.75, beef: 0.65, beef_mince: 0.75,
+  chicken_mince: 0.8, turkey_mince: 0.8, chicken_liver: 0.8, cod: 0.8, pollock: 0.8, salmon: 0.8,
+  trout: 0.8, mackerel: 0.8, tuna_fresh: 0.8, shrimp: 0.8, squid: 0.7,
+};
+
+const SOUP_TITLE = /суп|окрошк|борщ|свекольник/i;
+
+/** Литры и миллилитры из строки вроде «1 л», «500 мл», «2–2,5 л» (диапазон — по середине). */
+export function parseLiquidMl(amount: string): number {
+  const m = amount.replace(/,/g, ".").match(/(\d+(?:\.\d+)?)(?:\s*[–-]\s*(\d+(?:\.\d+)?))?\s*(мл|л)(?![а-я])/);
+  if (!m) return 0;
+  const value = m[2] ? (Number(m[1]) + Number(m[2])) / 2 : Number(m[1]);
+  return m[3] === "л" ? value * 1000 : value;
+}
+
+/**
+ * Примерный вес готового блюда в граммах. В супах вода и бульон из «по вкусу» входят в вес,
+ * а крупы считаются без привара — они впитывают ту же воду.
+ */
+export function dishWeight(recipe: Recipe): number {
+  const soup = recipe.art === "soup" || SOUP_TITLE.test(recipe.title);
+  const water = (recipe.extras ?? [])
+    .filter((e) => /^(вода|кипят|бульон)/i.test(e.name) && !/для/i.test(e.name))
+    .reduce((acc, e) => acc + parseLiquidMl(e.amount), 0);
+  // Без привара круп: только ужарка мяса и рыбы.
+  const raw = recipe.ingredients.reduce((acc, item) => acc + item.grams * Math.min(1, COOKED_FACTOR[item.id] ?? 1), 0);
+  if (soup) return raw + water;
+  const cooked = recipe.ingredients.reduce((acc, item) => acc + item.grams * (COOKED_FACTOR[item.id] ?? 1), 0);
+  // Каша или крупа, сваренная на воде из «по вкусу»: берём больший из двух способов оценки.
+  const hasCereal = recipe.ingredients.some((i) => i.id === "oats" || (COOKED_FACTOR[i.id] ?? 1) > 1);
+  return hasCereal ? Math.max(cooked, raw + water) : cooked;
+}
+
+/** КБЖУ на 100 г готового блюда (без округления). */
+export function per100g(recipe: Recipe, map: Record<string, Ingredient>): Macros {
+  const w = dishWeight(recipe);
+  return w > 0 ? scale(recipeTotals(recipe, map), 100 / w) : ZERO;
+}
+
 /** Граммы продуктов под нужное число порций. */
 export function scaleIngredients(recipe: Recipe, servings: number): { id: string; grams: number }[] {
   const k = servings / Math.max(1, recipe.servings);

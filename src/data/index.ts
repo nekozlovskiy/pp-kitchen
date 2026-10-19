@@ -2,7 +2,7 @@ import ingredientsJson from "./ingredients.json";
 import recipesJson from "./recipes.json";
 import sourcesJson from "./sources.json";
 import type { Category, Ingredient, Recipe, Source } from "../types";
-import { perServing } from "../lib/nutrition";
+import { per100g, perServing } from "../lib/nutrition";
 
 export const ingredients = ingredientsJson as Ingredient[];
 export const ingredientMap: Record<string, Ingredient> = Object.fromEntries(
@@ -16,6 +16,9 @@ export const sources = sourcesJson as Record<string, Source>;
 export const servingMacros = Object.fromEntries(
   recipes.map((r) => [r.id, perServing(r, ingredientMap)]),
 );
+
+// КБЖУ на 100 г готового блюда: вес оценивается с приваром круп и ужаркой мяса.
+export const per100Macros = Object.fromEntries(recipes.map((r) => [r.id, per100g(r, ingredientMap)]));
 
 export const categories: { id: Category; label: string; plural: string }[] = [
   { id: "breakfast", label: "Завтрак", plural: "Завтраки" },

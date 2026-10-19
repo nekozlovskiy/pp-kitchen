@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ingredientMap, ingredients, recipes, sources } from "../data";
-import { macroPercents, perServing, recipeTotals, round, scaleIngredients } from "./nutrition";
+import { dishWeight, macroPercents, parseLiquidMl, per100g, perServing, recipeTotals, round, scaleIngredients } from "./nutrition";
 import type { Recipe } from "../types";
 
 const sample: Recipe = {
@@ -56,6 +56,22 @@ describe("данные", () => {
     }
   });
 
+  it("объём жидкости разбирается из литров, миллилитров и диапазонов", () => {
+    expect(parseLiquidMl("1 л")).toBe(1000);
+    expect(parseLiquidMl("500 мл")).toBe(500);
+    expect(parseLiquidMl("2–2,5 л")).toBe(2250);
+    expect(parseLiquidMl("2 стакана")).toBe(0);
+  });
+
+  it("вес готового блюда: в супе учитывается вода, крупа получает привар", () => {
+    const soup = { ...sample, art: "soup" as const, ingredients: [{ id: "lentil", grams: 100 }], extras: [{ name: "Вода", amount: "1 л" }] };
+    expect(dishWeight(soup)).toBe(1100);
+    const porridge = { ...sample, art: "plate" as const, ingredients: [{ id: "buckwheat", grams: 100 }] };
+    expect(dishWeight(porridge)).toBe(250);
+    const meat = { ...sample, art: "plate" as const, ingredients: [{ id: "chicken", grams: 200 }] };
+    expect(dishWeight(meat)).toBe(150);
+  });
+
   it("рецепты ссылаются только на существующие продукты, id уникальны", () => {
     const ids = new Set<string>();
     for (const r of recipes) {
@@ -76,6 +92,14 @@ describe("данные", () => {
 
   it("у каждого рецепта указан существующий источник", () => {
     for (const r of recipes) expect(sources[r.source], r.id).toBeDefined();
+  });
+
+  it("у каждого рецепта разумная калорийность 100 г готового блюда", () => {
+    for (const r of recipes) {
+      const kcal = per100g(r, ingredientMap).kcal;
+      expect(kcal, r.id).toBeGreaterThan(10);
+      expect(kcal, r.id).toBeLessThan(600);
+    }
   });
 
   it("видео — ссылка на пост Instagram без меток отслеживания", () => {

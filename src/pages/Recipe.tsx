@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { categoryLabel, ingredientMap, recipeMap, servingMacros, sources } from "../data";
+import { categoryLabel, ingredientMap, per100Macros, recipeMap, servingMacros, sources } from "../data";
 import { macroPercents, round } from "../lib/nutrition";
 import { scaleIngredients } from "../lib/nutrition";
 import { formatAmount, formatTime, servingsLabel } from "../lib/format";
@@ -28,6 +28,7 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
   const photo = usePhotoUrl(recipe.id, journal[recipe.id]?.photo);
   const closeCook = useCallback(() => setCooking(false), []);
   const m = round(servingMacros[recipe.id]);
+  const m100 = round(per100Macros[recipe.id]);
   const pc = macroPercents(servingMacros[recipe.id]);
   const items = scaleIngredients(recipe, servings);
 
@@ -104,6 +105,12 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
             </dd>
           </div>
         </dl>
+        <p className="per100">
+          <b>≈ {m100.kcal} ккал</b> в 100 г готового блюда
+          <span>
+            Б {m100.p} · Ж {m100.f} · У {m100.c} г
+          </span>
+        </p>
       </section>
 
       <div className="recipe__actions">

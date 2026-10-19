@@ -652,3 +652,28 @@
     display: none !important;
   }
 }
+
+/* ---------- КБЖУ на 100 г ---------- */
+
+.nutrition {
+  flex-wrap: wrap;
+}
+.per100 {
+  flex: 1 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 14px;
+}
+.per100 b {
+  color: var(--ink);
+  font-size: 16px;
+}
+.per100 span {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
