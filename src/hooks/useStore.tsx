@@ -53,9 +53,9 @@ type Store = {
   toggleSwap: (recipeId: string, key: string) => void;
   /** КБЖУ порции с учётом замен. */
   servingFor: (recipeId: string) => Macros;
-  /** Меню на неделю: семь списков блюд, понедельник — первый. */
   /** Итоги прошлых дней для графика в «Моём дне» */
   history: History;
+  /** Меню на неделю: семь списков блюд, понедельник — первый. */
   week: DayItem[][];
   addToWeek: (day: number, id: string, servings?: number) => void;
   removeFromWeek: (day: number, index: number) => void;
@@ -76,6 +76,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     () => new Set(readJSON<string[]>("pp.favorites", []).filter((id) => recipeMap[id])),
   );
   const [day, setDay] = useState<DayItem[]>(loadDay);
+  // Дата, к которой относится «Мой день»: телефон может держать вкладку открытой через полночь.
+  const [dayDate, setDayDate] = useState(todayKey);
+  useEffect(() => {
+    const check = () => {
+      const today = todayKey();
+      if (today === dayDate) return;
+      setDay([]);
+      setDayDate(today);
+    };
+    document.addEventListener("visibilitychange", check);
+    window.addEventListener("focus", check);
+    const id = window.setInterval(check, 60_000);
+    return () => {
+      document.removeEventListener("visibilitychange", check);
+      window.removeEventListener("focus", check);
+      window.clearInterval(id);
+    };
+  }, [dayDate]);
   const [goal, setGoalState] = useState<number>(() => readJSON<number>("pp.goal", config.defaultGoalKcal));
   const [shopping, setShopping] = useState<ShoppingState>(() => {
     const saved = readJSON<ShoppingState>("pp.shopping", { items: [], checked: [] });
@@ -121,7 +139,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => writeJSON("pp.week", week), [week]);
   useEffect(() => writeJSON("pp.shopping", shopping), [shopping]);
   useEffect(() => writeJSON("pp.favorites", [...favorites]), [favorites]);
-  useEffect(() => writeJSON("pp.day", { date: todayKey(), items: day }), [day]);
+  useEffect(() => writeJSON("pp.day", { date: dayDate, items: day }), [day, dayDate]);
   const [history, setHistory] = useState<History>(() => cleanHistory(readJSON<unknown>("pp.history", {})));
   useEffect(() => writeJSON("pp.history", history), [history]);
   // Итог сегодняшнего дня сразу попадает в историю: завтра «Мой день» очистится, а график останется.
@@ -131,8 +149,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         scale(swaps[x.id]?.length ? perServing(applySwaps(recipeMap[x.id], swaps[x.id]), ingredientMap) : servingMacros[x.id], x.servings),
       ),
     );
-    setHistory((h) => withDay(h, todayKey(), totals));
-  }, [day, swaps]);
+    setHistory((h) => withDay(h, dayDate, totals));
+  }, [day, swaps, dayDate]);
   useEffect(() => writeJSON("pp.goal", goal), [goal]);
 
   const showToast = useCallback((msg: string) => {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ingredientMap, ingredients, recipes, sources } from "../data";
 import { dishWeight, macroPercents, parseLiquidMl, per100g, perServing, recipeTotals, round, scaleIngredients } from "./nutrition";
+import { dietIngredients } from "./diet";
 import type { Recipe } from "../types";
 
 const sample: Recipe = {
@@ -113,6 +114,11 @@ describe("данные", () => {
       expect(kcal, r.id).toBeGreaterThan(10);
       expect(kcal, r.id).toBeLessThan(600);
     }
+  });
+
+  it("пшеница, рожь, ячмень и овёс попадают в фильтр «Без глютена»", () => {
+    const grain = /пшени|пшеничн|ржан|ячмен|ячнев|перлов|овсян|булгур|манн|цельнозерн|лаваш|тортиль|сухар|батон|соба/i;
+    for (const i of ingredients) if (grain.test(i.name)) expect(dietIngredients.gluten.has(i.id), i.id).toBe(true);
   });
 
   it("видео — ссылка на пост Instagram без меток отслеживания", () => {
