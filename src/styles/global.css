@@ -1162,6 +1162,51 @@ i.dot::before {
   text-underline-offset: 3px;
 }
 
+/* ---------- Похожие рецепты ---------- */
+
+.similar__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+.similar__item {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  grid-template-rows: 1fr auto;
+  column-gap: 12px;
+  align-items: center;
+  min-height: 72px;
+  padding: 8px 14px 8px 8px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+}
+.similar__item:hover {
+  border-color: var(--ink);
+}
+.similar__item:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+.similar__art {
+  grid-row: 1 / 3;
+  width: 64px;
+  height: 52px;
+}
+.similar__title {
+  align-self: end;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.similar__kcal {
+  align-self: start;
+  font-size: 14px;
+  color: var(--muted);
+}
+
 /* ---------- Степпер ---------- */
 
 .stepper {
@@ -1435,6 +1480,7 @@ i.dot::before {
   .sheet__close,
   .recipe__actions,
   .recipe__tools,
+  .similar,
   .stepper,
   .ingredients input {
     display: none !important;

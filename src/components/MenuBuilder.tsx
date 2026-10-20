@@ -9,15 +9,15 @@ import { Stepper } from "./Stepper";
 
 /** Подбор меню на день под цель по калориям и белку с учётом ограничений в еде. */
 export function MenuBuilder() {
-  const { goal, proteinGoal, setProteinGoal, exclude, favorites, addToDay, addToShopping, showToast } = useStore();
+  const { goal, proteinGoal, setProteinGoal, exclude, dislikes, favorites, addToDay, addToShopping, showToast } = useStore();
   const location = useLocation();
   const [seed, setSeed] = useState<number | null>(null);
 
   const menu = useMemo(() => {
     if (seed == null) return null;
-    const pool = recipes.filter((r) => fitsDiet(r, exclude));
+    const pool = recipes.filter((r) => fitsDiet(r, exclude, dislikes));
     return buildMenu(pool, servingMacros, { kcal: goal, minProtein: proteinGoal, seed, favorites });
-  }, [seed, goal, proteinGoal, exclude, favorites]);
+  }, [seed, goal, proteinGoal, exclude, dislikes, favorites]);
   const t = menu && round(menu.total);
 
   return (

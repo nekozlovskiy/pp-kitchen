@@ -4,8 +4,10 @@ import { dietIngredients, fitsDiet } from "./diet";
 import { formatClock, splitStep } from "./steptime";
 import { missingFor, pantryMatches } from "./pantry";
 import { buildMenu } from "./menu";
-import { collections, hasProduct, products } from "./collections";
+import { collections, daysSince, hasProduct, products, seasonCollection } from "./collections";
 import { cleanHistory, lastDays, withDay } from "./history";
+import { makeSimilar } from "./similar";
+import { todayKey } from "./format";
 
 const timers = (s: string) => splitStep(s).filter((p) => p.seconds).map((p) => [p.text, p.seconds]);
 
@@ -140,7 +142,7 @@ describe("подборки и главный продукт", () => {
 
   it("каждая группа продуктов и каждая подборка находят рецепты", () => {
     for (const p of products) expect(recipes.some((r) => hasProduct(r, p.id)), p.id).toBe(true);
-    for (const c of collections.filter((c) => c.id !== "loved")) {
+    for (const c of collections.filter((c) => c.id !== "loved" && c.id !== "missed")) {
       expect(recipes.some((r) => c.test(r, { macros: servingMacros[r.id] })), c.id).toBe(true);
     }
   });
@@ -168,17 +170,67 @@ describe("подборки и главный продукт", () => {
     expect(loved.test(r, { macros: servingMacros[r.id] })).toBe(false);
     expect(loved.test(r, { macros: servingMacros[r.id], journal: { rating: 5 } })).toBe(true);
   });
+
+  it("сезонная подборка своя в каждом сезоне и всегда находит рецепты", () => {
+    const ids = [0, 3, 6, 9].map((month) => seasonCollection(new Date(2026, month, 15)));
+    expect(ids.map((c) => c.id)).toEqual(["winter", "spring", "summer", "autumn"]);
+    expect(seasonCollection(new Date(2026, 11, 1)).id).toBe("winter");
+    for (const c of ids) expect(recipes.filter((r) => c.test(r, { macros: servingMacros[r.id] })).length, c.id).toBeGreaterThan(10);
+  });
+
+  it("«Давно не готовила» — понравившееся, что не готовили больше месяца", () => {
+    const missed = collections.find((c) => c.id === "missed")!;
+    const r = recipes[0];
+    const ago = (days: number) => {
+      const d = new Date();
+      d.setDate(d.getDate() - days);
+      return todayKey(d);
+    };
+    expect(daysSince("2026-10-01", new Date(2026, 9, 31))).toBe(30);
+    expect(missed.test(r, { macros: servingMacros[r.id], journal: { rating: 5, cooked: 1, last: ago(40) } })).toBe(true);
+    expect(missed.test(r, { macros: servingMacros[r.id], journal: { rating: 5, cooked: 1, last: ago(5) } })).toBe(false);
+    expect(missed.test(r, { macros: servingMacros[r.id], journal: { rating: 2, cooked: 1, last: ago(40) } })).toBe(false);
+    expect(missed.test(r, { macros: servingMacros[r.id], journal: { rating: 5 } })).toBe(false);
+  });
+});
+
+describe("«Не люблю» и похожие рецепты", () => {
+  it("нелюбимый продукт убирает рецепты с ним", () => {
+    const withOnion = recipes.filter((r) => r.ingredients.some((i) => i.id === "onion"));
+    expect(withOnion.length).toBeGreaterThan(0);
+    for (const r of withOnion) expect(fitsDiet(r, [], ["onion"]), r.id).toBe(false);
+    expect(fitsDiet(withOnion[0], [])).toBe(true);
+  });
+
+  it("похожие: не сам рецепт, не больше четырёх, с общими продуктами и с учётом фильтра", () => {
+    const similar = makeSimilar(recipes);
+    let empty = 0;
+    for (const r of recipes) {
+      const list = similar(r);
+      if (!list.length) empty++;
+      expect(list.length).toBeLessThanOrEqual(4);
+      for (const s of list) {
+        expect(s.id).not.toBe(r.id);
+        expect(s.ingredients.some((i) => r.ingredients.some((j) => j.id === i.id)), `${r.id} → ${s.id}`).toBe(true);
+      }
+    }
+    // Почти у каждого рецепта находится что-то похожее
+    expect(empty / recipes.length).toBeLessThan(0.05);
+    const fishDish = recipeMap["gs-steamed-tilapia-cucumber-sauce"] ?? recipes[0];
+    for (const s of similar(fishDish, 4, (x) => fitsDiet(x, ["fish"]))) expect(fitsDiet(s, ["fish"])).toBe(true);
+  });
 });
 
 describe("история дней", () => {
   const m = (kcal: number) => ({ kcal, p: 10, f: 5, c: 20 });
 
-  it("хранит 14 последних дней, пустой день убирает", () => {
+  it("хранит 60 последних дней, пустой день убирает", () => {
     let h = {};
-    for (let d = 1; d <= 20; d++) h = withDay(h, `2026-10-${String(d).padStart(2, "0")}`, m(1000 + d));
-    expect(Object.keys(h)).toHaveLength(14);
-    expect(Object.keys(h)[0]).toBe("2026-10-07");
-    expect(withDay(h, "2026-10-20", m(0))["2026-10-20"]).toBeUndefined();
+    const key = (i: number) => todayKey(new Date(2026, 7, 1 + i));
+    for (let i = 0; i < 70; i++) h = withDay(h, key(i), m(1000 + i));
+    expect(Object.keys(h)).toHaveLength(60);
+    expect(Object.keys(h)[0]).toBe(key(10));
+    expect(withDay(h, key(69), m(0))[key(69)]).toBeUndefined();
   });
 
   it("неделя заканчивается сегодняшним днём, пропуски — null", () => {

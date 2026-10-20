@@ -10,14 +10,14 @@ export const WEEKDAYS = ["Понедельник", "Вторник", "Среда
 export const todayIndex = () => (new Date().getDay() + 6) % 7;
 
 export function Week() {
-  const { week, setWeek, removeFromWeek, clearWeek, addToDay, addToShopping, showToast, goal, proteinGoal, exclude, favorites, servingFor } =
+  const { week, setWeek, removeFromWeek, clearWeek, addToDay, addToShopping, showToast, goal, proteinGoal, exclude, dislikes, favorites, servingFor } =
     useStore();
   const location = useLocation();
   const today = todayIndex();
   const planned = week.some((d) => d.length);
 
   const autofill = () => {
-    const pool = recipes.filter((r) => fitsDiet(r, exclude));
+    const pool = recipes.filter((r) => fitsDiet(r, exclude, dislikes));
     const base = Date.now();
     const days = WEEKDAYS.map((_, i) => {
       const menu = buildMenu(pool, servingMacros, { kcal: goal, minProtein: proteinGoal, seed: base + i * 7919, favorites });

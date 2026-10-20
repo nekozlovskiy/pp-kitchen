@@ -43,6 +43,9 @@ type Store = {
   markCooked: (id: string) => void;
   exclude: DietTag[];
   toggleExclude: (tag: DietTag) => void;
+  /** Нелюбимые продукты: рецепты с ними прячутся из каталога, подборок и меню. */
+  dislikes: string[];
+  toggleDislike: (ingredientId: string) => void;
   pantry: string[];
   togglePantry: (ingredientId: string) => void;
   clearPantry: () => void;
@@ -114,6 +117,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [pantry, setPantry] = useState<string[]>(() =>
     readJSON<string[]>("pp.pantry", []).filter((id) => ingredientMap[id]),
   );
+  const [dislikes, setDislikes] = useState<string[]>(() => {
+    const saved = readJSON<string[]>("pp.dislikes", []);
+    return Array.isArray(saved) ? saved.filter((id) => ingredientMap[id]) : [];
+  });
   const [proteinGoal, setProteinGoalState] = useState<number>(() => readJSON<number>("pp.proteinGoal", 90));
   const [swaps, setSwaps] = useState<Record<string, string[]>>(() => {
     const saved = readJSON<Record<string, string[]>>("pp.swaps", {});
@@ -128,6 +135,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => writeJSON("pp.journal", journal), [journal]);
   useEffect(() => writeJSON("pp.exclude", exclude), [exclude]);
   useEffect(() => writeJSON("pp.pantry", pantry), [pantry]);
+  useEffect(() => writeJSON("pp.dislikes", dislikes), [dislikes]);
   useEffect(() => writeJSON("pp.proteinGoal", proteinGoal), [proteinGoal]);
   const [week, setWeekState] = useState<DayItem[][]>(() => {
     const saved = readJSON<DayItem[][]>("pp.week", []);
@@ -216,6 +224,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setJournal((j) => ({ ...j, [id]: { ...j[id], cooked: (j[id]?.cooked ?? 0) + 1, last: todayKey() } })),
       exclude,
       toggleExclude: (tag) => setExclude((e) => (e.includes(tag) ? e.filter((t) => t !== tag) : [...e, tag])),
+      dislikes,
+      toggleDislike: (ingredientId) =>
+        setDislikes((d) => (d.includes(ingredientId) ? d.filter((x) => x !== ingredientId) : [...d, ingredientId])),
       pantry,
       togglePantry: (ingredientId) =>
         setPantry((p) => (p.includes(ingredientId) ? p.filter((x) => x !== ingredientId) : [...p, ingredientId])),
@@ -237,7 +248,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       servingFor: (recipeId) =>
         swaps[recipeId]?.length ? perServing(applySwaps(recipeMap[recipeId], swaps[recipeId]), ingredientMap) : servingMacros[recipeId],
     }),
-    [favorites, toggleFavorite, day, addToDay, goal, shopping, toast, showToast, journal, exclude, pantry, proteinGoal, swaps, week, history],
+    [favorites, toggleFavorite, day, addToDay, goal, shopping, toast, showToast, journal, exclude, dislikes, pantry, proteinGoal, swaps, week, history],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

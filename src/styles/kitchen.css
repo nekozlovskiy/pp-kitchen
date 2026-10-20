@@ -405,6 +405,28 @@
   font-size: 13px;
   color: var(--muted);
 }
+.dislikes {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+.dislikes__title {
+  font-weight: 700;
+}
+.dislikes__search {
+  width: 100%;
+  max-width: 360px;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  font-size: 16px;
+}
+.dislikes__search:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
 
 /* ---------- Из того, что есть ---------- */
 
@@ -1039,8 +1061,18 @@
 .collection--soups {
   background: color-mix(in srgb, var(--food-red) 18%, var(--surface));
 }
-.collection--autumn {
+.collection--autumn,
+.collection--summer {
   background: color-mix(in srgb, var(--food-yolk) 20%, var(--surface));
+}
+.collection--spring {
+  background: var(--tint-lunch);
+}
+.collection--winter {
+  background: var(--tint-dinner);
+}
+.collection--missed {
+  background: var(--tint-snack);
 }
 .collection--no-sugar {
   background: var(--tint-dessert);

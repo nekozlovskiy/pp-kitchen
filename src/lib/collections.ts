@@ -28,7 +28,57 @@ export function hasProduct(recipe: Recipe, productId: string): boolean {
   return !group || recipe.ingredients.some((i) => group.ids.has(i.id));
 }
 
-type Ctx = { macros: Macros; journal?: { cooked?: number; rating?: number } };
+type Ctx = { macros: Macros; journal?: { cooked?: number; rating?: number; last?: string } };
+
+type Collection = { id: string; title: string; hint: string; test: (r: Recipe, c: Ctx) => boolean };
+
+const liked = (c: Ctx) => (c.journal?.rating ?? 0) >= 4 || (c.journal?.cooked ?? 0) >= 2;
+
+/** Сколько дней прошло с даты «ГГГГ-ММ-ДД». */
+export function daysSince(key: string, today = new Date()): number {
+  const [y, m, d] = key.split("-").map(Number);
+  const then = Date.UTC(y, m - 1, d);
+  const now = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  return Math.round((now - then) / 86_400_000);
+}
+
+// Сезонная подборка меняется сама: месяцы считаются с нуля, декабрь — 11.
+const SEASONS: { months: number[]; id: string; title: string; hint: string; ids: ReadonlySet<string> }[] = [
+  {
+    months: [11, 0, 1],
+    id: "winter",
+    title: "Зима: согревающее",
+    hint: "Корнеплоды, квашеная капуста и цитрусы",
+    ids: new Set(["beet", "celery_root", "parsnip", "turnip", "parsley_root", "sauerkraut", "orange", "mandarin", "pomelo", "persimmon", "lingonberry", "cranberry"]),
+  },
+  {
+    months: [2, 3, 4],
+    id: "spring",
+    title: "Весна: первая зелень",
+    hint: "Шпинат, щавель, крапива, черемша и редис",
+    ids: new Set(["spinach", "sorrel", "nettle", "ramsons", "radish", "asparagus", "arugula", "chard"]),
+  },
+  {
+    months: [5, 6, 7],
+    id: "summer",
+    title: "Лето: овощи и ягоды",
+    hint: "Кабачки, баклажаны, ягоды и арбуз",
+    ids: new Set(["zucchini", "eggplant", "berries", "cherry", "currant", "watermelon", "peach"]),
+  },
+  {
+    months: [8, 9, 10],
+    id: "autumn",
+    title: "Осень: тыква и капуста",
+    hint: "Сезонные овощи и яблоки",
+    ids: new Set(["pumpkin", "cabbage", "napa_cabbage", "sauerkraut", "apple", "beet", "persimmon", "lingonberry", "cranberry"]),
+  },
+];
+
+/** Подборка текущего сезона: зимой корнеплоды и цитрусы, весной зелень, летом овощи и ягоды, осенью тыква. */
+export function seasonCollection(date = new Date()): Collection {
+  const s = SEASONS.find((x) => x.months.includes(date.getMonth()))!;
+  return { id: s.id, title: s.title, hint: s.hint, test: (r) => r.ingredients.some((i) => s.ids.has(i.id)) };
+}
 
 const OVEN = /духовк|запек|запеч|аэрогрил|выпека/i;
 // «на пару секунд/минут» — не про пар; водяная баня в шагах бывает и для шоколада, поэтому её ищем только в названии
@@ -36,19 +86,25 @@ const STEAM = /на пару(?!\s+(секунд|минут|час|дн|ложе�
 const STEAM_TITLE = /на пару|паров|водяной бане/i;
 const SOUP = /суп|борщ|щи\b|похл[её]бк|уха\b|окрошк|свекольник|солянк|рассольник|минестроне|гаспачо|крупник/i;
 const SUGARS = new Set(["sugar", "honey", "maple_syrup", "agave_syrup", "topinambur_syrup"]);
-const AUTUMN = new Set(["pumpkin", "cabbage", "napa_cabbage", "sauerkraut", "apple", "beet", "persimmon", "lingonberry", "cranberry"]);
+const MISSED_DAYS = 30;
 
 /** Подборки на главной: готовые сочетания условий. */
-export const collections: { id: string; title: string; hint: string; test: (r: Recipe, c: Ctx) => boolean }[] = [
+export const collections: Collection[] = [
   { id: "quick-dinner", title: "Ужин за 20 минут", hint: "Быстро после работы", test: (r) => r.category === "dinner" && r.timeMinutes <= 20 },
   { id: "light-dinner", title: "Лёгкий ужин", hint: "До 350 ккал на порцию", test: (r, c) => r.category === "dinner" && c.macros.kcal <= 350 },
   { id: "protein", title: "Много белка", hint: "От 25 г на порцию", test: (_, c) => c.macros.p >= 25 },
   { id: "steamed", title: "На пару", hint: "Пароварка, водяная баня, конверты", test: (r) => STEAM_TITLE.test(r.title) || r.steps.some((s) => STEAM.test(s)) },
   { id: "soups", title: "Супы", hint: "Горячие, холодные и крем-супы", test: (r) => SOUP.test(r.title) },
-  { id: "autumn", title: "Осень: тыква и капуста", hint: "Сезонные овощи и яблоки", test: (r) => r.ingredients.some((i) => AUTUMN.has(i.id)) },
+  seasonCollection(),
   { id: "no-oven", title: "Без духовки", hint: "Плита, кастрюля или без готовки", test: (r) => !r.steps.some((s) => OVEN.test(s)) },
   { id: "no-sugar", title: "Сладкое без сахара", hint: "Десерты без сахара и мёда", test: (r) => r.category === "dessert" && !r.ingredients.some((i) => SUGARS.has(i.id)) },
-  { id: "loved", title: "Любимое", hint: "Высокие оценки и то, что готовила", test: (_, c) => (c.journal?.rating ?? 0) >= 4 || (c.journal?.cooked ?? 0) >= 2 },
+  { id: "loved", title: "Любимое", hint: "Высокие оценки и то, что готовила", test: (_, c) => liked(c) },
+  {
+    id: "missed",
+    title: "Давно не готовила",
+    hint: "Понравилось, но не было больше месяца",
+    test: (_, c) => liked(c) && Boolean(c.journal?.last) && daysSince(c.journal!.last!) >= MISSED_DAYS,
+  },
 ];
 
 export const collectionMap = Object.fromEntries(collections.map((c) => [c.id, c]));

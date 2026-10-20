@@ -30,12 +30,23 @@ export function Shopping() {
   const bought = new Set(shopping.checked);
   const left = lines.filter((l) => !bought.has(l.id)).length;
 
-  const copy = async () => {
+  // На телефоне — системное меню «Поделиться» (Заметки, мессенджеры), на компьютере — копирование.
+  const canShare = typeof navigator !== "undefined" && typeof navigator.share === "function";
+  const send = async () => {
     const text = [
       "Список покупок",
       ...lines.filter((l) => !bought.has(l.id)).map((l) => `— ${l.name}: ${formatAmount(ingredientMap[l.id], l.grams)}`),
       ...(extras.length ? ["", "Ещё понадобится: " + extras.join(", ")] : []),
     ].join("\n");
+    if (canShare) {
+      try {
+        await navigator.share({ title: "Список покупок", text });
+        return;
+      } catch (e) {
+        // Закрыли меню — ничего не делаем; иначе (браузер отказал) пробуем скопировать
+        if ((e as DOMException)?.name === "AbortError") return;
+      }
+    }
     showToast((await copyText(text)) ? "Список скопирован" : "Не удалось скопировать: выделите список вручную");
   };
 
@@ -86,8 +97,8 @@ export function Shopping() {
               <h2 className="shopping__h">
                 Купить <span className="shopping__left">{left ? `осталось ${left}` : "всё куплено"}</span>
               </h2>
-              <button type="button" className="btn btn--accent" onClick={copy}>
-                Скопировать
+              <button type="button" className="btn btn--accent" onClick={send}>
+                {canShare ? "Отправить" : "Скопировать"}
               </button>
             </div>
             <ul className="ingredients">

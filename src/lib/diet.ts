@@ -44,7 +44,10 @@ export const dietIngredients: Record<DietTag, ReadonlySet<string>> = {
   gluten: new Set(tagged.gluten),
 };
 
-/** Подходит ли рецепт, если исключить все перечисленные группы продуктов. */
-export function fitsDiet(recipe: Recipe, exclude: readonly DietTag[]): boolean {
-  return exclude.every((tag) => recipe.ingredients.every((i) => !dietIngredients[tag].has(i.id)));
+/** Подходит ли рецепт, если исключить все перечисленные группы продуктов и отдельные нелюбимые продукты. */
+export function fitsDiet(recipe: Recipe, exclude: readonly DietTag[], dislikes: readonly string[] = []): boolean {
+  return (
+    exclude.every((tag) => recipe.ingredients.every((i) => !dietIngredients[tag].has(i.id))) &&
+    recipe.ingredients.every((i) => !dislikes.includes(i.id))
+  );
 }

@@ -10,6 +10,7 @@ export const TRANSFER_KEYS = [
   "pp.goal",
   "pp.proteinGoal",
   "pp.exclude",
+  "pp.dislikes",
   "pp.pantry",
   "pp.swaps",
   "pp.history",

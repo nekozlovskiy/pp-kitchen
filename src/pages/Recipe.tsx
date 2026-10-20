@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { clearCooking, readCooking, saveCooking } from "../lib/cooking";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { categoryLabel, ingredientMap, per100Macros, portionGrams, recipeAliases, recipeMap, sources } from "../data";
+import { categoryLabel, ingredientMap, per100Macros, portionGrams, recipeAliases, recipeMap, recipes, servingMacros, sources } from "../data";
+import { makeSimilar } from "../lib/similar";
+import { fitsDiet } from "../lib/diet";
 import { macroPercents, per100g, round, scale, scaleIngredients } from "../lib/nutrition";
 import { applySwaps, availableSwaps } from "../lib/swaps";
 import { formatAmount, formatTime, servingsLabel } from "../lib/format";
@@ -41,6 +43,32 @@ function ShareButton({ recipe, onCopied }: { recipe: Recipe; onCopied: () => voi
         <path d="M12 15V4M8 8l4-4 4 4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" />
       </svg>
     </button>
+  );
+}
+
+const similar = makeSimilar(recipes);
+
+/** Похожие блюда внизу рецепта. Переход заменяет текущий рецепт, чтобы «Закрыть» возвращало в каталог. */
+function SimilarRecipes({ recipe }: { recipe: Recipe }) {
+  const { exclude, dislikes } = useStore();
+  const location = useLocation();
+  const list = similar(recipe, 4, (r) => fitsDiet(r, exclude, dislikes));
+  if (!list.length) return null;
+  return (
+    <section className="recipe__section similar" aria-labelledby="similar-title">
+      <h2 id="similar-title">Похожие рецепты</h2>
+      <ul className="similar__list">
+        {list.map((r) => (
+          <li key={r.id}>
+            <Link to={`/recipe/${r.id}`} state={location.state} replace className="similar__item">
+              <Art className="similar__art" kind={r.art} category={r.category} seed={r.id} />
+              <span className="similar__title">{r.title}</span>
+              <span className="similar__kcal">{Math.round(servingMacros[r.id].kcal)} ккал</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -370,6 +398,8 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
           », {sources[recipe.source].site}, автор {sources[recipe.source].author}. КБЖУ посчитано нами по составу.
         </p>
       )}
+
+      <SimilarRecipes recipe={recipe} />
     </article>
   );
 }
@@ -380,6 +410,10 @@ export function RecipeSheet() {
   const location = useLocation();
   const recipe = recipeMap[recipeAliases[id] ?? id];
   const hasBackground = Boolean((location.state as { background?: unknown } | null)?.background);
+  // Переход к похожему рецепту открывает его с начала, а не с того места, где листали предыдущий.
+  useEffect(() => {
+    document.querySelector(".sheet__panel")?.scrollTo({ top: 0 });
+  }, [recipe?.id]);
 
   const close = useCallback(() => {
     if (hasBackground) navigate(-1);

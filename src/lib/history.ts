@@ -1,12 +1,12 @@
 import type { Macros } from "../types";
 import { todayKey } from "./format";
 
-/** Итоги «Моего дня» по датам «ГГГГ-ММ-ДД»: хранятся последние 14 дней. */
+/** Итоги «Моего дня» по датам «ГГГГ-ММ-ДД»: хранятся последние 60 дней с записями. */
 export type History = Record<string, Macros>;
 
-const KEEP_DAYS = 14;
+const KEEP_DAYS = 60;
 
-/** Записывает итог дня; пустой день убирает. Старше двух недель — удаляется. */
+/** Записывает итог дня; пустой день убирает. Хранит 60 последних дней с записями. */
 export function withDay(history: History, date: string, totals: Macros): History {
   const next: History = { ...history };
   if (totals.kcal > 0) next[date] = totals;

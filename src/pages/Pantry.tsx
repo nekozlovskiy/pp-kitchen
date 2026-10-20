@@ -17,7 +17,7 @@ const byUsage = ingredients
 const shortName = (id: string) => (ingredientMap[id]?.name ?? id).replace(/\s*\(.*\)$/, "").toLowerCase();
 
 export function Pantry() {
-  const { pantry, togglePantry, clearPantry, exclude } = useStore();
+  const { pantry, togglePantry, clearPantry, exclude, dislikes } = useStore();
   const location = useLocation();
   const [query, setQuery] = useState("");
   const [showAll, setShowAll] = useState(false);
@@ -31,12 +31,12 @@ export function Pantry() {
 
   // Если с двумя докупками ничего не складывается, показываем все рецепты с выбранными продуктами.
   const { found, loose } = useMemo(() => {
-    const pool = recipes.filter((r) => fitsDiet(r, exclude));
+    const pool = recipes.filter((r) => fitsDiet(r, exclude, dislikes));
     const strict = pantryMatches(pool, have, { maxMissing: 2 });
     return strict.length > 0
       ? { found: strict, loose: false }
       : { found: pantryMatches(pool, have, { maxMissing: Infinity }), loose: true };
-  }, [have, exclude]);
+  }, [have, exclude, dislikes]);
   const ready = found.filter((m) => m.missing.length === 0).length;
 
   return (

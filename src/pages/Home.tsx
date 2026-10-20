@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { config } from "../config";
 import { categoryLabel, ingredientMap, isProteinDense, per100Macros, recipes, servingMacros } from "../data";
 import { round } from "../lib/nutrition";
-import { formatTime, plural } from "../lib/format";
+import { formatTime, plural, todayKey } from "../lib/format";
 import { matches, searchText } from "../lib/search";
 import { Art } from "../art/Art";
 import { FilterBar, KCAL_MAX, defaultFilters } from "../components/FilterBar";
@@ -22,9 +22,11 @@ function recipeOfTheDay() {
   return recipes[(days * 37) % recipes.length];
 }
 
-/** Записка дня: своя на каждый день, по кругу. Сдвиг, чтобы не совпадала по ритму с рецептом дня. */
+/** Записка дня: своя на каждый день, по кругу. Сдвиг, чтобы не совпадала по ритму с рецептом дня. В особые даты — своя. */
 function noteOfTheDay() {
   const d = new Date();
+  const special = config.dateNotes[todayKey(d).slice(5)];
+  if (special) return special;
   const days = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86_400_000);
   return config.notes[(days + 3) % config.notes.length];
 }
@@ -84,16 +86,16 @@ function Feature() {
 
 /** Лента подборок: готовые сочетания фильтров. «Любимое» появляется, когда есть оценки или повторы. */
 function Collections({ onPick }: { onPick: (id: string) => void }) {
-  const { journal, exclude } = useStore();
+  const { journal, exclude, dislikes } = useStore();
   const items = useMemo(
     () =>
       collections
         .map((c) => ({
           ...c,
-          count: recipes.filter((r) => fitsDiet(r, exclude) && c.test(r, { macros: servingMacros[r.id], journal: journal[r.id] })).length,
+          count: recipes.filter((r) => fitsDiet(r, exclude, dislikes) && c.test(r, { macros: servingMacros[r.id], journal: journal[r.id] })).length,
         }))
         .filter((c) => c.count > 0),
-    [journal, exclude],
+    [journal, exclude, dislikes],
   );
   return (
     <section className="collections wrap" aria-labelledby="collections-title">
@@ -118,7 +120,7 @@ function Collections({ onPick }: { onPick: (id: string) => void }) {
 }
 
 export function Home() {
-  const { favorites, exclude, journal } = useStore();
+  const { favorites, exclude, dislikes, journal } = useStore();
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [limit, setLimit] = useState(PAGE);
 
@@ -141,7 +143,7 @@ export function Home() {
       if (filters.product && !hasProduct(r, filters.product)) return false;
       const col = collectionMap[filters.collection];
       if (col && !col.test(r, { macros: m, journal: journal[r.id] })) return false;
-      if (!fitsDiet(r, exclude)) return false;
+      if (!fitsDiet(r, exclude, dislikes)) return false;
       if (filters.maxKcal < KCAL_MAX && m.kcal > filters.maxKcal) return false;
       if (filters.query.trim() && !matches(texts[r.id], filters.query)) return false;
       return true;
@@ -159,10 +161,10 @@ export function Home() {
         recipeRank[a] - recipeRank[b],
     }[filters.sort];
     return [...out].sort((a, b) => by(a.id, b.id));
-  }, [filters, favorites, exclude, journal]);
+  }, [filters, favorites, exclude, dislikes, journal]);
 
   // Смена ограничений в еде тоже возвращает к первой странице.
-  useEffect(() => setLimit(PAGE), [exclude]);
+  useEffect(() => setLimit(PAGE), [exclude, dislikes]);
 
   const touched = JSON.stringify(filters) !== JSON.stringify(defaultFilters);
 

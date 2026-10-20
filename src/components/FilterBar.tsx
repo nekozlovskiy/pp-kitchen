@@ -1,5 +1,6 @@
+import { useState } from "react";
 import type { Category } from "../types";
-import { categories } from "../data";
+import { categories, ingredientMap, recipes } from "../data";
 import { dietLabels } from "../lib/diet";
 import type { DietTag } from "../lib/diet";
 import { useStore } from "../hooks/useStore";
@@ -41,9 +42,61 @@ export const defaultFilters: Filters = {
   sort: "default",
 };
 
+const norm = (s: string) => s.toLowerCase().replace(/ё/g, "е");
+
+/** Продукты, которые встречаются в рецептах, по алфавиту — из них выбирают нелюбимые. */
+const usedIngredients = [...new Set(recipes.flatMap((r) => r.ingredients.map((i) => i.id)))]
+  .map((id) => ingredientMap[id])
+  .filter(Boolean)
+  .sort((a, b) => a.name.localeCompare(b.name, "ru"));
+
+/** «Не люблю»: поиск продукта и отмеченные продукты кнопками, нажатие снимает отметку. */
+function DislikePicker() {
+  const { dislikes, toggleDislike } = useStore();
+  const [q, setQ] = useState("");
+  const query = norm(q.trim());
+  const found = query ? usedIngredients.filter((i) => !dislikes.includes(i.id) && norm(i.name).includes(query)).slice(0, 8) : [];
+  return (
+    <div className="dislikes">
+      <p className="dislikes__title">Не люблю</p>
+      {dislikes.length > 0 && (
+        <div className="toggles">
+          {dislikes.map((id) => (
+            <button key={id} type="button" className="toggle is-on" aria-pressed="true" onClick={() => toggleDislike(id)} aria-label={`Вернуть рецепты с продуктом «${ingredientMap[id]?.name}»`}>
+              {ingredientMap[id]?.name} ×
+            </button>
+          ))}
+        </div>
+      )}
+      <input
+        type="search"
+        className="dislikes__search"
+        placeholder="Найти продукт: лук, печень, кинза…"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        aria-label="Найти нелюбимый продукт"
+      />
+      {query && (
+        <div className="toggles">
+          {found.length ? (
+            found.map((i) => (
+              <button key={i.id} type="button" className="toggle" aria-pressed="false" onClick={() => toggleDislike(i.id)}>
+                {i.name}
+              </button>
+            ))
+          ) : (
+            <p className="diet__hint">Такого продукта в рецептах нет. Зелень и пряности не считаются: их можно просто не класть.</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function FilterBar({ value, onChange }: { value: Filters; onChange: (f: Filters) => void }) {
   const set = <K extends keyof Filters>(k: K, v: Filters[K]) => onChange({ ...value, [k]: v });
-  const { exclude, toggleExclude } = useStore();
+  const { exclude, toggleExclude, dislikes } = useStore();
+  const limits = exclude.length + dislikes.length;
   return (
     <div className="filters">
       <label className="search">
@@ -120,7 +173,7 @@ export function FilterBar({ value, onChange }: { value: Filters; onChange: (f: F
 
         <details className="diet">
           <summary>
-            Ограничения в еде{exclude.length ? `: ${exclude.length}` : ""}
+            Ограничения в еде{limits ? `: ${limits}` : ""}
           </summary>
           <div className="toggles">
             {(Object.keys(dietLabels) as DietTag[]).map((tag) => (
@@ -135,7 +188,8 @@ export function FilterBar({ value, onChange }: { value: Filters; onChange: (f: F
               </button>
             ))}
           </div>
-          <p className="diet__hint">Запоминается на этом телефоне. Овсянку считаем с глютеном.</p>
+          <DislikePicker />
+          <p className="diet__hint">Рецепты с отмеченным пропадают из каталога, подборок и меню. Запоминается на этом телефоне. Овсянку считаем с глютеном.</p>
         </details>
 
         <label className="range">

@@ -29,6 +29,9 @@ export function WeekChart() {
   const past = days.slice(0, -1).filter((d) => d.totals);
   const avg = (k: "kcal" | "p") => Math.round(past.reduce((a, d) => a + d.totals![k], 0) / past.length);
   const inGoal = past.filter((d) => Math.abs(d.totals!.kcal - goal) <= goal * 0.1).length;
+  // Месяц показываем, только когда в нём есть дни сверх последней недели — иначе это те же цифры.
+  const month = lastDays(history, 30).slice(0, -1).filter((d) => d.totals);
+  const monthAvg = (k: "kcal" | "p") => Math.round(month.reduce((a, d) => a + d.totals![k], 0) / month.length);
 
   return (
     <section className="week-chart" aria-labelledby="week-chart-title">
@@ -74,6 +77,11 @@ export function WeekChart() {
       <p className="week-chart__sum">
         До сегодня в среднем <b>{avg("kcal")} ккал</b> и <b>{avg("p")} г белка</b> в день · в пределах цели ±10% — {inGoal} из {past.length}
       </p>
+      {month.length > past.length && (
+        <p className="week-chart__sum">
+          За 30 дней в среднем <b>{monthAvg("kcal")} ккал</b> и <b>{monthAvg("p")} г белка</b> в день · дней с записями — {month.length}
+        </p>
+      )}
       <table className="visually-hidden">
         <caption>Калории и белок по дням</caption>
         <tbody>
