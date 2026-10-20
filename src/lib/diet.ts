@@ -20,7 +20,7 @@ const tagged: Record<DietTag, string[]> = {
   ],
   fish: [
     "cod", "pollock", "salmon", "salmon_salted", "pink_salmon_boiled", "trout", "tuna", "tuna_fresh",
-    "shrimp", "squid", "crab_sticks", "mackerel", "mussels", "herring_salted", "salmon_hot_smoked", "tilapia", "trout_salted",
+    "shrimp", "squid", "crab_sticks", "mackerel", "mussels", "herring_salted", "salmon_hot_smoked", "tilapia", "trout_salted", "sockeye",
   ],
   dairy: [
     "cottage0", "cottage2", "cottage5", "yogurt", "yogurt0", "yogurt_natural", "kefir", "milk", "milk25",
