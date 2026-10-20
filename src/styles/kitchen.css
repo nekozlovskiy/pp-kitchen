@@ -727,6 +727,10 @@
   background: color-mix(in srgb, var(--protein) 16%, transparent);
   color: var(--protein);
 }
+.card__badge--new {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
 .kcal__per100 {
   flex-basis: 100%;
   font-family: var(--font-text);
@@ -996,6 +1000,161 @@
 .collections {
   margin-top: 40px;
 }
+
+/* ---------- Моя кухня ---------- */
+.kitchen__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+.kitchen__stat {
+  display: grid;
+  gap: 2px;
+  padding: 16px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+}
+.kitchen__stat b {
+  font-family: var(--font-display);
+  font-size: 34px;
+  line-height: 1;
+}
+.kitchen__stat b.kitchen__stat-word {
+  font-size: 22px;
+  line-height: 1.15;
+}
+.kitchen__stat span {
+  font-size: 14px;
+  color: var(--muted);
+}
+.kitchen__section {
+  margin-top: 32px;
+}
+.kitchen__section > .menu__title {
+  margin-bottom: 12px;
+}
+.ach {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+  gap: 10px;
+}
+.ach__item {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  column-gap: 10px;
+  row-gap: 2px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  color: var(--muted);
+}
+.ach__item.is-done {
+  background: var(--accent-soft);
+  border-color: transparent;
+  color: var(--ink);
+}
+.ach__badge {
+  grid-row: 1 / 3;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--accent);
+}
+.ach__title {
+  font-weight: 700;
+  color: var(--ink);
+}
+.ach__hint {
+  grid-column: 2 / 4;
+  font-size: 13px;
+}
+.ach__count {
+  grid-column: 3;
+  grid-row: 1;
+  font-size: 13px;
+  font-weight: 700;
+}
+.ach__bar {
+  grid-column: 1 / 4;
+  height: 6px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--line) 70%, transparent);
+  overflow: hidden;
+}
+.ach__bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+.feed__month + .feed__month {
+  margin-top: 18px;
+}
+.feed {
+  display: grid;
+  gap: 8px;
+}
+.feed__item {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  grid-template-rows: 1fr auto;
+  column-gap: 12px;
+  align-items: center;
+  min-height: 64px;
+  padding: 6px 14px 6px 6px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  color: var(--ink);
+  text-decoration: none;
+}
+.feed__item:hover {
+  border-color: var(--ink);
+}
+.feed__item:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+.feed__art {
+  grid-row: 1 / 3;
+  width: 56px;
+  height: 52px;
+  border-radius: var(--r-sm);
+  object-fit: cover;
+}
+.feed__title {
+  align-self: end;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.feed__meta {
+  align-self: start;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* ---------- Не знаю, что приготовить ---------- */
+.surprise {
+  margin-top: 32px;
+  margin-bottom: 44px;
+}
+.surprise > * {
+  max-width: 720px;
+}
+.surprise__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+.surprise__go {
+  margin-top: 14px;
+}
 .collections__list {
   display: flex;
   gap: 12px;
@@ -1073,6 +1232,9 @@
 }
 .collection--missed {
   background: var(--tint-snack);
+}
+.collection--new {
+  background: var(--tint-dessert);
 }
 .collection--no-sugar {
   background: var(--tint-dessert);

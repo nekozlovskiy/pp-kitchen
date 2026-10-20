@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { fitsDiet } from "../lib/diet";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { config } from "../config";
-import { categoryLabel, ingredientMap, isProteinDense, per100Macros, recipes, servingMacros } from "../data";
+import { categories, categoryLabel, ingredientMap, isProteinDense, per100Macros, recipes, servingMacros } from "../data";
 import { round } from "../lib/nutrition";
 import { formatTime, plural, todayKey } from "../lib/format";
 import { matches, searchText } from "../lib/search";
 import { Art } from "../art/Art";
 import { FilterBar, KCAL_MAX, defaultFilters } from "../components/FilterBar";
 import type { Filters } from "../components/FilterBar";
+import type { Category } from "../types";
 import { RecipeCard } from "../components/RecipeCard";
 import { useStore } from "../hooks/useStore";
 import { collectionMap, collections, hasProduct } from "../lib/collections";
@@ -86,16 +87,16 @@ function Feature() {
 
 /** Лента подборок: готовые сочетания фильтров. «Любимое» появляется, когда есть оценки или повторы. */
 function Collections({ onPick }: { onPick: (id: string) => void }) {
-  const { journal, exclude, dislikes } = useStore();
+  const { journal, exclude, dislikes, fresh } = useStore();
   const items = useMemo(
     () =>
       collections
         .map((c) => ({
           ...c,
-          count: recipes.filter((r) => fitsDiet(r, exclude, dislikes) && c.test(r, { macros: servingMacros[r.id], journal: journal[r.id] })).length,
+          count: recipes.filter((r) => fitsDiet(r, exclude, dislikes) && c.test(r, { macros: servingMacros[r.id], journal: journal[r.id], fresh: fresh.has(r.id) })).length,
         }))
         .filter((c) => c.count > 0),
-    [journal, exclude, dislikes],
+    [journal, exclude, dislikes, fresh],
   );
   return (
     <section className="collections wrap" aria-labelledby="collections-title">
@@ -119,8 +120,39 @@ function Collections({ onPick }: { onPick: (id: string) => void }) {
   );
 }
 
+/** «Не знаю, что приготовить»: случайное блюдо из выбранного раздела с учётом ограничений и «Не люблю». */
+function Surprise() {
+  const { exclude, dislikes } = useStore();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [cat, setCat] = useState<Category | "all">("all");
+  const pick = () => {
+    const pool = recipes.filter((r) => (cat === "all" || r.category === cat) && fitsDiet(r, exclude, dislikes));
+    if (!pool.length) return;
+    const r = pool[Math.floor(Math.random() * pool.length)];
+    navigate(`/recipe/${r.id}`, { state: { background: location } });
+  };
+  return (
+    <section className="surprise wrap" aria-labelledby="surprise-title">
+      <h2 id="surprise-title" className="surprise__title">
+        Не знаю, что приготовить
+      </h2>
+      <div className="toggles" role="group" aria-label="Раздел">
+        {([["all", "Что угодно"], ...categories.map((c) => [c.id, c.label])] as [Category | "all", string][]).map(([id, label]) => (
+          <button key={id} type="button" className={`toggle ${cat === id ? "is-on" : ""}`} aria-pressed={cat === id} onClick={() => setCat(id)}>
+            {label}
+          </button>
+        ))}
+      </div>
+      <button type="button" className="btn btn--accent surprise__go" onClick={pick}>
+        Выбери за меня
+      </button>
+    </section>
+  );
+}
+
 export function Home() {
-  const { favorites, exclude, dislikes, journal } = useStore();
+  const { favorites, exclude, dislikes, journal, fresh } = useStore();
   const [filters, setFilters] = useState<Filters>(defaultFilters);
   const [limit, setLimit] = useState(PAGE);
 
@@ -142,7 +174,7 @@ export function Home() {
       if (filters.cookedOnly && !journal[r.id]?.cooked) return false;
       if (filters.product && !hasProduct(r, filters.product)) return false;
       const col = collectionMap[filters.collection];
-      if (col && !col.test(r, { macros: m, journal: journal[r.id] })) return false;
+      if (col && !col.test(r, { macros: m, journal: journal[r.id], fresh: fresh.has(r.id) })) return false;
       if (!fitsDiet(r, exclude, dislikes)) return false;
       if (filters.maxKcal < KCAL_MAX && m.kcal > filters.maxKcal) return false;
       if (filters.query.trim() && !matches(texts[r.id], filters.query)) return false;
@@ -161,7 +193,7 @@ export function Home() {
         recipeRank[a] - recipeRank[b],
     }[filters.sort];
     return [...out].sort((a, b) => by(a.id, b.id));
-  }, [filters, favorites, exclude, dislikes, journal]);
+  }, [filters, favorites, exclude, dislikes, journal, fresh]);
 
   // Смена ограничений в еде тоже возвращает к первой странице.
   useEffect(() => setLimit(PAGE), [exclude, dislikes]);
@@ -181,6 +213,8 @@ export function Home() {
           document.getElementById("catalog-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
         }}
       />
+
+      <Surprise />
 
       <section className="catalog wrap" aria-labelledby="catalog-title">
         <h2 id="catalog-title" className="section-title">

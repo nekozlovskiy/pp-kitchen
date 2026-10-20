@@ -17,6 +17,13 @@ export function Favorites() {
             : "Здесь будут рецепты, отмеченные сердечком."}
         </p>
       </header>
+      <Link to="/kitchen" className="pantry-link">
+        <span>
+          <b>Моя кухня</b>
+          <span>Что и когда готовила, цифры и достижения</span>
+        </span>
+        <span aria-hidden="true">→</span>
+      </Link>
       {list.length ? (
         <div className="grid">
           {list.map((r) => (

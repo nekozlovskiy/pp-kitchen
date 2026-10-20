@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { ingredientMap, recipeMap } from "../data";
 import { formatAmount, plural } from "../lib/format";
 import { buildShoppingList } from "../lib/shopping";
+import { groupByAisle } from "../lib/aisles";
 import { Stepper } from "../components/Stepper";
 import { useStore } from "../hooks/useStore";
 
@@ -35,7 +36,11 @@ export function Shopping() {
   const send = async () => {
     const text = [
       "Список покупок",
-      ...lines.filter((l) => !bought.has(l.id)).map((l) => `— ${l.name}: ${formatAmount(ingredientMap[l.id], l.grams)}`),
+      ...groupByAisle(lines.filter((l) => !bought.has(l.id))).flatMap((g) => [
+        "",
+        `${g.aisle}:`,
+        ...g.lines.map((l) => `— ${l.name}: ${formatAmount(ingredientMap[l.id], l.grams)}`),
+      ]),
       ...(extras.length ? ["", "Ещё понадобится: " + extras.join(", ")] : []),
     ].join("\n");
     if (canShare) {
@@ -101,17 +106,22 @@ export function Shopping() {
                 {canShare ? "Отправить" : "Скопировать"}
               </button>
             </div>
-            <ul className="ingredients">
-              {lines.map((l) => (
-                <li key={l.id}>
-                  <label className={bought.has(l.id) ? "is-done" : ""}>
-                    <input type="checkbox" checked={bought.has(l.id)} onChange={() => toggleBought(l.id)} />
-                    <span className="ingredients__name">{l.name}</span>
-                    <span className="ingredients__amount">{formatAmount(ingredientMap[l.id], l.grams)}</span>
-                  </label>
-                </li>
-              ))}
-            </ul>
+            {groupByAisle(lines).map((g) => (
+              <div key={g.aisle} className="shopping__aisle">
+                <h3 className="shopping__aisle-title">{g.aisle}</h3>
+                <ul className="ingredients">
+                  {g.lines.map((l) => (
+                    <li key={l.id}>
+                      <label className={bought.has(l.id) ? "is-done" : ""}>
+                        <input type="checkbox" checked={bought.has(l.id)} onChange={() => toggleBought(l.id)} />
+                        <span className="ingredients__name">{l.name}</span>
+                        <span className="ingredients__amount">{formatAmount(ingredientMap[l.id], l.grams)}</span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
             {extras.length > 0 && (
               <p className="shopping__extras">
                 <b>Ещё понадобится:</b> {extras.join(", ")}

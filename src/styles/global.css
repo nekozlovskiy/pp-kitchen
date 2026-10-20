@@ -1460,6 +1460,17 @@ i.dot::before {
 .shopping__extras b {
   color: var(--ink);
 }
+.shopping__aisle {
+  margin-top: 18px;
+}
+.shopping__aisle-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
 
 /* ---------- Печать рецепта ---------- */
 

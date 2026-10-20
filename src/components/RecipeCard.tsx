@@ -28,7 +28,7 @@ export function HeartButton({ id, title, className = "" }: { id: string; title: 
 
 export function RecipeCard({ recipe, wide = false }: { recipe: Recipe; wide?: boolean }) {
   const location = useLocation();
-  const { journal } = useStore();
+  const { journal, fresh } = useStore();
   const entry = journal[recipe.id];
   const photo = usePhotoUrl(recipe.id, entry?.photo);
   const m = round(servingMacros[recipe.id]);
@@ -51,6 +51,7 @@ export function RecipeCard({ recipe, wide = false }: { recipe: Recipe; wide?: bo
           {categoryLabel[recipe.category]}, {formatTime(recipe.timeMinutes)}
           {isProteinDense(recipe.id) && <span className="card__badge card__badge--protein">белок</span>}
           {recipe.video && <span className="card__badge">видео</span>}
+          {fresh.has(recipe.id) && <span className="card__badge card__badge--new">новое</span>}
         </p>
         <h3 className="card__title">
           <Link to={`/recipe/${recipe.id}`} state={{ background: location }} className="card__link">

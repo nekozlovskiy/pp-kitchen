@@ -7,6 +7,9 @@ import { buildMenu } from "./menu";
 import { collections, daysSince, hasProduct, products, seasonCollection } from "./collections";
 import { cleanHistory, lastDays, withDay } from "./history";
 import { makeSimilar } from "./similar";
+import { AISLES, aisleOf, groupByAisle } from "./aisles";
+import { freshIds, updateKnown } from "./fresh";
+import { cookEvents, kitchenStats } from "./kitchen";
 import { todayKey } from "./format";
 
 const timers = (s: string) => splitStep(s).filter((p) => p.seconds).map((p) => [p.text, p.seconds]);
@@ -142,7 +145,7 @@ describe("подборки и главный продукт", () => {
 
   it("каждая группа продуктов и каждая подборка находят рецепты", () => {
     for (const p of products) expect(recipes.some((r) => hasProduct(r, p.id)), p.id).toBe(true);
-    for (const c of collections.filter((c) => c.id !== "loved" && c.id !== "missed")) {
+    for (const c of collections.filter((c) => !["loved", "missed", "new"].includes(c.id))) {
       expect(recipes.some((r) => c.test(r, { macros: servingMacros[r.id] })), c.id).toBe(true);
     }
   });
@@ -243,5 +246,58 @@ describe("история дней", () => {
   it("чужие данные в хранилище отбрасываются", () => {
     expect(cleanHistory({ "2026-10-19": m(1500), junk: m(1), "2026-10-18": { kcal: "много" } })).toEqual({ "2026-10-19": m(1500) });
     expect(cleanHistory(null)).toEqual({});
+  });
+});
+
+describe("покупки по отделам", () => {
+  it("свежие продукты не уходят в бакалею, отделы идут по порядку", () => {
+    expect(aisleOf("tomato")).toBe("Овощи и зелень");
+    expect(aisleOf("apple")).toBe("Фрукты и ягоды");
+    expect(aisleOf("chicken")).toBe("Мясо и птица");
+    expect(aisleOf("salmon")).toBe("Рыба и морепродукты");
+    expect(aisleOf("kefir")).toBe("Молочное и сыр");
+    expect(aisleOf("egg")).toBe("Яйца");
+    expect(aisleOf("buckwheat")).toBe("Крупы, макароны, мука");
+    expect(aisleOf("olive_oil")).toBe("Бакалея, соусы и масла");
+    const groups = groupByAisle([{ id: "olive_oil" }, { id: "tomato" }, { id: "egg" }]);
+    expect(groups.map((g) => g.aisle)).toEqual(["Овощи и зелень", "Яйца", "Бакалея, соусы и масла"]);
+  });
+
+  it("у каждого продукта есть отдел, свежие овощи и фрукты не попадают в бакалею", () => {
+    for (const ing of Object.values(ingredientMap)) expect(AISLES).toContain(aisleOf(ing.id));
+    const fresh = ["Овощи и зелень", "Фрукты и ягоды"];
+    for (const id of ["tomato", "cucumber", "carrot", "onion", "potato", "zucchini", "apple", "banana", "berries", "nettle", "quince"])
+      expect(fresh, id).toContain(aisleOf(id));
+  });
+});
+
+describe("«Новое» и «Моя кухня»", () => {
+  it("при первом визите ничего не новое, потом новое — то, чего телефон не видел", () => {
+    const first = updateKnown(null, ["a", "b"], "2026-10-20");
+    expect(freshIds(first, new Date(2026, 9, 20)).size).toBe(0);
+    const later = updateKnown(first, ["a", "b", "c"], "2026-10-25");
+    expect([...freshIds(later, new Date(2026, 9, 26))]).toEqual(["c"]);
+    expect(freshIds(later, new Date(2026, 10, 20)).size).toBe(0);
+    expect(updateKnown(later, ["a"], "2026-10-26")).toEqual({ a: "" });
+  });
+
+  it("лента и достижения считаются по отметкам", () => {
+    const [soup] = recipes.filter((r) => collections.find((c) => c.id === "soups")!.test(r, { macros: servingMacros[r.id] }));
+    const other = recipes.find((r) => r.id !== soup.id)!;
+    const journal = {
+      [soup.id]: { cooked: 2, last: "2026-10-18", dates: ["2026-09-30", "2026-10-18"], rating: 5 },
+      [other.id]: { cooked: 1, last: "2026-10-01" },
+      "нет-такого": { cooked: 3, last: "2026-10-02" },
+    };
+    expect(cookEvents(journal).map((e) => e.date)).toEqual(["2026-10-18", "2026-10-01", "2026-09-30"]);
+    const s = kitchenStats(journal, new Date(2026, 9, 20));
+    expect(s.total).toBe(3);
+    expect(s.distinct).toBe(2);
+    expect(s.thisMonth).toBe(2);
+    const ach = Object.fromEntries(s.achievements.map((a) => [a.id, a]));
+    expect(ach.first.done).toBe(true);
+    expect(ach.ten.value).toBe(3);
+    expect(ach.soups.value).toBeGreaterThanOrEqual(1);
+    expect(ach.critic.value).toBe(1);
   });
 });

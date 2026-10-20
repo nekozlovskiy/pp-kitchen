@@ -14,6 +14,7 @@ import { Shopping } from "./pages/Shopping";
 import { Pantry } from "./pages/Pantry";
 import { Week } from "./pages/Week";
 import { Transfer } from "./pages/Transfer";
+import { Kitchen } from "./pages/Kitchen";
 import { TimerDock } from "./components/TimerDock";
 import { CookingBanner } from "./components/CookingBanner";
 
@@ -23,7 +24,7 @@ function useTitle(location: Location) {
     const r = m ? recipeMap[decodeURIComponent(m[1])] : undefined;
     const page =
       r?.title ??
-      ({ "/day": "Мой день", "/favorites": "Избранное", "/shopping": "Покупки", "/pantry": "Из того, что есть", "/week": "Меню на неделю", "/transfer": "Перенос" } as Record<string, string>)[
+      ({ "/day": "Мой день", "/favorites": "Избранное", "/shopping": "Покупки", "/pantry": "Из того, что есть", "/week": "Меню на неделю", "/transfer": "Перенос", "/kitchen": "Моя кухня" } as Record<string, string>)[
         location.pathname
       ];
     document.title = page ? `${page} | ПП-кухня` : `ПП-кухня ${config.herNameGenitive}`;
@@ -69,6 +70,7 @@ export function App() {
           <Route path="/pantry" element={<Pantry />} />
           <Route path="/week" element={<Week />} />
           <Route path="/transfer" element={<Transfer />} />
+          <Route path="/kitchen" element={<Kitchen />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         {background && (
@@ -81,6 +83,8 @@ export function App() {
         <p className="footer__love">Сделано с любовью для {config.herNameGenitive}</p>
         <p className="disclaimer">{config.disclaimer}</p>
         <p className="footer__links">
+          <Link to="/kitchen">Моя кухня: что я готовила и достижения</Link>
+          {" · "}
           <Link to="/transfer">Перенести избранное и отметки на другой телефон</Link>
         </p>
       </footer>

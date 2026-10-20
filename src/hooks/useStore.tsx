@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import { readJSON, writeJSON } from "../lib/storage";
 import { todayKey } from "../lib/format";
 import { cleanHistory, withDay } from "../lib/history";
+import { freshIds, updateKnown } from "../lib/fresh";
+import type { Known } from "../lib/fresh";
 import type { History } from "../lib/history";
 import { config } from "../config";
 import { ingredientMap, recipeMap, servingMacros } from "../data";
@@ -17,7 +19,10 @@ export type DayItem = { id: string; servings: number; grams?: boolean };
 type DayState = { date: string; items: DayItem[] };
 export type ShoppingState = { items: DayItem[]; checked: string[] };
 /** Личные отметки к рецепту. Всё хранится только в этом браузере. */
-export type JournalEntry = { note?: string; cooked?: number; last?: string; rating?: number; photo?: number };
+export type JournalEntry = { note?: string; cooked?: number; last?: string; rating?: number; photo?: number; dates?: string[] };
+
+/** Сколько последних дат готовки помнить для ленты «Моя кухня». */
+const KEEP_DATES = 50;
 
 type Store = {
   favorites: Set<string>;
@@ -43,6 +48,8 @@ type Store = {
   markCooked: (id: string) => void;
   exclude: DietTag[];
   toggleExclude: (tag: DietTag) => void;
+  /** Рецепты, которые появились на сайте за последние две недели (для этого телефона). */
+  fresh: ReadonlySet<string>;
   /** Нелюбимые продукты: рецепты с ними прячутся из каталога, подборок и меню. */
   dislikes: string[];
   toggleDislike: (ingredientId: string) => void;
@@ -117,6 +124,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [pantry, setPantry] = useState<string[]>(() =>
     readJSON<string[]>("pp.pantry", []).filter((id) => ingredientMap[id]),
   );
+  const [known] = useState<Known>(() => updateKnown(readJSON<Known | null>("pp.known", null), Object.keys(recipeMap), todayKey()));
+  useEffect(() => writeJSON("pp.known", known), [known]);
+  const fresh = useMemo(() => freshIds(known), [known]);
   const [dislikes, setDislikes] = useState<string[]>(() => {
     const saved = readJSON<string[]>("pp.dislikes", []);
     return Array.isArray(saved) ? saved.filter((id) => ingredientMap[id]) : [];
@@ -221,9 +231,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       journal,
       updateJournal: (id, patch) => setJournal((j) => ({ ...j, [id]: { ...j[id], ...patch } })),
       markCooked: (id) =>
-        setJournal((j) => ({ ...j, [id]: { ...j[id], cooked: (j[id]?.cooked ?? 0) + 1, last: todayKey() } })),
+        setJournal((j) => {
+          const today = todayKey();
+          const dates = [...(j[id]?.dates ?? []), today].slice(-KEEP_DATES);
+          return { ...j, [id]: { ...j[id], cooked: (j[id]?.cooked ?? 0) + 1, last: today, dates } };
+        }),
       exclude,
       toggleExclude: (tag) => setExclude((e) => (e.includes(tag) ? e.filter((t) => t !== tag) : [...e, tag])),
+      fresh,
       dislikes,
       toggleDislike: (ingredientId) =>
         setDislikes((d) => (d.includes(ingredientId) ? d.filter((x) => x !== ingredientId) : [...d, ingredientId])),
@@ -248,7 +263,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       servingFor: (recipeId) =>
         swaps[recipeId]?.length ? perServing(applySwaps(recipeMap[recipeId], swaps[recipeId]), ingredientMap) : servingMacros[recipeId],
     }),
-    [favorites, toggleFavorite, day, addToDay, goal, shopping, toast, showToast, journal, exclude, dislikes, pantry, proteinGoal, swaps, week, history],
+    [favorites, toggleFavorite, day, addToDay, goal, shopping, toast, showToast, journal, exclude, fresh, dislikes, pantry, proteinGoal, swaps, week, history],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

@@ -28,7 +28,7 @@ export function hasProduct(recipe: Recipe, productId: string): boolean {
   return !group || recipe.ingredients.some((i) => group.ids.has(i.id));
 }
 
-type Ctx = { macros: Macros; journal?: { cooked?: number; rating?: number; last?: string } };
+type Ctx = { macros: Macros; journal?: { cooked?: number; rating?: number; last?: string }; fresh?: boolean };
 
 type Collection = { id: string; title: string; hint: string; test: (r: Recipe, c: Ctx) => boolean };
 
@@ -90,6 +90,7 @@ const MISSED_DAYS = 30;
 
 /** Подборки на главной: готовые сочетания условий. */
 export const collections: Collection[] = [
+  { id: "new", title: "Новинки", hint: "Появились за последние две недели", test: (_, c) => Boolean(c.fresh) },
   { id: "quick-dinner", title: "Ужин за 20 минут", hint: "Быстро после работы", test: (r) => r.category === "dinner" && r.timeMinutes <= 20 },
   { id: "light-dinner", title: "Лёгкий ужин", hint: "До 350 ккал на порцию", test: (r, c) => r.category === "dinner" && c.macros.kcal <= 350 },
   { id: "protein", title: "Много белка", hint: "От 25 г на порцию", test: (_, c) => c.macros.p >= 25 },
