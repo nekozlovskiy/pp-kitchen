@@ -3,6 +3,7 @@ import { clearCooking, readCooking, saveCooking } from "../lib/cooking";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { categoryLabel, ingredientMap, per100Macros, portionGrams, recipeAliases, recipeMap, recipes, servingMacros, sources } from "../data";
 import { makeSimilar } from "../lib/similar";
+import { isMyRecipe } from "../lib/myRecipes";
 import { fitsDiet } from "../lib/diet";
 import { macroPercents, per100g, round, scale, scaleIngredients } from "../lib/nutrition";
 import { applySwaps, availableSwaps } from "../lib/swaps";
@@ -98,6 +99,7 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
     setCookStep(0);
   };
   const [keepAwake, setKeepAwake] = useState(false);
+  const [showMacros, setShowMacros] = useState(false);
   const [cooking, setCooking] = useState(false);
   const wake = useWakeLock(keepAwake);
   const photo = usePhotoUrl(recipe.id, journal[recipe.id]?.photo);
@@ -279,9 +281,13 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
           <h2>Продукты</h2>
           <Stepper value={servings} onChange={setServings} label="Число порций" min={1} max={20} format={servingsLabel} />
         </div>
+        <button type="button" className="btn btn--text ingredients__macros-toggle" aria-pressed={showMacros} onClick={() => setShowMacros((v) => !v)}>
+          {showMacros ? "Скрыть КБЖУ продуктов" : "Показать КБЖУ продуктов"}
+        </button>
         <ul className="ingredients">
           {items.map((it, i) => {
             const ing = ingredientMap[it.id];
+            const k = it.grams / 100;
             return (
               <li key={it.id}>
                 <label className={checked.has(i) ? "is-done" : ""}>
@@ -289,6 +295,13 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
                   <span className="ingredients__name">{ing?.name ?? it.id}</span>
                   <span className="ingredients__amount">{formatAmount(ing, it.grams)}</span>
                 </label>
+                {showMacros && ing && (
+                  <p className="ingredients__macros">
+                    {Math.round(ing.per100.kcal * k)} ккал · Б {Math.round(ing.per100.p * k)} · Ж {Math.round(ing.per100.f * k)} · У{" "}
+                    {Math.round(ing.per100.c * k)}
+                    <span> · в 100 г {Math.round(ing.per100.kcal)} ккал</span>
+                  </p>
+                )}
               </li>
             );
           })}
@@ -396,6 +409,12 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
             {sources[recipe.source].title}
           </a>
           », {sources[recipe.source].site}, автор {sources[recipe.source].author}. КБЖУ посчитано нами по составу.
+        </p>
+      )}
+
+      {isMyRecipe(recipe.id) && (
+        <p className="source">
+          Свой рецепт, КБЖУ посчитано по таблице продуктов. <Link to={`/my/${recipe.id}`}>Изменить или удалить</Link>
         </p>
       )}
 

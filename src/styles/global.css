@@ -219,6 +219,39 @@ button {
   padding-bottom: 48px;
 }
 
+/* ---------- Зимний снег на обложке ---------- */
+.masthead {
+  position: relative;
+  isolation: isolate;
+}
+.snow {
+  position: absolute;
+  z-index: -1;
+  inset: -8px 0 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.snow span {
+  position: absolute;
+  top: -20px;
+  color: color-mix(in srgb, var(--accent) 35%, var(--muted));
+  opacity: 0.55;
+  animation: snowfall linear infinite;
+}
+@keyframes snowfall {
+  to {
+    transform: translate(18px, 520px) rotate(180deg);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .snow span {
+    animation: none;
+    top: var(--y);
+    opacity: 0.35;
+  }
+}
+
 @media (min-width: 900px) {
   .cover {
     grid-template-columns: 1.25fr 1fr;
@@ -1085,6 +1118,19 @@ i.dot::before {
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
+.ingredients__macros {
+  margin: -6px 0 10px 40px;
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.ingredients__macros span {
+  opacity: 0.85;
+}
+.ingredients__macros-toggle {
+  margin: -4px 0 6px;
+  padding-inline: 0;
+}
 .ingredients .is-done .ingredients__name,
 .ingredients .is-done .ingredients__amount {
   text-decoration: line-through;
@@ -1492,6 +1538,7 @@ i.dot::before {
   .recipe__actions,
   .recipe__tools,
   .similar,
+  .ingredients__macros-toggle,
   .stepper,
   .ingredients input {
     display: none !important;

@@ -10,6 +10,8 @@ import { makeSimilar } from "./similar";
 import { AISLES, aisleOf, groupByAisle } from "./aisles";
 import { freshIds, updateKnown } from "./fresh";
 import { cookEvents, kitchenStats } from "./kitchen";
+import { cleanMyRecipes, draftProblem, makeMyRecipe } from "./myRecipes";
+import { addUserRecipe, removeUserRecipe, userRecipeIds } from "../data";
 import { todayKey } from "./format";
 
 const timers = (s: string) => splitStep(s).filter((p) => p.seconds).map((p) => [p.text, p.seconds]);
@@ -299,5 +301,46 @@ describe("«Новое» и «Моя кухня»", () => {
     expect(ach.ten.value).toBe(3);
     expect(ach.soups.value).toBeGreaterThanOrEqual(1);
     expect(ach.critic.value).toBe(1);
+  });
+});
+
+describe("свои рецепты", () => {
+  const draft = {
+    title: "  Мамины сырники ",
+    category: "breakfast" as const,
+    servings: 2,
+    timeMinutes: 25,
+    description: "",
+    ingredients: [
+      { id: "cottage5", grams: 400 },
+      { id: "egg", grams: 55 },
+      { id: "нет-такого", grams: 10 },
+      { id: "oat_flour", grams: 0 },
+    ],
+    steps: ["Смешайте всё.", "  ", "Обжарьте."],
+  };
+
+  it("черновик чистится: пустые шаги, неизвестные продукты и нулевой вес убираются", () => {
+    const r = makeMyRecipe(draft, 1_700_000_000_000);
+    expect(r.id).toMatch(/^my-/);
+    expect(r.title).toBe("Мамины сырники");
+    expect(r.ingredients.map((i) => i.id)).toEqual(["cottage5", "egg"]);
+    expect(r.steps).toEqual(["Смешайте всё.", "Обжарьте."]);
+    expect(draftProblem(draft)).toBe("");
+    expect(draftProblem({ ...draft, title: " " })).toMatch(/название/);
+    expect(draftProblem({ ...draft, steps: [""] })).toMatch(/шаг/);
+  });
+
+  it("из хранилища берутся только свои рецепты, КБЖУ регистрируется и снимается", () => {
+    const r = makeMyRecipe(draft, 1_700_000_000_000);
+    const clean = cleanMyRecipes([r, { ...r, id: "gs-чужой" }, { junk: 1 }, null]);
+    expect(clean.map((x) => x.id)).toEqual([r.id]);
+    addUserRecipe(r);
+    expect(recipeMap[r.id]).toBe(r);
+    expect(servingMacros[r.id].kcal).toBeGreaterThan(100);
+    expect(recipes.some((x) => x.id === r.id)).toBe(false);
+    removeUserRecipe(r.id);
+    expect(recipeMap[r.id]).toBeUndefined();
+    expect(userRecipeIds.has(r.id)).toBe(false);
   });
 });

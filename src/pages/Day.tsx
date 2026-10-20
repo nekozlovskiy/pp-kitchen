@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { config } from "../config";
-import { portionGrams, recipeMap } from "../data";
+import { ingredientMap, ingredients, portionGrams, recipeMap } from "../data";
+import { foodsMacros } from "../hooks/useStore";
 import { round, scale, sum } from "../lib/nutrition";
 import { plural } from "../lib/format";
 import { MacroRing } from "../components/MacroRing";
@@ -9,10 +11,59 @@ import { useStore } from "../hooks/useStore";
 import { MenuBuilder } from "../components/MenuBuilder";
 import { WeekChart } from "../components/WeekChart";
 
+const norm = (s: string) => s.toLowerCase().replace(/ё/g, "е");
+const allIngredients = [...ingredients].sort((a, b) => a.name.localeCompare(b.name, "ru"));
+
+/** Продукт без рецепта: поиск по таблице продуктов, вес по умолчанию — одна штука или 100 г. */
+function FoodPicker() {
+  const { addFood, showToast } = useStore();
+  const [q, setQ] = useState("");
+  const query = norm(q.trim());
+  const found = query ? allIngredients.filter((i) => norm(i.name).includes(query)).slice(0, 8) : [];
+  return (
+    <section className="food-picker" aria-labelledby="food-picker-title">
+      <h2 id="food-picker-title" className="food-picker__title">
+        Продукт без рецепта
+      </h2>
+      <input
+        type="search"
+        className="dislikes__search"
+        placeholder="Яблоко, кефир, творог…"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        aria-label="Найти продукт"
+      />
+      {query && (
+        <div className="toggles">
+          {found.length ? (
+            found.map((i) => (
+              <button
+                key={i.id}
+                type="button"
+                className="toggle"
+                onClick={() => {
+                  const grams = i.piece?.grams ?? 100;
+                  addFood(i.id, grams);
+                  showToast(`${i.name}: ${grams} ${i.unit === "ml" ? "мл" : "г"} в моём дне`);
+                  setQ("");
+                }}
+              >
+                {i.name}
+              </button>
+            ))
+          ) : (
+            <p className="diet__hint">Такого продукта нет в таблице.</p>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
 export function Day() {
-  const { day, setDayServings, toggleDayUnit, removeFromDay, clearDay, goal, setGoal, servingFor } = useStore();
+  const { day, setDayServings, toggleDayUnit, removeFromDay, clearDay, goal, setGoal, servingFor, foods, setFoodGrams, removeFood } = useStore();
   const location = useLocation();
-  const totalsRaw = sum(day.map((x) => scale(servingFor(x.id), x.servings)));
+  const totalsRaw = sum([...day.map((x) => scale(servingFor(x.id), x.servings)), foodsMacros(foods)]);
   const t = round(totalsRaw);
   const left = goal - t.kcal;
   const progress = Math.min(100, (t.kcal / goal) * 100);
@@ -72,7 +123,7 @@ export function Day() {
         </div>
       </section>
 
-      {day.length ? (
+      {day.length || foods.length ? (
         <>
           <ul className="day__list">
             {day.map((x, i) => {
@@ -132,6 +183,38 @@ export function Day() {
                 </li>
               );
             })}
+            {foods.map((f, i) => {
+              const ing = ingredientMap[f.id];
+              const unit = ing.unit === "ml" ? "мл" : "г";
+              return (
+                <li key={f.id} className="day__item">
+                  <div className="day__item-main">
+                    <span className="day__item-title">{ing.name}</span>
+                    <span className="day__item-kcal">{Math.round((ing.per100.kcal * f.grams) / 100)} ккал</span>
+                  </div>
+                  <div className="day__item-ctrl">
+                    <label className="grams-input">
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        min={1}
+                        max={3000}
+                        defaultValue={Math.round(f.grams)}
+                        onChange={(e) => {
+                          const v = Number(e.target.value);
+                          if (v > 0 && v <= 3000) setFoodGrams(i, v);
+                        }}
+                        aria-label={`Сколько ${unit}: ${ing.name}`}
+                      />
+                      <span>{unit}</span>
+                    </label>
+                    <button type="button" className="btn btn--text" onClick={() => removeFood(i)} aria-label={`Убрать «${ing.name}»`}>
+                      Убрать
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
           <button type="button" className="btn btn--ghost" onClick={clearDay}>
             Очистить день
@@ -140,12 +223,14 @@ export function Day() {
       ) : (
         <div className="empty">
           <p className="empty__title">Сегодня пока пусто</p>
-          <p>Откройте рецепт и нажмите «В мой день», чтобы посчитать калории за день.</p>
+          <p>Откройте рецепт и нажмите «В мой день», чтобы посчитать калории за день. Перекус без рецепта можно добавить ниже.</p>
           <Link to="/" className="btn btn--accent">
             Выбрать рецепт
           </Link>
         </div>
       )}
+
+      <FoodPicker />
 
       <WeekChart />
 

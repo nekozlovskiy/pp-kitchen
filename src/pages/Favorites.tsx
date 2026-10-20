@@ -24,6 +24,13 @@ export function Favorites() {
         </span>
         <span aria-hidden="true">→</span>
       </Link>
+      <Link to="/my" className="pantry-link">
+        <span>
+          <b>Мои рецепты</b>
+          <span>Свои блюда с подсчётом КБЖУ</span>
+        </span>
+        <span aria-hidden="true">→</span>
+      </Link>
       {list.length ? (
         <div className="grid">
           {list.map((r) => (

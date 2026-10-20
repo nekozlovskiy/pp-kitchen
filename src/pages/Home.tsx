@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import type { CSSProperties } from "react";
 import { fitsDiet } from "../lib/diet";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { config } from "../config";
@@ -11,6 +12,7 @@ import { FilterBar, KCAL_MAX, defaultFilters } from "../components/FilterBar";
 import type { Filters } from "../components/FilterBar";
 import type { Category } from "../types";
 import { RecipeCard } from "../components/RecipeCard";
+import { InstallHint } from "../components/InstallHint";
 import { useStore } from "../hooks/useStore";
 import { collectionMap, collections, hasProduct } from "../lib/collections";
 
@@ -32,9 +34,39 @@ function noteOfTheDay() {
   return config.notes[(days + 3) % config.notes.length];
 }
 
+/** Зима на обложке: с 1 декабря по 14 января. */
+function isWinterHoliday(d = new Date()) {
+  return d.getMonth() === 11 || (d.getMonth() === 0 && d.getDate() <= 14);
+}
+
+/** Лёгкий снег поверх обложки; при «уменьшить движение» снежинки просто стоят. */
+function Snow() {
+  return (
+    <div className="snow" aria-hidden="true">
+      {Array.from({ length: 16 }, (_, i) => (
+        <span
+          key={i}
+          style={
+            {
+              left: `${(i * 61) % 100}%`,
+              "--y": `${(i * 37) % 90}%`,
+              animationDelay: `${(i * 0.7) % 9}s`,
+              animationDuration: `${9 + (i % 5) * 2}s`,
+              fontSize: `${10 + (i % 4) * 4}px`,
+            } as CSSProperties
+          }
+        >
+          ❄
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function Masthead() {
   return (
     <div className="masthead">
+      {isWinterHoliday() && <Snow />}
       <h1 className="masthead__title" aria-label="ПП-кухня">
         <span className="masthead__line">ПП‑</span>
         <span className="masthead__line">кухня</span>
@@ -205,6 +237,7 @@ export function Home() {
       <header className="cover wrap">
         <Masthead />
         <Feature />
+        <InstallHint />
       </header>
 
       <Collections

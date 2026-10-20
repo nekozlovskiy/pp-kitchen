@@ -15,8 +15,10 @@ import { Pantry } from "./pages/Pantry";
 import { Week } from "./pages/Week";
 import { Transfer } from "./pages/Transfer";
 import { Kitchen } from "./pages/Kitchen";
+import { MyRecipeEditor, MyRecipes } from "./pages/MyRecipes";
 import { TimerDock } from "./components/TimerDock";
 import { CookingBanner } from "./components/CookingBanner";
+import { AchievementWatcher } from "./components/AchievementWatcher";
 
 function useTitle(location: Location) {
   useEffect(() => {
@@ -24,7 +26,8 @@ function useTitle(location: Location) {
     const r = m ? recipeMap[decodeURIComponent(m[1])] : undefined;
     const page =
       r?.title ??
-      ({ "/day": "Мой день", "/favorites": "Избранное", "/shopping": "Покупки", "/pantry": "Из того, что есть", "/week": "Меню на неделю", "/transfer": "Перенос", "/kitchen": "Моя кухня" } as Record<string, string>)[
+      (location.pathname.startsWith("/my/") && location.pathname !== "/my/new" ? "Изменить рецепт" : undefined) ??
+      ({ "/day": "Мой день", "/favorites": "Избранное", "/shopping": "Покупки", "/pantry": "Из того, что есть", "/week": "Меню на неделю", "/transfer": "Перенос", "/kitchen": "Моя кухня", "/my": "Мои рецепты", "/my/new": "Новый рецепт" } as Record<string, string>)[
         location.pathname
       ];
     document.title = page ? `${page} | ПП-кухня` : `ПП-кухня ${config.herNameGenitive}`;
@@ -71,6 +74,9 @@ export function App() {
           <Route path="/week" element={<Week />} />
           <Route path="/transfer" element={<Transfer />} />
           <Route path="/kitchen" element={<Kitchen />} />
+          <Route path="/my" element={<MyRecipes />} />
+          <Route path="/my/new" element={<MyRecipeEditor />} />
+          <Route path="/my/:id" element={<MyRecipeEditor key={location.pathname} />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         {background && (
@@ -89,6 +95,7 @@ export function App() {
         </p>
       </footer>
       <TimerDock />
+      <AchievementWatcher />
       <Toast />
     </>
   );

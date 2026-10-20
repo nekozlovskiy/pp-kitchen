@@ -31,6 +31,28 @@ export const portionGrams: Record<string, number> = Object.fromEntries(
   recipes.map((r) => [r.id, Math.max(10, Math.round(dishWeight(r) / Math.max(1, r.servings) / 10) * 10)]),
 );
 
+/**
+ * Свои рецепты Анюты: живут только в её браузере. Их дописываем в общие таблицы (поиск по id, КБЖУ, вес порции),
+ * чтобы «Мой день», покупки и меню работали с ними как с обычными, но в каталог `recipes` не добавляем.
+ */
+export const userRecipeIds = new Set<string>();
+
+export function addUserRecipe(r: Recipe): void {
+  userRecipeIds.add(r.id);
+  recipeMap[r.id] = r;
+  servingMacros[r.id] = perServing(r, ingredientMap);
+  per100Macros[r.id] = per100g(r, ingredientMap);
+  portionGrams[r.id] = Math.max(10, Math.round(dishWeight(r) / Math.max(1, r.servings) / 10) * 10);
+}
+
+export function removeUserRecipe(id: string): void {
+  if (!userRecipeIds.delete(id)) return;
+  delete recipeMap[id];
+  delete servingMacros[id];
+  delete per100Macros[id];
+  delete portionGrams[id];
+}
+
 /** Белковое блюдо: от 10 г белка на каждые 100 ккал. */
 export const isProteinDense = (id: string) => {
   const m = servingMacros[id];

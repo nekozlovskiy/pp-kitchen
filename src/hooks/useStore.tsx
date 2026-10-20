@@ -7,16 +7,24 @@ import { freshIds, updateKnown } from "../lib/fresh";
 import type { Known } from "../lib/fresh";
 import type { History } from "../lib/history";
 import { config } from "../config";
-import { ingredientMap, recipeMap, servingMacros } from "../data";
+import { addUserRecipe, ingredientMap, recipeMap, removeUserRecipe, servingMacros } from "../data";
+import { cleanMyRecipes } from "../lib/myRecipes";
+import type { Macros, Recipe } from "../types";
 import { perServing, scale, sum } from "../lib/nutrition";
 import { SWAPS, applySwaps } from "../lib/swaps";
-import type { Macros } from "../types";
 import { dietLabels } from "../lib/diet";
 import type { DietTag } from "../lib/diet";
 
 /** servings — доля порции; grams — показывать и менять в граммах вместо порций. */
 export type DayItem = { id: string; servings: number; grams?: boolean };
-type DayState = { date: string; items: DayItem[] };
+/** Продукт без рецепта в «Моём дне»: id из таблицы продуктов и вес в граммах. */
+export type FoodItem = { id: string; grams: number };
+type DayState = { date: string; items: DayItem[]; foods?: FoodItem[] };
+
+/** КБЖУ продуктов без рецепта по таблице продуктов. */
+export function foodsMacros(foods: FoodItem[]): Macros {
+  return sum(foods.map((f) => scale(ingredientMap[f.id].per100, f.grams / 100)));
+}
 export type ShoppingState = { items: DayItem[]; checked: string[] };
 /** Личные отметки к рецепту. Всё хранится только в этом браузере. */
 export type JournalEntry = { note?: string; cooked?: number; last?: string; rating?: number; photo?: number; dates?: string[] };
@@ -33,6 +41,10 @@ type Store = {
   toggleDayUnit: (index: number) => void;
   removeFromDay: (index: number) => void;
   clearDay: () => void;
+  foods: FoodItem[];
+  addFood: (ingredientId: string, grams: number) => void;
+  setFoodGrams: (index: number, grams: number) => void;
+  removeFood: (index: number) => void;
   goal: number;
   setGoal: (kcal: number) => void;
   shopping: ShoppingState;
@@ -48,6 +60,10 @@ type Store = {
   markCooked: (id: string) => void;
   exclude: DietTag[];
   toggleExclude: (tag: DietTag) => void;
+  /** Свои рецепты: хранятся только в этом браузере, в каталог не попадают. */
+  myRecipes: Recipe[];
+  saveMyRecipe: (recipe: Recipe) => void;
+  deleteMyRecipe: (id: string) => void;
   /** Рецепты, которые появились на сайте за последние две недели (для этого телефона). */
   fresh: ReadonlySet<string>;
   /** Нелюбимые продукты: рецепты с ними прячутся из каталога, подборок и меню. */
@@ -75,10 +91,20 @@ type Store = {
 
 const Ctx = createContext<Store | null>(null);
 
+// Свои рецепты регистрируются до первого рендера: сохранённые «Мой день» и покупки могут на них ссылаться.
+const savedMine = cleanMyRecipes(readJSON<unknown>("pp.myRecipes", []));
+savedMine.forEach(addUserRecipe);
+
 function loadDay(): DayItem[] {
   const saved = readJSON<DayState | null>("pp.day", null);
   if (!saved || saved.date !== todayKey() || !Array.isArray(saved.items)) return [];
   return saved.items.filter((i) => recipeMap[i.id] && i.servings > 0);
+}
+
+function loadFoods(): FoodItem[] {
+  const saved = readJSON<DayState | null>("pp.day", null);
+  if (!saved || saved.date !== todayKey() || !Array.isArray(saved.foods)) return [];
+  return saved.foods.filter((f) => f && ingredientMap[f.id] && f.grams > 0);
 }
 
 export function StoreProvider({ children }: { children: ReactNode }) {
@@ -86,6 +112,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     () => new Set(readJSON<string[]>("pp.favorites", []).filter((id) => recipeMap[id])),
   );
   const [day, setDay] = useState<DayItem[]>(loadDay);
+  const [foods, setFoods] = useState<FoodItem[]>(loadFoods);
   // Дата, к которой относится «Мой день»: телефон может держать вкладку открытой через полночь.
   const [dayDate, setDayDate] = useState(todayKey);
   useEffect(() => {
@@ -93,6 +120,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       const today = todayKey();
       if (today === dayDate) return;
       setDay([]);
+      setFoods([]);
       setDayDate(today);
     };
     document.addEventListener("visibilitychange", check);
@@ -124,6 +152,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [pantry, setPantry] = useState<string[]>(() =>
     readJSON<string[]>("pp.pantry", []).filter((id) => ingredientMap[id]),
   );
+  const [myRecipes, setMyRecipes] = useState<Recipe[]>(savedMine);
+  useEffect(() => writeJSON("pp.myRecipes", myRecipes), [myRecipes]);
   const [known] = useState<Known>(() => updateKnown(readJSON<Known | null>("pp.known", null), Object.keys(recipeMap), todayKey()));
   useEffect(() => writeJSON("pp.known", known), [known]);
   const fresh = useMemo(() => freshIds(known), [known]);
@@ -157,18 +187,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => writeJSON("pp.week", week), [week]);
   useEffect(() => writeJSON("pp.shopping", shopping), [shopping]);
   useEffect(() => writeJSON("pp.favorites", [...favorites]), [favorites]);
-  useEffect(() => writeJSON("pp.day", { date: dayDate, items: day }), [day, dayDate]);
+  useEffect(() => writeJSON("pp.day", { date: dayDate, items: day, foods }), [day, foods, dayDate]);
   const [history, setHistory] = useState<History>(() => cleanHistory(readJSON<unknown>("pp.history", {})));
   useEffect(() => writeJSON("pp.history", history), [history]);
   // Итог сегодняшнего дня сразу попадает в историю: завтра «Мой день» очистится, а график останется.
   useEffect(() => {
-    const totals = sum(
-      day.map((x) =>
+    const totals = sum([
+      ...day.map((x) =>
         scale(swaps[x.id]?.length ? perServing(applySwaps(recipeMap[x.id], swaps[x.id]), ingredientMap) : servingMacros[x.id], x.servings),
       ),
-    );
+      foodsMacros(foods),
+    ]);
     setHistory((h) => withDay(h, dayDate, totals));
-  }, [day, swaps, dayDate]);
+  }, [day, foods, swaps, dayDate]);
   useEffect(() => writeJSON("pp.goal", goal), [goal]);
 
   const showToast = useCallback((msg: string) => {
@@ -204,7 +235,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setDay((prev) => prev.map((x, j) => (j === index ? { ...x, servings } : x))),
       toggleDayUnit: (index) => setDay((prev) => prev.map((x, j) => (j === index ? { ...x, grams: !x.grams } : x))),
       removeFromDay: (index) => setDay((prev) => prev.filter((_, j) => j !== index)),
-      clearDay: () => setDay([]),
+      clearDay: () => {
+        setDay([]);
+        setFoods([]);
+      },
+      foods,
+      addFood: (ingredientId, grams) =>
+        setFoods((prev) => {
+          const i = prev.findIndex((f) => f.id === ingredientId);
+          if (i === -1) return [...prev, { id: ingredientId, grams }];
+          return prev.map((f, j) => (j === i ? { ...f, grams: f.grams + grams } : f));
+        }),
+      setFoodGrams: (index, grams) => setFoods((prev) => prev.map((f, j) => (j === index ? { ...f, grams } : f))),
+      removeFood: (index) => setFoods((prev) => prev.filter((_, j) => j !== index)),
       goal,
       setGoal: (kcal) => setGoalState(Math.max(800, Math.min(5000, Math.round(kcal) || config.defaultGoalKcal))),
       shopping,
@@ -239,6 +282,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       exclude,
       toggleExclude: (tag) => setExclude((e) => (e.includes(tag) ? e.filter((t) => t !== tag) : [...e, tag])),
       fresh,
+      myRecipes,
+      saveMyRecipe: (recipe) => {
+        addUserRecipe(recipe);
+        setMyRecipes((list) => (list.some((r) => r.id === recipe.id) ? list.map((r) => (r.id === recipe.id ? recipe : r)) : [recipe, ...list]));
+      },
+      deleteMyRecipe: (id) => {
+        // Сначала убираем ссылки на рецепт из всех списков, потом сам рецепт.
+        setDay((d) => d.filter((x) => x.id !== id));
+        setShopping((s) => ({ ...s, items: s.items.filter((x) => x.id !== id) }));
+        setWeekState((w) => w.map((items) => items.filter((x) => x.id !== id)));
+        setFavorites((f) => {
+          const next = new Set(f);
+          next.delete(id);
+          return next;
+        });
+        setMyRecipes((list) => list.filter((r) => r.id !== id));
+        removeUserRecipe(id);
+      },
       dislikes,
       toggleDislike: (ingredientId) =>
         setDislikes((d) => (d.includes(ingredientId) ? d.filter((x) => x !== ingredientId) : [...d, ingredientId])),
@@ -263,7 +324,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       servingFor: (recipeId) =>
         swaps[recipeId]?.length ? perServing(applySwaps(recipeMap[recipeId], swaps[recipeId]), ingredientMap) : servingMacros[recipeId],
     }),
-    [favorites, toggleFavorite, day, addToDay, goal, shopping, toast, showToast, journal, exclude, fresh, dislikes, pantry, proteinGoal, swaps, week, history],
+    [favorites, toggleFavorite, day, foods, addToDay, goal, shopping, toast, showToast, journal, exclude, fresh, myRecipes, dislikes, pantry, proteinGoal, swaps, week, history],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

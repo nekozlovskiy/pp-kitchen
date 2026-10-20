@@ -1343,3 +1343,133 @@
 .week-chart__sum b {
   color: var(--ink);
 }
+
+/* ---------- Продукт без рецепта ---------- */
+.food-picker {
+  display: grid;
+  gap: 10px;
+  margin-top: 28px;
+}
+.food-picker__title {
+  font-family: var(--font-display);
+  font-size: 22px;
+}
+
+/* ---------- Подсказка «На экран Домой» ---------- */
+.install-hint {
+  display: grid;
+  gap: 8px;
+  padding: 18px 20px;
+  border-radius: var(--r-lg);
+  background: var(--tint-dinner);
+  max-width: 64ch;
+}
+.install-hint__title {
+  font-weight: 700;
+}
+.install-hint__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* ---------- Конфетти за достижение ---------- */
+.confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+  pointer-events: none;
+}
+.confetti span {
+  position: absolute;
+  top: -12px;
+  width: 8px;
+  height: 12px;
+  border-radius: 2px;
+  animation: confetti 2.4s cubic-bezier(0.2, 0.6, 0.4, 1) both;
+}
+@keyframes confetti {
+  to {
+    transform: translate(var(--x), 105vh) rotate(var(--r));
+    opacity: 0.2;
+  }
+}
+
+/* ---------- Мои рецепты и редактор ---------- */
+.my__new {
+  margin-bottom: 20px;
+}
+.my-editor {
+  max-width: 760px;
+}
+.field {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+.field > span {
+  font-weight: 700;
+}
+.field > input[type="text"],
+.field > input[type="number"],
+.field > textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  font: inherit;
+  font-size: 16px;
+  color: var(--ink);
+}
+.field > input[type="number"] {
+  max-width: 140px;
+}
+.field > input:focus-visible,
+.field > textarea:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+.my-editor__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 28px;
+}
+.my-editor__ings {
+  display: grid;
+  gap: 6px;
+}
+.my-editor__ings li {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+.my-editor__hint {
+  grid-column: 1 / -1;
+  color: var(--muted);
+}
+.my-editor__preview {
+  margin-top: 22px;
+  padding: 14px 18px;
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+}
+.my-editor__problem {
+  margin-top: 10px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.my-editor__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+.my-editor__delete {
+  margin-left: auto;
+}
