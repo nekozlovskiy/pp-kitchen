@@ -244,5 +244,16 @@
   "gsr_1576": { "site": "Гастроном.ру", "title": "Долма по-гречески", "author": "Редакция «Гастронома»", "date": "2026-04-19", "url": "https://www.gastronom.ru/recipe/1576/dolma-po-grecheski" },
   "gsr_46094": { "site": "Гастроном.ру", "title": "Пицца  без муки, на тесте из цветной капусты", "author": "Редакция «Гастронома»", "date": "2025-02-14", "url": "https://www.gastronom.ru/recipe/46094/picca-bez-muki-na-teste-iz-cvetnoj-kapusty" },
   "gsr_979": { "site": "Гастроном.ру", "title": "Омлет с крапивой", "author": "Редакция «Гастронома»", "date": "2026-03-23", "url": "https://www.gastronom.ru/recipe/979/omlet-iz-krapivy" },
-  "gsr_19772": { "site": "Гастроном.ру", "title": "Роллы из рисовой бумаги с креветками", "author": "Редакция «Гастронома»", "date": "2026-01-01", "url": "https://www.gastronom.ru/recipe/19772/rolly-iz-risovoj-bumagi-s-krevetkami" }
+  "gsr_19772": { "site": "Гастроном.ру", "title": "Роллы из рисовой бумаги с креветками", "author": "Редакция «Гастронома»", "date": "2026-01-01", "url": "https://www.gastronom.ru/recipe/19772/rolly-iz-risovoj-bumagi-s-krevetkami" },
+  "ig_konvertiki": { "site": "Instagram", "title": "Конвертики с творогом и сыром", "author": "@pp_foodpro", "date": "2019-06-01", "url": "https://www.instagram.com/p/ByKXuKChSHc/" },
+  "ig_bejgly": { "site": "Instagram", "title": "Творожные бейглы с форелью", "author": "@nikakix_diet", "date": "2023-12-25", "url": "https://www.instagram.com/reel/C1RYurxIaXo/" },
+  "ig_syrniki": { "site": "Instagram", "title": "Рецепт сырников", "author": "@nastya_zayats", "date": "2025-10-31", "url": "https://www.instagram.com/reel/DQdyDmsAqDT/" },
+  "ig_frikadelki_griby": { "site": "Instagram", "title": "Мегаужин! Фрикадельки в грибном соусе", "author": "@iravarit", "date": "2025-03-20", "url": "https://www.instagram.com/reel/DHawy9Woh76/" },
+  "ig_pirog_kartofel": { "site": "Instagram", "title": "Пирог без теста: картофель, курица и грибы", "author": "@shlomadaria", "date": "2026-09-30", "url": "https://www.instagram.com/reel/Dd53UI1sTQy/" },
+  "ig_vatrushki": { "site": "Instagram", "title": "Ватрушки с вишней", "author": "@masha.stories", "date": "2025-02-19", "url": "https://www.instagram.com/reel/DGQ41ouODeZ/" },
+  "ig_frikadelki_pasta": { "site": "Instagram", "title": "Любимый рецепт фрикаделек", "author": "@barilova_tanya", "date": "2026-09-21", "url": "https://www.instagram.com/reel/DdijK9Xgi_s/" },
+  "ig_vafli": { "site": "Instagram", "title": "Мега белковые ПП вафли с начинкой", "author": "@amalinovamila", "date": "2025-07-14", "url": "https://www.instagram.com/reel/DMGMjljiwMX/" },
+  "ig_ovsyanka_tomat": { "site": "Instagram", "title": "Томатная овсянка", "author": "@purplegrace", "date": "2026-04-24", "url": "https://www.instagram.com/reel/DXgfAukkeJy/" },
+  "ig_mini_tako": { "site": "Instagram", "title": "Мини-тако", "author": "@pyzakovv", "date": "2026-03-10", "url": "https://www.instagram.com/reel/DVtM9lTDNqh/" },
+  "ig_gnezda": { "site": "Instagram", "title": "Гнезда с фаршем", "author": "@p_chupahina", "date": "2026-10-01", "url": "https://www.instagram.com/reel/Dd8agsXqjzu/" }
 }

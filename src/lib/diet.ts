@@ -20,13 +20,13 @@ const tagged: Record<DietTag, string[]> = {
   ],
   fish: [
     "cod", "pollock", "salmon", "salmon_salted", "pink_salmon_boiled", "trout", "tuna", "tuna_fresh",
-    "shrimp", "squid", "crab_sticks", "mackerel", "mussels", "herring_salted", "salmon_hot_smoked", "tilapia",
+    "shrimp", "squid", "crab_sticks", "mackerel", "mussels", "herring_salted", "salmon_hot_smoked", "tilapia", "trout_salted",
   ],
   dairy: [
     "cottage0", "cottage2", "cottage5", "yogurt", "yogurt0", "yogurt_natural", "kefir", "milk", "milk25",
     "sour_cream", "sour_cream15", "cream10", "dry_milk", "butter", "cheese_light", "cheese_hard", "feta",
     "mozzarella", "parmesan", "ricotta", "cream_cheese", "suluguni", "protein", "yogurt_greek_fat", "ryazhenka",
-    "cottage_grain", "pesto", "gorgonzola", "cottage9", "sour_cream20", "processed_cheese", "ghee", "yogurt6", "adyghe_cheese", "kefir25",
+    "cottage_grain", "pesto", "gorgonzola", "cottage9", "sour_cream20", "processed_cheese", "ghee", "yogurt6", "adyghe_cheese", "kefir25", "cream20",
   ],
   egg: ["egg", "egg_white", "egg_yolk", "quail_egg"],
   gluten: [
