@@ -34,7 +34,13 @@
     </noscript>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Обложка видна сразу, ещё до загрузки скриптов с рецептами; React заменит её той же разметкой.
+         Текст посвящения должен совпадать с config.dedication (проверяет тест). -->
+    <div id="root"><div class="shell"><div class="topbar wrap"><a class="topbar__brand" href="#/">ПП‑кухня</a></div><main class="home"><header class="cover wrap"><div class="masthead"><h1 class="masthead__title" aria-label="ПП-кухня"><span class="masthead__line">ПП‑</span><span class="masthead__line">кухня</span></h1><p class="masthead__dedication">Маленький журнал вкусной жизни. Посвящается Анюте, моему любимому шеф‑повару.</p><svg class="masthead__squiggle" viewBox="0 0 260 18" aria-hidden="true"><path d="M2 12c22-10 40 6 62-2s38-10 60 0 40 6 62-2 46-8 70 2" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" /></svg></div></header></main></div></div>
+    <script>
+      // Открыли сразу рецепт или другую страницу — обложка главной не нужна.
+      if (location.hash.length > 2) document.querySelector(".shell").remove();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
