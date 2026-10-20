@@ -5,8 +5,9 @@ import { RecipeCard } from "../components/RecipeCard";
 import { useStore } from "../hooks/useStore";
 
 export function Favorites() {
-  const { favorites } = useStore();
-  const list = recipes.filter((r) => favorites.has(r.id));
+  const { favorites, myRecipes } = useStore();
+  // Свои рецепты не в каталоге, поэтому добавляем их отдельно — иначе счётчик на вкладке и список разойдутся.
+  const list = [...recipes, ...myRecipes].filter((r) => favorites.has(r.id));
   return (
     <main className="wrap">
       <header className="page-head">

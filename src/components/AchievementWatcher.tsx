@@ -21,7 +21,7 @@ export function AchievementWatcher() {
         if (!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) setBurst((b) => b + 1);
       }
     }
-    seen.current = ids;
+    seen.current = new Set([...(seen.current ?? []), ...ids]);
   }, [done, showToast]);
 
   useEffect(() => {

@@ -6,6 +6,16 @@ type InstallEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{
 const standalone = () =>
   window.matchMedia?.("(display-mode: standalone)").matches || (navigator as Navigator & { standalone?: boolean }).standalone === true;
 
+// Браузер присылает событие установки один раз и рано — ловим его при загрузке модуля, а не только на главной.
+let deferred: InstallEvent | null = null;
+const listeners = new Set<(e: InstallEvent) => void>();
+if (typeof window !== "undefined")
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferred = e as InstallEvent;
+    listeners.forEach((f) => f(deferred!));
+  });
+
 const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
 /**
@@ -14,15 +24,13 @@ const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.p
  */
 export function InstallHint() {
   const [hidden, setHidden] = useState(() => readJSON<boolean>("pp.installHint", false) || standalone());
-  const [prompt, setPrompt] = useState<InstallEvent | null>(null);
+  const [prompt, setPrompt] = useState<InstallEvent | null>(deferred);
 
   useEffect(() => {
-    const onPrompt = (e: Event) => {
-      e.preventDefault();
-      setPrompt(e as InstallEvent);
+    listeners.add(setPrompt);
+    return () => {
+      listeners.delete(setPrompt);
     };
-    window.addEventListener("beforeinstallprompt", onPrompt);
-    return () => window.removeEventListener("beforeinstallprompt", onPrompt);
   }, []);
 
   const close = () => {
@@ -38,7 +46,7 @@ export function InstallHint() {
       {prompt ? (
         <p>Поставьте сайт иконкой на телефон — он будет открываться как приложение, даже без интернета.</p>
       ) : (
-        <p>Нажмите «Поделиться» в Safari и выберите «На экран „Домой“» — сайт будет открываться как приложение, даже без интернета.</p>
+        <p>Нажмите в браузере «Поделиться» и выберите «На экран „Домой“» — сайт будет открываться как приложение, даже без интернета.</p>
       )}
       <div className="install-hint__actions">
         {prompt && (
@@ -46,9 +54,16 @@ export function InstallHint() {
             type="button"
             className="btn btn--accent"
             onClick={async () => {
-              await prompt.prompt();
-              await prompt.userChoice;
-              close();
+              // Окно установки можно показать только один раз; что бы ни случилось — подсказку закрываем.
+              try {
+                await prompt.prompt();
+                await prompt.userChoice;
+              } catch {
+                /* браузер отказал */
+              } finally {
+                deferred = null;
+                close();
+              }
             }}
           >
             Установить

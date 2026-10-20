@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Category } from "../types";
 import { categories, ingredientMap, recipes } from "../data";
 import { dietLabels } from "../lib/diet";
@@ -54,6 +54,7 @@ const usedIngredients = [...new Set(recipes.flatMap((r) => r.ingredients.map((i)
 function DislikePicker() {
   const { dislikes, toggleDislike } = useStore();
   const [q, setQ] = useState("");
+  const input = useRef<HTMLInputElement>(null);
   const query = norm(q.trim());
   const found = query ? usedIngredients.filter((i) => !dislikes.includes(i.id) && norm(i.name).includes(query)).slice(0, 8) : [];
   return (
@@ -62,13 +63,14 @@ function DislikePicker() {
       {dislikes.length > 0 && (
         <div className="toggles">
           {dislikes.map((id) => (
-            <button key={id} type="button" className="toggle is-on" aria-pressed="true" onClick={() => toggleDislike(id)} aria-label={`Вернуть рецепты с продуктом «${ingredientMap[id]?.name}»`}>
+            <button key={id} type="button" className="toggle is-on" onClick={() => toggleDislike(id)} aria-label={`Вернуть рецепты с продуктом «${ingredientMap[id]?.name}»`}>
               {ingredientMap[id]?.name} ×
             </button>
           ))}
         </div>
       )}
       <input
+        ref={input}
         type="search"
         className="dislikes__search"
         placeholder="Найти продукт: лук, печень, кинза…"
@@ -80,7 +82,16 @@ function DislikePicker() {
         <div className="toggles">
           {found.length ? (
             found.map((i) => (
-              <button key={i.id} type="button" className="toggle" aria-pressed="false" onClick={() => toggleDislike(i.id)}>
+              <button
+                key={i.id}
+                type="button"
+                className="toggle"
+                onClick={() => {
+                  toggleDislike(i.id);
+                  // Кнопка исчезает из результатов — возвращаем фокус в поиск, чтобы не терять место.
+                  input.current?.focus();
+                }}
+              >
                 {i.name}
               </button>
             ))

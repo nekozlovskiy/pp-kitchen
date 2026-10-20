@@ -1473,3 +1473,17 @@
 .my-editor__delete {
   margin-left: auto;
 }
+
+/* ---------- Повторить вчера ---------- */
+.repeat-day {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  margin: 8px 0 20px;
+  padding: 16px 18px;
+  border-radius: var(--r-md);
+  background: var(--tint-breakfast);
+}
+.repeat-day p {
+  color: var(--ink);
+}

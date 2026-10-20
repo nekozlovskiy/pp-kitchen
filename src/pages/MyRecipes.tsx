@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { categories, ingredientMap, ingredients, recipeMap } from "../data";
 import { formatAmount, plural, servingsLabel } from "../lib/format";
@@ -62,6 +62,7 @@ export function MyRecipeEditor() {
   );
   const [stepsText, setStepsText] = useState(() => (existing ? existing.steps.join("\n") : ""));
   const [q, setQ] = useState("");
+  const search = useRef<HTMLInputElement>(null);
   const [tried, setTried] = useState(false);
 
   if (id && !existing) {
@@ -124,7 +125,7 @@ export function MyRecipeEditor() {
         </div>
         <label className="field">
           <span>Время, минут</span>
-          <input type="number" inputMode="numeric" min={1} max={1440} value={draft.timeMinutes} onChange={(e) => set("timeMinutes", Number(e.target.value))} />
+          <input type="number" inputMode="numeric" min={1} max={1440} value={draft.timeMinutes || ""} onChange={(e) => set("timeMinutes", Number(e.target.value))} />
         </label>
       </div>
 
@@ -163,7 +164,7 @@ export function MyRecipeEditor() {
             })}
           </ul>
         )}
-        <input type="search" className="dislikes__search" placeholder="Добавить продукт: курица, рис, творог…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Найти продукт" />
+        <input ref={search} type="search" className="dislikes__search" placeholder="Добавить продукт: курица, рис, творог…" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Найти продукт" />
         {query && (
           <div className="toggles">
             {found.length ? (
@@ -175,6 +176,7 @@ export function MyRecipeEditor() {
                   onClick={() => {
                     set("ingredients", [...draft.ingredients, { id: i.id, grams: i.piece?.grams ?? 100 }]);
                     setQ("");
+                    search.current?.focus();
                   }}
                 >
                   {i.name}

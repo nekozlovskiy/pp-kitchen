@@ -154,13 +154,16 @@ function Collections({ onPick }: { onPick: (id: string) => void }) {
 
 /** «Не знаю, что приготовить»: случайное блюдо из выбранного раздела с учётом ограничений и «Не люблю». */
 function Surprise() {
-  const { exclude, dislikes } = useStore();
+  const { exclude, dislikes, showToast } = useStore();
   const navigate = useNavigate();
   const location = useLocation();
   const [cat, setCat] = useState<Category | "all">("all");
   const pick = () => {
     const pool = recipes.filter((r) => (cat === "all" || r.category === cat) && fitsDiet(r, exclude, dislikes));
-    if (!pool.length) return;
+    if (!pool.length) {
+      showToast("Ничего не подошло: загляните в «Ограничения в еде»");
+      return;
+    }
     const r = pool[Math.floor(Math.random() * pool.length)];
     navigate(`/recipe/${r.id}`, { state: { background: location } });
   };

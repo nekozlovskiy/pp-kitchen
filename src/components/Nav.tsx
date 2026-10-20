@@ -36,10 +36,10 @@ function Icon({ name }: { name: "book" | "heart" | "sun" | "bag" | "week" }) {
 }
 
 export function Nav() {
-  const { favorites, day, shopping, week } = useStore();
+  const { favorites, day, foods, shopping, week } = useStore();
   const plannedDays = week.filter((d) => d.length).length;
   // Число блюд за день: порции бывают дробными, когда вес вводится в граммах.
-  const portions = day.length;
+  const portions = day.length + foods.length;
   return (
     <nav className="nav" aria-label="Разделы">
       <NavLink to="/" end className="nav__link">

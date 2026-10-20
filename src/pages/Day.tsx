@@ -1,23 +1,64 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { config } from "../config";
 import { ingredientMap, ingredients, portionGrams, recipeMap } from "../data";
 import { foodsMacros } from "../hooks/useStore";
 import { round, scale, sum } from "../lib/nutrition";
-import { plural } from "../lib/format";
+import { plural, todayKey } from "../lib/format";
 import { MacroRing } from "../components/MacroRing";
 import { Stepper } from "../components/Stepper";
 import { useStore } from "../hooks/useStore";
 import { MenuBuilder } from "../components/MenuBuilder";
 import { WeekChart } from "../components/WeekChart";
 
+const yesterdayKey = () => {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return todayKey(d);
+};
+const lastDayLabel = (date: string) =>
+  date === yesterdayKey() ? "Вчера" : new Date(`${date}T12:00:00`).toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
+
 const norm = (s: string) => s.toLowerCase().replace(/ё/g, "е");
 const allIngredients = [...ingredients].sort((a, b) => a.name.localeCompare(b.name, "ru"));
+
+/**
+ * Вес продукта в «Моём дне». Пока в поле печатают, оно своё; если вес поменялся снаружи
+ * (тот же продукт добавили ещё раз) — подтягивает новое значение.
+ */
+function FoodGrams({ grams, unit, label, onChange }: { grams: number; unit: string; label: string; onChange: (v: number) => void }) {
+  const ref = useRef<HTMLInputElement>(null);
+  const [text, setText] = useState(String(Math.round(grams)));
+  useEffect(() => {
+    if (document.activeElement !== ref.current) setText(String(Math.round(grams)));
+  }, [grams]);
+  return (
+    <label className="grams-input">
+      <input
+        ref={ref}
+        type="number"
+        inputMode="numeric"
+        min={1}
+        max={3000}
+        value={text}
+        onChange={(e) => {
+          setText(e.target.value);
+          const v = Number(e.target.value);
+          if (v > 0 && v <= 3000) onChange(v);
+        }}
+        onBlur={() => setText(String(Math.round(grams)))}
+        aria-label={label}
+      />
+      <span>{unit}</span>
+    </label>
+  );
+}
 
 /** Продукт без рецепта: поиск по таблице продуктов, вес по умолчанию — одна штука или 100 г. */
 function FoodPicker() {
   const { addFood, showToast } = useStore();
   const [q, setQ] = useState("");
+  const input = useRef<HTMLInputElement>(null);
   const query = norm(q.trim());
   const found = query ? allIngredients.filter((i) => norm(i.name).includes(query)).slice(0, 8) : [];
   return (
@@ -26,6 +67,7 @@ function FoodPicker() {
         Продукт без рецепта
       </h2>
       <input
+        ref={input}
         type="search"
         className="dislikes__search"
         placeholder="Яблоко, кефир, творог…"
@@ -46,6 +88,7 @@ function FoodPicker() {
                   addFood(i.id, grams);
                   showToast(`${i.name}: ${grams} ${i.unit === "ml" ? "мл" : "г"} в моём дне`);
                   setQ("");
+                  input.current?.focus();
                 }}
               >
                 {i.name}
@@ -61,7 +104,7 @@ function FoodPicker() {
 }
 
 export function Day() {
-  const { day, setDayServings, toggleDayUnit, removeFromDay, clearDay, goal, setGoal, servingFor, foods, setFoodGrams, removeFood } = useStore();
+  const { day, setDayServings, toggleDayUnit, removeFromDay, clearDay, goal, setGoal, servingFor, foods, setFoodGrams, removeFood, lastDay, repeatLastDay } = useStore();
   const location = useLocation();
   const totalsRaw = sum([...day.map((x) => scale(servingFor(x.id), x.servings)), foodsMacros(foods)]);
   const t = round(totalsRaw);
@@ -122,6 +165,17 @@ export function Day() {
           <Stepper value={goal} onChange={setGoal} min={800} max={5000} step={50} label="Цель по калориям" format={(v) => `${v} ккал`} />
         </div>
       </section>
+
+      {!day.length && !foods.length && lastDay && (
+        <div className="repeat-day">
+          <p>
+            {lastDayLabel(lastDay.date)}: {lastDay.items.map((x) => recipeMap[x.id]?.title).concat(lastDay.foods.map((f) => ingredientMap[f.id]?.name)).filter(Boolean).join(", ")}
+          </p>
+          <button type="button" className="btn btn--accent" onClick={repeatLastDay}>
+            {lastDay.date === yesterdayKey() ? "Повторить вчера" : "Повторить этот день"}
+          </button>
+        </div>
+      )}
 
       {day.length || foods.length ? (
         <>
@@ -193,21 +247,7 @@ export function Day() {
                     <span className="day__item-kcal">{Math.round((ing.per100.kcal * f.grams) / 100)} ккал</span>
                   </div>
                   <div className="day__item-ctrl">
-                    <label className="grams-input">
-                      <input
-                        type="number"
-                        inputMode="numeric"
-                        min={1}
-                        max={3000}
-                        defaultValue={Math.round(f.grams)}
-                        onChange={(e) => {
-                          const v = Number(e.target.value);
-                          if (v > 0 && v <= 3000) setFoodGrams(i, v);
-                        }}
-                        aria-label={`Сколько ${unit}: ${ing.name}`}
-                      />
-                      <span>{unit}</span>
-                    </label>
+                    <FoodGrams grams={f.grams} unit={unit} label={`Сколько ${unit}: ${ing.name}`} onChange={(v) => setFoodGrams(i, v)} />
                     <button type="button" className="btn btn--text" onClick={() => removeFood(i)} aria-label={`Убрать «${ing.name}»`}>
                       Убрать
                     </button>
