@@ -347,9 +347,9 @@ describe("свои рецепты", () => {
 
 describe("обложка в index.html", () => {
   it("посвящение в статичной обложке совпадает с config", async () => {
-    const { readFileSync } = await import("node:fs");
     const { config } = await import("../config");
-    const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+    // ?raw — Vite отдаёт файл строкой; так тесту не нужны типы Node.
+    const html = (await import("../../index.html?raw")).default;
     expect(html).toContain(`<p class="masthead__dedication">${config.dedication}</p>`);
   });
 });
