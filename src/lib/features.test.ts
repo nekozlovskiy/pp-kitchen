@@ -19,6 +19,8 @@ import { isProteinDense } from "../data";
 import { parseTogether, togetherLink, readAssignment, readChecks, saveAssignment, saveChecks } from "./together";
 import { shareOrCopy } from "./share";
 import { buyLink, MAX_EXTRAS, parseBuy } from "./buyLink";
+import { markFound, newlyCooked, noteHint, readFound, secretNoteIds } from "./secretNotes";
+import { TRANSFER_KEYS } from "./transfer";
 import { cheeseIds } from "./diet";
 import { ingredients } from "../data";
 import { challengeProgress, challenges, cuisineOf } from "./challenges";
@@ -541,6 +543,32 @@ describe("исправления по ревью", () => {
     expect(aisleOf("sourdough")).toBe("Хлеб");
     expect(aisleOf("edamame")).toBe("Заморозка");
     expect(aisleOf("chicken_hearts")).toBe("Мясо и птица");
+  });
+
+  it("тайные записки: все id рецептов существуют, подсказки разные и не выдают название", () => {
+    const ids = secretNoteIds();
+    expect(ids.length).toBe(Object.keys(config.secretNotes).length);
+    expect(new Set(ids.map(noteHint)).size).toBe(ids.length);
+    for (const id of ids) expect(noteHint(id)).not.toContain(recipeMap[id].title);
+  });
+
+  it("записка открывается только у блюда, приготовленного за эту сессию", () => {
+    const ids = ["a", "b", "c"];
+    expect(newlyCooked({ a: 2, b: 0 }, { a: 2, b: 0 }, ids)).toBeUndefined();
+    expect(newlyCooked({ a: 2, b: 0 }, { a: 2, b: 1 }, ids)).toBe("b");
+    expect(newlyCooked({}, { c: 1 }, ids)).toBe("c");
+    expect(newlyCooked({}, { x: 5 }, ids)).toBeUndefined();
+  });
+
+  it("найденные записки переносятся на другой телефон", () => {
+    expect(TRANSFER_KEYS).toContain("pp.foundNotes");
+  });
+
+  it("записку находят один раз", () => {
+    vi.stubGlobal("window", { localStorage: memoryStorage(), dispatchEvent: () => true });
+    expect(markFound("pp-bliny", "2026-10-23")).toBe(true);
+    expect(markFound("pp-bliny", "2026-10-24")).toBe(false);
+    expect(readFound()).toEqual([{ id: "pp-bliny", date: "2026-10-23" }]);
   });
 
   it("все сыры из таблицы продуктов — в списке сыров и в «Без молочного»", () => {

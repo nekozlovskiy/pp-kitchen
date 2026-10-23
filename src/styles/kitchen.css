@@ -1844,3 +1844,57 @@
   background: var(--accent-soft);
   font-weight: 600;
 }
+
+/* ---------- Тайные записки ---------- */
+.secret {
+  text-align: center;
+  /* снизу место под подсказку «Записала: приготовлено сегодня», она появляется одновременно с конвертом */
+  padding: 8px 4px 112px;
+}
+.secret__envelope {
+  font-size: 64px;
+  line-height: 1;
+}
+.secret__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 24px;
+  margin: 12px 0;
+}
+.secret__note {
+  font-family: var(--font-hand);
+  font-size: 24px;
+  line-height: 1.35;
+  margin: 8px 0 18px;
+}
+.secret__list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.secret__item {
+  padding: 12px 14px;
+  border-radius: var(--r-lg);
+  border: 1.5px dashed var(--line);
+  color: var(--muted);
+}
+.secret__item.is-found {
+  border: 1.5px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+.secret__item-title {
+  font-weight: 600;
+  color: inherit;
+}
+.secret__item-note {
+  font-family: var(--font-hand);
+  font-size: 19px;
+  margin-top: 6px;
+}
+.secret__item-date {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}

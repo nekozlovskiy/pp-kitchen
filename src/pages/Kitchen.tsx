@@ -7,6 +7,7 @@ import { Art } from "../art/Art";
 import { useStore } from "../hooks/useStore";
 import { usePhotoUrl } from "../hooks/usePhoto";
 import { ChallengeBlock } from "../components/Challenge";
+import { SecretNotesBlock } from "../components/SecretNotes";
 
 const dayFmt = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long" });
 const monthFmt = new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric" });
@@ -74,6 +75,8 @@ export function Kitchen() {
       </section>
 
       <ChallengeBlock />
+
+      <SecretNotesBlock />
 
       <section aria-labelledby="ach-title" className="kitchen__section">
         <h2 id="ach-title" className="menu__title">

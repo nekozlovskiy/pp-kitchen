@@ -4,6 +4,7 @@ import { readJSON, writeJSON } from "./storage";
 export const TRANSFER_KEYS = [
   "pp.favorites",
   "pp.journal",
+  "pp.foundNotes",
   "pp.day",
   "pp.week",
   "pp.shopping",

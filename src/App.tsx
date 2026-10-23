@@ -22,6 +22,7 @@ import { MyRecipeEditor, MyRecipes } from "./pages/MyRecipes";
 import { TimerDock } from "./components/TimerDock";
 import { CookingBanner } from "./components/CookingBanner";
 import { AchievementWatcher } from "./components/AchievementWatcher";
+import { SecretNoteWatcher } from "./components/SecretNotes";
 
 function useTitle(location: Location) {
   useEffect(() => {
@@ -102,6 +103,7 @@ export function App() {
       </footer>
       <TimerDock />
       <AchievementWatcher />
+      <SecretNoteWatcher />
       <Toast />
     </>
   );
