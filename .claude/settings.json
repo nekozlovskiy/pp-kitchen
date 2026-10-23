@@ -6,8 +6,20 @@
         "hooks": [
           {
             "type": "command",
-            "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in */src/data/*.json) cd \"$CLAUDE_PROJECT_DIR\" && npx vitest run src/lib/nutrition.test.ts --reporter=dot >/tmp/pp-data-test.log 2>&1 || { echo 'Тесты данных упали после правки '\"$f\"':' >&2; tail -40 /tmp/pp-data-test.log >&2; exit 2; } ;; esac",
-            "timeout": 120
+            "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in */src/data/*.json) cd \"$CLAUDE_PROJECT_DIR\" && npx vitest run src/lib/nutrition.test.ts --reporter=dot >/tmp/pp-data-test.log 2>&1 || { echo 'Тесты данных упали после правки '\"$f\"':' >&2; tail -40 /tmp/pp-data-test.log >&2; exit 2; } ;; */src/*.ts|*/src/*.tsx) cd \"$CLAUDE_PROJECT_DIR\" && npm run typecheck >/tmp/pp-typecheck.log 2>&1 || { echo 'Ошибки типов после правки '\"$f\"':' >&2; grep -E 'error TS' /tmp/pp-typecheck.log | head -20 >&2; exit 2; } ;; esac",
+            "timeout": 180
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in */dist/*|*/package-lock.json) echo \"Не правьте $f вручную: dist/ собирает npm run build, package-lock.json меняет только npm install.\" >&2; exit 2 ;; esac",
+            "timeout": 10
           }
         ]
       }
