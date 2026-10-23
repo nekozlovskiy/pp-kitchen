@@ -3,6 +3,8 @@ import { ingredientMap, recipeMap } from "../data";
 import { formatAmount, plural } from "../lib/format";
 import { buildShoppingList } from "../lib/shopping";
 import { groupByAisle } from "../lib/aisles";
+import { buyLink } from "../lib/buyLink";
+import { shareOrCopy } from "../lib/share";
 import { Stepper } from "../components/Stepper";
 import { useStore } from "../hooks/useStore";
 
@@ -53,6 +55,11 @@ export function Shopping() {
       }
     }
     showToast((await copyText(text)) ? "Список скопирован" : "Не удалось скопировать: выделите список вручную");
+  };
+  // Ему в магазин: ссылка с тем, что ещё не куплено; у него откроется список с галочками.
+  const sendToHim = () => {
+    const text = `Купишь по дороге? 🥺\n${buyLink(lines.filter((l) => !bought.has(l.id)), extras)}`;
+    shareOrCopy({ text }, text, () => showToast("Ссылка на список скопирована — отправь её в чат"));
   };
 
   return (
@@ -106,6 +113,11 @@ export function Shopping() {
                 {canShare ? "Отправить" : "Скопировать"}
               </button>
             </div>
+            {(left > 0 || extras.length > 0) && (
+              <button type="button" className="btn btn--ghost shopping__to-him" onClick={sendToHim}>
+                Отправить ему в магазин 🛒
+              </button>
+            )}
             {groupByAisle(lines).map((g) => (
               <div key={g.aisle} className="shopping__aisle">
                 <h3 className="shopping__aisle-title">{g.aisle}</h3>

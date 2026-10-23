@@ -27,16 +27,20 @@ export function readAssignment(recipeId: string, stepCount: number): number[] {
   return Array.isArray(all[recipeId]) ? all[recipeId].filter((i) => Number.isInteger(i) && i >= 0 && i < stepCount) : [];
 }
 
-type Checks = { key: string; date: string; steps: number[] };
+type Checks<T> = { key: string; date: string; steps: T[] };
 
-/** Его галочки живут для одной ссылки и одного дня: новая раздача открывается чистой. */
-export function readChecks(key: string, today: string): number[] {
-  const c = readJSON<Checks | null>("pp.togetherChecks", null);
-  return c && !Array.isArray(c) && c.key === key && c.date === today && Array.isArray(c.steps) ? c.steps : [];
+/**
+ * Его галочки живут для одной ссылки и одного дня: новая раздача открывается чистой.
+ * Шаги «Готовим вдвоём» — номерами, продукты из «Покупок» — id (свой ключ хранилища).
+ */
+export function readChecks<T extends number | string = number>(key: string, today: string, store = "pp.togetherChecks"): T[] {
+  const c = readJSON<Checks<T> | null>(store, null);
+  const ok = c && !Array.isArray(c) && c.key === key && c.date === today && Array.isArray(c.steps);
+  return ok ? c.steps.filter((x) => typeof x === "number" || typeof x === "string") : [];
 }
 
-export function saveChecks(key: string, today: string, steps: readonly number[]): void {
-  writeJSON("pp.togetherChecks", { key, date: today, steps: [...steps] });
+export function saveChecks<T extends number | string>(key: string, today: string, steps: readonly T[], store = "pp.togetherChecks"): void {
+  writeJSON(store, { key, date: today, steps: [...steps] });
 }
 
 export function saveAssignment(recipeId: string, steps: readonly number[]): void {

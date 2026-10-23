@@ -18,6 +18,7 @@ import { buildDeck, ensureToday, moods, readSwipeDay, saveSwipeDay } from "./moo
 import { isProteinDense } from "../data";
 import { parseTogether, togetherLink, readAssignment, readChecks, saveAssignment, saveChecks } from "./together";
 import { shareOrCopy } from "./share";
+import { buyLink, MAX_EXTRAS, parseBuy } from "./buyLink";
 import { cheeseIds } from "./diet";
 import { ingredients } from "../data";
 import { challengeProgress, challenges, cuisineOf } from "./challenges";
@@ -507,6 +508,39 @@ describe("исправления по ревью", () => {
     expect(copied[0]).toContain("«Хачапури»");
     expect(copied[0]).toContain("https://x.test/pp-kitchen/#/recipe/r1");
     expect(toast).toBe(true);
+  });
+
+  it("список покупок в ссылке: туда и обратно, мусор отбрасывается", () => {
+    vi.stubGlobal("location", { origin: "https://x.test", pathname: "/pp-kitchen/" });
+    const link = buyLink([{ id: "chicken", grams: 500.4 }, { id: "egg", grams: 110 }], ["Соль", "Чеснок, 2 зубчика"]);
+    const params = new URLSearchParams(link.split("?")[1]);
+    expect(parseBuy(params)).toEqual({ lines: [{ id: "chicken", grams: 500 }, { id: "egg", grams: 110 }], extras: ["Соль", "Чеснок, 2 зубчика"], unknown: 0 });
+    const junk = parseBuy(new URLSearchParams("l=chicken:100,nope:5,egg:-1,chicken:50,egg:x"));
+    expect(junk.lines).toEqual([{ id: "chicken", grams: 150 }]);
+    expect(junk.unknown).toBe(1); // «nope» нет в таблице — о нём скажем, а не потеряем молча
+  });
+
+  it("лимит дополнений одинаков при сборке и разборе ссылки", () => {
+    vi.stubGlobal("location", { origin: "https://x.test", pathname: "/" });
+    const many = Array.from({ length: MAX_EXTRAS + 10 }, (_, i) => `добавка ${i}`);
+    const link = buyLink([], many);
+    expect(parseBuy(new URLSearchParams(link.split("?")[1])).extras).toEqual(many.slice(0, MAX_EXTRAS));
+  });
+
+  it("галочки покупок хранятся отдельно от «Готовим вдвоём» и не всплывают завтра", () => {
+    vi.stubGlobal("window", { localStorage: memoryStorage() });
+    saveChecks("buy?l=egg:55", "2026-10-23", ["egg"], "pp.buyChecks");
+    saveChecks("ig-x?s=0", "2026-10-23", [0]);
+    expect(readChecks<string>("buy?l=egg:55", "2026-10-23", "pp.buyChecks")).toEqual(["egg"]);
+    expect(readChecks<string>("buy?l=egg:55", "2026-10-24", "pp.buyChecks")).toEqual([]);
+    expect(readChecks("ig-x?s=0", "2026-10-23")).toEqual([0]);
+  });
+
+  it("новые продукты разложены по отделам магазина, а не в бакалею", () => {
+    expect(aisleOf("pasta")).toBe("Крупы, макароны, мука");
+    expect(aisleOf("sourdough")).toBe("Хлеб");
+    expect(aisleOf("edamame")).toBe("Заморозка");
+    expect(aisleOf("chicken_hearts")).toBe("Мясо и птица");
   });
 
   it("все сыры из таблицы продуктов — в списке сыров и в «Без молочного»", () => {

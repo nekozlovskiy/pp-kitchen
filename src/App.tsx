@@ -17,6 +17,7 @@ import { Transfer } from "./pages/Transfer";
 import { Kitchen } from "./pages/Kitchen";
 import { Swipe } from "./pages/Swipe";
 import { Together } from "./pages/Together";
+import { BuyList } from "./pages/BuyList";
 import { MyRecipeEditor, MyRecipes } from "./pages/MyRecipes";
 import { TimerDock } from "./components/TimerDock";
 import { CookingBanner } from "./components/CookingBanner";
@@ -29,7 +30,7 @@ function useTitle(location: Location) {
     const page =
       r?.title ??
       (location.pathname.startsWith("/my/") && location.pathname !== "/my/new" ? "Изменить рецепт" : undefined) ??
-      ({ "/day": "Мой день", "/favorites": "Избранное", "/shopping": "Покупки", "/pantry": "Из того, что есть", "/week": "Меню на неделю", "/transfer": "Перенос", "/kitchen": "Моя кухня", "/my": "Мои рецепты", "/my/new": "Новый рецепт" } as Record<string, string>)[
+      ({ "/day": "Мой день", "/favorites": "Избранное", "/shopping": "Покупки", "/pantry": "Из того, что есть", "/week": "Меню на неделю", "/transfer": "Перенос", "/kitchen": "Моя кухня", "/my": "Мои рецепты", "/my/new": "Новый рецепт", "/swipe": "Чего хочется?", "/buy": "Купить" } as Record<string, string>)[
         location.pathname
       ];
     document.title = page ? `${page} | ПП-кухня` : `ПП-кухня ${config.herNameGenitive}`;
@@ -78,6 +79,7 @@ export function App() {
           <Route path="/kitchen" element={<Kitchen />} />
           <Route path="/swipe" element={<Swipe />} />
           <Route path="/together/:id" element={<Together />} />
+          <Route path="/buy" element={<BuyList />} />
           <Route path="/my" element={<MyRecipes />} />
           <Route path="/my/new" element={<MyRecipeEditor />} />
           <Route path="/my/:id" element={<MyRecipeEditor key={location.pathname} />} />
