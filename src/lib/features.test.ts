@@ -13,10 +13,10 @@ import { cookEvents, kitchenStats } from "./kitchen";
 import { cleanMyRecipes, draftProblem, makeMyRecipe } from "./myRecipes";
 import { addUserRecipe, removeUserRecipe, userRecipeIds } from "../data";
 import { todayKey } from "./format";
-import { cookForMeText } from "./cookForMe";
-import { buildDeck, moods } from "./moodDeck";
+import { askToCook, cookForMeText } from "./cookForMe";
+import { buildDeck, ensureToday, moods, readSwipeDay, saveSwipeDay } from "./moodDeck";
 import { isProteinDense } from "../data";
-import { parseTogether, readAssignment, readChecks, saveAssignment, saveChecks } from "./together";
+import { parseTogether, togetherLink, readAssignment, readChecks, saveAssignment, saveChecks } from "./together";
 import { shareOrCopy } from "./share";
 import { cheeseIds } from "./diet";
 import { ingredients } from "../data";
@@ -476,6 +476,37 @@ describe("исправления по ревью", () => {
     vi.stubGlobal("window", { localStorage: memoryStorage() });
     saveAssignment("x", [1, 5, 6]);
     expect(readAssignment("x", 4)).toEqual([1]);
+  });
+
+  it("отметки колоды «на сегодня» назавтра сбрасываются", () => {
+    vi.stubGlobal("window", { localStorage: memoryStorage() });
+    saveSwipeDay({ date: "2026-10-23", skipped: ["a"], liked: ["b"] });
+    expect(readSwipeDay("2026-10-23")).toEqual({ date: "2026-10-23", skipped: ["a"], liked: ["b"] });
+    expect(readSwipeDay("2026-10-24")).toEqual({ date: "2026-10-24", skipped: [], liked: [] });
+  });
+
+  it("открытый через полночь экран колоды показывает новый пустой день", () => {
+    const yesterday = { date: "2026-10-23", skipped: ["a"], liked: ["b"] };
+    expect(ensureToday(yesterday, "2026-10-23")).toBe(yesterday);
+    expect(ensureToday(yesterday, "2026-10-24")).toEqual({ date: "2026-10-24", skipped: [], liked: [] });
+  });
+
+  it("ссылка «Готовим вдвоём» разбирается обратно в те же шаги и порции", () => {
+    vi.stubGlobal("location", { origin: "https://x.test", pathname: "/pp-kitchen/" });
+    const link = togetherLink("ig-cottage-khachapuri", 3, [4, 0, 2]);
+    expect(link).toBe("https://x.test/pp-kitchen/#/together/ig-cottage-khachapuri?n=3&s=0.2.4");
+    expect(parseTogether(new URLSearchParams(link.split("?")[1]), 5, 2)).toEqual({ servings: 3, steps: [0, 2, 4] });
+  });
+
+  it("«Приготовь мне» без системного меню копирует текст вместе со ссылкой", async () => {
+    const copied: string[] = [];
+    vi.stubGlobal("location", { origin: "https://x.test", pathname: "/pp-kitchen/" });
+    vi.stubGlobal("navigator", { clipboard: { writeText: async (t: string) => void copied.push(t) } });
+    let toast = false;
+    await askToCook({ id: "r1", title: "Хачапури" }, () => (toast = true));
+    expect(copied[0]).toContain("«Хачапури»");
+    expect(copied[0]).toContain("https://x.test/pp-kitchen/#/recipe/r1");
+    expect(toast).toBe(true);
   });
 
   it("все сыры из таблицы продуктов — в списке сыров и в «Без молочного»", () => {

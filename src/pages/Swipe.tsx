@@ -1,11 +1,11 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import type { Location } from "react-router-dom";
 import { categories, isProteinDense, recipeMap, recipes, servingMacros } from "../data";
 import { fitsDiet } from "../lib/diet";
 import { formatTime } from "../lib/format";
 import { askToCook } from "../lib/cookForMe";
-import { buildDeck, moods, readSwipeDay, saveSwipeDay, type SwipeDay } from "../lib/moodDeck";
+import { buildDeck, ensureToday, moods, readSwipeDay, saveSwipeDay, type SwipeDay } from "../lib/moodDeck";
 import { Art } from "../art/Art";
 import { useStore } from "../hooks/useStore";
 import type { Category, Recipe } from "../types";
@@ -61,10 +61,26 @@ export function Swipe() {
     setDay(next);
     saveSwipeDay(next);
   };
+  // Экран могли оставить открытым через полночь: при возврате в приложение начинаем новый день.
+  useEffect(() => {
+    const refresh = () => setDay((d) => ensureToday(d));
+    document.addEventListener("visibilitychange", refresh);
+    window.addEventListener("focus", refresh);
+    return () => {
+      document.removeEventListener("visibilitychange", refresh);
+      window.removeEventListener("focus", refresh);
+    };
+  }, []);
+  const today = (): SwipeDay => {
+    const d = ensureToday(day);
+    if (d !== day) setDay(d);
+    return d;
+  };
   const deal = (moodId: string) => {
     setMood(moodId);
     const pool = recipes.filter((r) => fitsDiet(r, exclude, dislikes));
-    const seen = new Set([...day.skipped, ...day.liked]);
+    const d = today();
+    const seen = new Set([...d.skipped, ...d.liked]);
     const ctx = (r: Recipe) => ({ macros: servingMacros[r.id], proteinDense: isProteinDense(r.id) });
     setDeck(buildDeck(pool, { category, mood: moodId, skipped: seen, ctx }));
     setIndex(0);
@@ -72,11 +88,12 @@ export function Swipe() {
   const decide = (like: boolean) => {
     if (!deck) return;
     const id = deck[index].id;
-    update(like ? { ...day, liked: [...day.liked, id] } : { ...day, skipped: [...day.skipped, id] });
+    const d = today();
+    update(like ? { ...d, liked: [...d.liked, id] } : { ...d, skipped: [...d.skipped, id] });
     setIndex((i) => i + 1);
   };
 
-  const liked = day.liked.map((id) => recipeMap[id]).filter(Boolean);
+  const liked = ensureToday(day).liked.map((id) => recipeMap[id]).filter(Boolean);
   const current = deck?.[index];
   const likedList = liked.length > 0 && (
     <LikedList

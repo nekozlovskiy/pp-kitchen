@@ -49,6 +49,10 @@ export function readSwipeDay(today = todayKey()): SwipeDay {
   return saved;
 }
 
+/** Отметки другого дня — пустой новый день (экран могли оставить открытым через полночь). */
+export const ensureToday = (day: SwipeDay, today = todayKey()): SwipeDay =>
+  day.date === today ? day : { date: today, skipped: [], liked: [] };
+
 export function saveSwipeDay(day: SwipeDay): void {
   writeJSON("pp.swipe", day);
 }
