@@ -5,6 +5,7 @@ export const TRANSFER_KEYS = [
   "pp.favorites",
   "pp.journal",
   "pp.foundNotes",
+  "pp.orders",
   "pp.day",
   "pp.week",
   "pp.shopping",

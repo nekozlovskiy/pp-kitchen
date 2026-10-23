@@ -1898,3 +1898,62 @@
   color: var(--muted);
   margin-top: 4px;
 }
+
+/* ---------- Заказы ---------- */
+.order {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: var(--r-lg);
+  background: var(--accent-soft);
+  font-weight: 600;
+}
+.order--status.is-done {
+  background: var(--surface);
+  color: var(--muted);
+}
+.order__title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  margin-bottom: 10px;
+  padding-right: 52px; /* место под крестик листа */
+}
+.order__answers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.order__answers .btn {
+  min-height: 48px;
+  padding: 0 10px;
+}
+.orders {
+  margin: 8px 0 16px;
+}
+.orders__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+.orders__list {
+  list-style: none;
+  padding: 0;
+}
+.orders__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.orders__item a {
+  font-weight: 600;
+  color: var(--ink);
+}
+.orders__status {
+  flex: none;
+  color: var(--muted);
+}
+.order--status {
+  padding-right: 60px; /* место под крестик листа */
+}

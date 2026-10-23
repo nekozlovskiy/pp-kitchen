@@ -21,6 +21,7 @@ import { shareOrCopy } from "./share";
 import { buyLink, MAX_EXTRAS, parseBuy } from "./buyLink";
 import { markFound, newlyCooked, noteHint, readFound, secretNoteIds } from "./secretNotes";
 import { TRANSFER_KEYS } from "./transfer";
+import { addOrder, answerOrder, isCooked, orderStatus, readOrders } from "./orders";
 import { cheeseIds } from "./diet";
 import { ingredients } from "../data";
 import { challengeProgress, challenges, cuisineOf } from "./challenges";
@@ -501,6 +502,47 @@ describe("исправления по ревью", () => {
     expect(parseTogether(new URLSearchParams(link.split("?")[1]), 5, 2)).toEqual({ servings: 3, steps: [0, 2, 4] });
   });
 
+  it("заказы: отправка, ответ, выполнение и забывание через 2 недели", () => {
+    vi.stubGlobal("window", { localStorage: memoryStorage() });
+    addOrder("r1", "2026-10-20", 2);
+    expect(readOrders(new Date("2026-10-21T12:00:00"))).toEqual([{ id: "r1", sent: "2026-10-20", cookedBefore: 2 }]);
+    expect(answerOrder("r1", "weekend", "2026-09-01", "2026-10-21")).toBe(false); // старая ссылка на прошлый заказ
+    expect(answerOrder("r1", "weekend", "2026-10-20", "2026-10-21")).toBe(true);
+    expect(readOrders(new Date("2026-10-21T12:00:00"))[0]).toEqual({ id: "r1", sent: "2026-10-20", cookedBefore: 2, answer: "weekend", answered: "2026-10-21" });
+    expect(answerOrder("r2", "today", "2026-10-21", "2026-10-21", 0)).toBe(true); // заказ, отправленный с другого телефона
+    expect(answerOrder("r3", "today", "2026-09-01", "2026-10-21", 0)).toBe(false); // забытый заказ не воскрешаем
+    expect(readOrders(new Date("2026-10-21T12:00:00")).map((o) => o.id)).toEqual(["r1", "r2"]);
+    expect(readOrders(new Date("2026-11-10T12:00:00"))).toEqual([]);
+    // приготовленное в тот же день, но до заказа, заказ не закрывает
+    expect(isCooked({ id: "r1", sent: "2026-10-20", cookedBefore: 2 }, 2)).toBe(false);
+    expect(isCooked({ id: "r1", sent: "2026-10-20", cookedBefore: 2 }, 3)).toBe(true);
+  });
+
+  it("статус заказа считается от дня ответа", () => {
+    const o = (answer: "today" | "tomorrow" | "weekend" | "other") => ({ id: "r", sent: "2026-10-20", cookedBefore: 0, answer, answered: "2026-10-20" });
+    expect(orderStatus(o("today"), 0, "2026-10-20")).toBe("Заказ принят · сегодня");
+    expect(orderStatus(o("today"), 0, "2026-10-21")).toBe("Заказ принят · вчера");
+    expect(orderStatus(o("tomorrow"), 0, "2026-10-20")).toBe("Заказ принят · завтра");
+    expect(orderStatus(o("tomorrow"), 0, "2026-10-21")).toBe("Заказ принят · сегодня");
+    expect(orderStatus(o("today"), 0, "2026-10-25")).toBe("Заказ принят · 20 октября");
+    expect(orderStatus(o("other"), 0, "2026-10-20")).toBe("Просит выбрать другое блюдо");
+    expect(orderStatus(o("weekend"), 1, "2026-10-21")).toBe("Заказ выполнен 🤍");
+    expect(orderStatus({ id: "r", sent: "2026-10-20", cookedBefore: 0 }, 0, "2026-10-20")).toBe("Заказ отправлен · ждёт ответа");
+  });
+
+  it("«Приготовь мне» шлёт ссылку-заказ и записывает заказ, только если сообщение ушло", async () => {
+    vi.stubGlobal("window", { localStorage: memoryStorage() });
+    vi.stubGlobal("location", { origin: "https://x.test", pathname: "/" });
+    const copied: string[] = [];
+    vi.stubGlobal("navigator", { share: async () => Promise.reject(Object.assign(new Error(), { name: "AbortError" })), clipboard: { writeText: async (t: string) => void copied.push(t) } });
+    await askToCook({ id: "r1", title: "Хачапури" }, () => {});
+    expect(readOrders()).toEqual([]);
+    vi.stubGlobal("navigator", { clipboard: { writeText: async (t: string) => void copied.push(t) } });
+    await askToCook({ id: "r1", title: "Хачапури" }, () => {});
+    expect(copied[0]).toMatch(/#\/recipe\/r1\?order=\d{4}-\d{2}-\d{2}$/);
+    expect(readOrders().map((o) => o.id)).toEqual(["r1"]);
+  });
+
   it("«Приготовь мне» без системного меню копирует текст вместе со ссылкой", async () => {
     const copied: string[] = [];
     vi.stubGlobal("location", { origin: "https://x.test", pathname: "/pp-kitchen/" });
@@ -508,7 +550,7 @@ describe("исправления по ревью", () => {
     let toast = false;
     await askToCook({ id: "r1", title: "Хачапури" }, () => (toast = true));
     expect(copied[0]).toContain("«Хачапури»");
-    expect(copied[0]).toContain("https://x.test/pp-kitchen/#/recipe/r1");
+    expect(copied[0]).toContain("https://x.test/pp-kitchen/#/recipe/r1?order=");
     expect(toast).toBe(true);
   });
 

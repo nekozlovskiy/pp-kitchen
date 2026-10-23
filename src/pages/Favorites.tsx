@@ -3,6 +3,7 @@ import { recipes } from "../data";
 import { plural } from "../lib/format";
 import { RecipeCard } from "../components/RecipeCard";
 import { useStore } from "../hooks/useStore";
+import { OrdersList } from "../components/Orders";
 
 export function Favorites() {
   const { favorites, myRecipes } = useStore();
@@ -18,6 +19,7 @@ export function Favorites() {
             : "Здесь будут рецепты, отмеченные сердечком."}
         </p>
       </header>
+      <OrdersList />
       <Link to="/kitchen" className="pantry-link">
         <span>
           <b>Моя кухня</b>

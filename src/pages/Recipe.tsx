@@ -20,6 +20,7 @@ import { useWakeLock } from "../hooks/useWakeLock";
 import { usePhotoUrl } from "../hooks/usePhoto";
 import { CookMode } from "../components/CookMode";
 import { TogetherPanel } from "../components/TogetherPanel";
+import { OrderPanel } from "../components/Orders";
 import { readAssignment, saveAssignment } from "../lib/together";
 import { RecipeJournal } from "../components/RecipeJournal";
 import { StepText } from "../components/StepText";
@@ -136,6 +137,8 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
 
   return (
     <article className="recipe">
+      {/* Заказ — первым: у него по ссылке-заказу кнопки ответа сразу на виду. */}
+      <OrderPanel recipe={recipe} />
       <header className="recipe__head">
         {photo ? (
           <img className="recipe__art recipe__photo" src={photo} alt={`Моё фото: ${recipe.title}`} />
