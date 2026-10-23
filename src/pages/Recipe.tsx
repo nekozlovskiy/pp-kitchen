@@ -52,13 +52,14 @@ function ShareButton({ recipe, onCopied }: { recipe: Recipe; onCopied: () => voi
 function CookForMeButton({ recipe, onCopied }: { recipe: Recipe; onCopied: () => void }) {
   const ask = async () => {
     const url = `${location.origin}${location.pathname}#/recipe/${recipe.id}`;
-    const text = cookForMeText(recipe.title);
+    // Ссылка внутри текста: при отдельном поле url Telegram и WhatsApp отбрасывают text и присылают только ссылку.
+    const text = `${cookForMeText(recipe.title)}\n${url}`;
     try {
       if (navigator.share) {
-        await navigator.share({ text, url });
+        await navigator.share({ text });
         return;
       }
-      await navigator.clipboard.writeText(`${text}\n${url}`);
+      await navigator.clipboard.writeText(text);
       onCopied();
     } catch {
       /* пользователь закрыл меню «Поделиться» */
