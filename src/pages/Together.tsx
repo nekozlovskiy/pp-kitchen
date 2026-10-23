@@ -1,18 +1,22 @@
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { ingredientMap, recipeAliases, recipeMap } from "../data";
-import { formatAmount, servingsLabel } from "../lib/format";
+import { formatAmount, servingsLabel, todayKey } from "../lib/format";
 import { scaleIngredients } from "../lib/nutrition";
-import { readJSON, writeJSON } from "../lib/storage";
-import { parseTogether } from "../lib/together";
+import { parseTogether, readChecks, saveChecks } from "../lib/together";
 import { StepText } from "../components/StepText";
 
-/** Его часть готовки по ссылке от Анюты: продукты и только его шаги с галочками. */
+/** Его часть готовки по ссылке от Анюты. Каждая ссылка — своя страница с чистыми галочками. */
 export function Together() {
   const { id = "" } = useParams();
   const [params] = useSearchParams();
+  const linkKey = `${id}?${params.toString()}`;
+  return <TogetherView key={linkKey} id={id} params={params} linkKey={linkKey} />;
+}
+
+function TogetherView({ id, params, linkKey }: { id: string; params: URLSearchParams; linkKey: string }) {
   const recipe = recipeMap[id] ?? recipeMap[recipeAliases[id]];
-  const [checked, setChecked] = useState<Set<number>>(() => new Set(readJSON<Record<string, number[]>>("pp.togetherChecks", {})[id] ?? []));
+  const [checked, setChecked] = useState<Set<number>>(() => new Set(readChecks(linkKey, todayKey())));
 
   if (!recipe) {
     return (
@@ -33,7 +37,7 @@ export function Together() {
     if (next.has(i)) next.delete(i);
     else next.add(i);
     setChecked(next);
-    writeJSON("pp.togetherChecks", { ...readJSON<Record<string, number[]>>("pp.togetherChecks", {}), [id]: [...next] });
+    saveChecks(linkKey, todayKey(), [...next]);
   };
 
   return (

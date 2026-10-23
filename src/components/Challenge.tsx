@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { config } from "../config";
 import { plural, todayKey } from "../lib/format";
-import { addDone, challengeMap, challengeProgress, challenges, daysLeft, readActive, readDone, saveActive, type Active } from "../lib/challenges";
+import { addDone, challengeHint, challengeMap, challengeProgress, challenges, daysLeft, readActive, readDone, saveActive, type Active } from "../lib/challenges";
 import { useStore } from "../hooks/useStore";
 
 const DEFAULT_NOTE = "Ты справилась! Горжусь тобой и жду, что приготовим дальше. Люблю 🤍";
@@ -34,7 +34,7 @@ export function ChallengeBlock() {
             </span>
             <span>
               <b>{c.title}</b>
-              <span className="challenge__hint">{c.hint}</span>
+              <span className="challenge__hint">{challengeHint(c.id)}</span>
             </span>
             {doneCount(c.id) > 0 && <span className="challenge__done-badge">✓ {doneCount(c.id) > 1 ? `×${doneCount(c.id)}` : ""}</span>}
           </button>
@@ -62,7 +62,7 @@ export function ChallengeBlock() {
           <p className="challenge__title">
             {c.emoji} {c.title}
           </p>
-          <p className="challenge__note">{config.challengeNotes[c.id] ?? DEFAULT_NOTE}</p>
+          <p className="challenge__note">{config.challengeNotes[c.id] || DEFAULT_NOTE}</p>
           <button
             type="button"
             className="btn btn--accent"
@@ -99,7 +99,7 @@ export function ChallengeBlock() {
           <p className="challenge__title">
             {c.emoji} {c.title}
           </p>
-          <p className="challenge__hint">{c.hint}</p>
+          <p className="challenge__hint">{challengeHint(c.id, active.start)}</p>
           <span className="ach__bar challenge__bar" role="progressbar" aria-valuemin={0} aria-valuemax={p.target} aria-valuenow={p.value} aria-label={`${c.title}: ${p.value} из ${p.target}`}>
             <span style={{ width: `${(p.value / p.target) * 100}%` }} />
           </span>

@@ -21,9 +21,22 @@ export function parseTogether(params: URLSearchParams, stepCount: number, defaul
 type Assignments = Record<string, number[]>;
 
 /** Раздача запоминается для рецепта, чтобы в следующий раз не делать её заново. */
-export function readAssignment(recipeId: string): number[] {
+export function readAssignment(recipeId: string, stepCount: number): number[] {
   const all = readJSON<Assignments>("pp.together", {});
-  return Array.isArray(all[recipeId]) ? all[recipeId].filter((i) => Number.isInteger(i)) : [];
+  // Если шагов в рецепте стало меньше, лишние номера отбрасываем.
+  return Array.isArray(all[recipeId]) ? all[recipeId].filter((i) => Number.isInteger(i) && i >= 0 && i < stepCount) : [];
+}
+
+type Checks = { key: string; date: string; steps: number[] };
+
+/** Его галочки живут для одной ссылки и одного дня: новая раздача открывается чистой. */
+export function readChecks(key: string, today: string): number[] {
+  const c = readJSON<Checks | null>("pp.togetherChecks", null);
+  return c && !Array.isArray(c) && c.key === key && c.date === today && Array.isArray(c.steps) ? c.steps : [];
+}
+
+export function saveChecks(key: string, today: string, steps: readonly number[]): void {
+  writeJSON("pp.togetherChecks", { key, date: today, steps: [...steps] });
 }
 
 export function saveAssignment(recipeId: string, steps: readonly number[]): void {

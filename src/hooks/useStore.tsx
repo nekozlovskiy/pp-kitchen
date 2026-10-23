@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { ReactNode } from "react";
 import { readJSON, writeJSON } from "../lib/storage";
 import { todayKey } from "../lib/format";
+import { cookDates } from "../lib/kitchen";
 import { cleanHistory, withDay } from "../lib/history";
 import { freshIds, updateKnown } from "../lib/fresh";
 import type { Known } from "../lib/fresh";
@@ -307,7 +308,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setJournal((j) => {
           const today = todayKey();
           // Старые записи без списка дат: прошлую дату «last» не теряем.
-          const prev = j[id]?.dates ?? (j[id]?.last ? [j[id]!.last!] : []);
+          const prev = cookDates(j[id]);
           const dates = [...prev, today].slice(-KEEP_DATES);
           return { ...j, [id]: { ...j[id], cooked: (j[id]?.cooked ?? 0) + 1, last: today, dates } };
         }),

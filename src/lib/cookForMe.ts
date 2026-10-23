@@ -1,4 +1,5 @@
 import { config } from "../config";
+import { shareOrCopy } from "./share";
 
 /** Текст просьбы «Приготовь мне»: случайный шаблон из config.cookForMe с названием блюда. */
 export function cookForMeText(title: string, random: () => number = Math.random): string {
@@ -12,14 +13,5 @@ export async function askToCook(recipe: { id: string; title: string }, onCopied:
   const url = `${location.origin}${location.pathname}#/recipe/${recipe.id}`;
   // Ссылка внутри текста: при отдельном поле url Telegram и WhatsApp отбрасывают text и присылают только ссылку.
   const text = `${cookForMeText(recipe.title)}\n${url}`;
-  try {
-    if (navigator.share) {
-      await navigator.share({ text });
-      return;
-    }
-    await navigator.clipboard.writeText(text);
-    onCopied();
-  } catch {
-    /* пользователь закрыл меню «Поделиться» */
-  }
+  await shareOrCopy({ text }, text, onCopied);
 }

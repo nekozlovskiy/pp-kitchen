@@ -1,11 +1,9 @@
 import type { Category, Macros, Recipe } from "../types";
 import { todayKey } from "./format";
 import { readJSON, writeJSON } from "./storage";
+import { cheeseIds } from "./diet";
 
-const CHEESE = new Set([
-  "cheese_light", "cheese_hard", "cheese_fat_free", "mozzarella", "parmesan", "feta", "suluguni", "ricotta",
-  "cream_cheese", "processed_cheese", "adyghe_cheese", "gorgonzola",
-]);
+const CHEESE = new Set(cheeseIds);
 
 export type MoodCtx = { macros: Macros; proteinDense: boolean };
 

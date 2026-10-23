@@ -8,13 +8,18 @@ type Journal = Record<string, Entry | undefined>;
 
 export type CookEvent = { id: string; date: string };
 
+/** Даты готовки блюда. В старых записях списка дат нет — известна только последняя. */
+export const cookDates = (e: Entry | undefined): string[] => (e?.dates?.length ? e.dates : e?.last ? [e.last] : []);
+
+/** Знаем ли все даты: в старых записях и после 50 раз ранние даты не сохранились. */
+export const fullHistory = (e: Entry | undefined): boolean => (e?.cooked ?? 0) <= cookDates(e).length;
+
 /** Лента готовки: каждая отмеченная дата, новые сверху. До появления списка дат известна только последняя. */
 export function cookEvents(journal: Journal): CookEvent[] {
   const out: CookEvent[] = [];
   for (const [id, e] of Object.entries(journal)) {
     if (!e?.cooked || !recipeMap[id]) continue;
-    const dates = e.dates?.length ? e.dates : e.last ? [e.last] : [];
-    for (const date of dates) out.push({ id, date });
+    for (const date of cookDates(e)) out.push({ id, date });
   }
   return out.sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
 }

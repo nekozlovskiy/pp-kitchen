@@ -1,5 +1,6 @@
 import { config } from "../config";
 import { togetherLink } from "../lib/together";
+import { shareOrCopy } from "../lib/share";
 import type { Recipe } from "../types";
 
 /** «Готовим вдвоём»: Анюта отмечает его шаги и отправляет ему ссылку с его частью. */
@@ -25,16 +26,7 @@ export function TogetherPanel({
   const send = async () => {
     // Ссылка внутри текста: отдельное поле url мессенджеры подставляют вместо текста.
     const text = `Готовим вместе «${recipe.title}»! Твои шаги — по ссылке 👨‍🍳\n${togetherLink(recipe.id, servings, [...partnerSteps])}`;
-    try {
-      if (navigator.share) {
-        await navigator.share({ text });
-        return;
-      }
-      await navigator.clipboard.writeText(text);
-      onCopied();
-    } catch {
-      /* пользователь закрыл меню «Поделиться» */
-    }
+    await shareOrCopy({ text }, text, onCopied);
   };
   return (
     <section className="together" aria-labelledby="together-title">

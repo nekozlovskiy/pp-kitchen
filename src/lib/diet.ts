@@ -11,6 +11,12 @@ export const dietLabels: Record<DietTag, string> = {
   gluten: "Без глютена",
 };
 
+/** Сыры — для настроения «Сырного». Новый сыр добавлять сюда; в «Без молочного» они попадают сами. */
+export const cheeseIds = [
+  "cheese_light", "cheese_hard", "cheese_fat_free", "mozzarella", "parmesan", "feta", "suluguni", "ricotta",
+  "cream_cheese", "processed_cheese", "adyghe_cheese", "gorgonzola",
+];
+
 // Какие продукты из ingredients.json попадают под ограничение.
 // Овёс считаем с глютеном: обычные хлопья почти всегда содержат его следы.
 const tagged: Record<DietTag, string[]> = {
@@ -42,7 +48,7 @@ const tagged: Record<DietTag, string[]> = {
 export const dietIngredients: Record<DietTag, ReadonlySet<string>> = {
   meat: new Set(tagged.meat),
   fish: new Set(tagged.fish),
-  dairy: new Set(tagged.dairy),
+  dairy: new Set([...tagged.dairy, ...cheeseIds]),
   egg: new Set(tagged.egg),
   gluten: new Set(tagged.gluten),
 };

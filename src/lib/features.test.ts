@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ingredientMap, recipeMap, recipes, servingMacros } from "../data";
 import { dietIngredients, fitsDiet } from "./diet";
 import { formatClock, splitStep } from "./steptime";
@@ -16,7 +16,10 @@ import { todayKey } from "./format";
 import { cookForMeText } from "./cookForMe";
 import { buildDeck, moods } from "./moodDeck";
 import { isProteinDense } from "../data";
-import { parseTogether } from "./together";
+import { parseTogether, readAssignment, readChecks, saveAssignment, saveChecks } from "./together";
+import { shareOrCopy } from "./share";
+import { cheeseIds } from "./diet";
+import { ingredients } from "../data";
 import { challengeProgress, challenges, cuisineOf } from "./challenges";
 import { config } from "../config";
 
@@ -419,5 +422,57 @@ describe("челлендж месяца", () => {
     expect(cuisineOf("Творожные хачапури по-аджарски")).toBe("грузинская");
     expect(cuisineOf("Хрустящие тако «Цезарь» с индейкой")).toBe("мексиканская");
     expect(cuisineOf("Омлет со спаржей")).toBeNull();
+  });
+});
+
+describe("исправления по ревью", () => {
+  const memoryStorage = () => {
+    const m = new Map<string, string>();
+    return { getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => void m.set(k, v), removeItem: (k: string) => void m.delete(k) };
+  };
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("«Поделиться»: закрытое меню — ничего, сломанное меню — копируем текст", async () => {
+    const copied: string[] = [];
+    const clipboard = { writeText: async (t: string) => void copied.push(t) };
+    vi.stubGlobal("navigator", { share: async () => Promise.reject(Object.assign(new Error(), { name: "AbortError" })), clipboard });
+    await shareOrCopy({ text: "a" }, "a", () => copied.push("toast"));
+    expect(copied).toEqual([]);
+    vi.stubGlobal("navigator", { share: async () => Promise.reject(Object.assign(new Error(), { name: "NotAllowedError" })), clipboard });
+    await shareOrCopy({ text: "b" }, "b", () => copied.push("toast"));
+    expect(copied).toEqual(["b", "toast"]);
+  });
+
+  it("«Сезонное» считает по сезону даты старта, а не сегодняшнему", () => {
+    const winter = recipes.find((r) => r.ingredients.some((i) => i.id === "orange") && !r.ingredients.some((i) => ["pumpkin", "cabbage", "napa_cabbage", "sauerkraut", "apple", "beet", "persimmon", "lingonberry", "cranberry"].includes(i.id)));
+    expect(winter).toBeDefined();
+    const journal = { [winter!.id]: { cooked: 1, dates: ["2026-12-10"] } };
+    expect(challengeProgress(journal, "season", "2026-12-05").value).toBe(1);
+  });
+
+  it("«Новенькое» не считает старые записи без полной истории дат", () => {
+    const [a] = recipes;
+    expect(challengeProgress({ [a.id]: { cooked: 7, last: "2026-10-20" } }, "new", "2026-10-15").value).toBe(0);
+    expect(challengeProgress({ [a.id]: { cooked: 1, last: "2026-10-20" } }, "new", "2026-10-15").value).toBe(1);
+  });
+
+  it("галочки по ссылке: другая ссылка или другой день — чистый лист", () => {
+    vi.stubGlobal("window", { localStorage: memoryStorage() });
+    saveChecks("x?s=0.2", "2026-10-23", [0, 2]);
+    expect(readChecks("x?s=0.2", "2026-10-23")).toEqual([0, 2]);
+    expect(readChecks("x?s=0.2.4", "2026-10-23")).toEqual([]);
+    expect(readChecks("x?s=0.2", "2026-10-30")).toEqual([]);
+  });
+
+  it("раздача шагов не указывает на шаги, которых в рецепте нет", () => {
+    vi.stubGlobal("window", { localStorage: memoryStorage() });
+    saveAssignment("x", [1, 5, 6]);
+    expect(readAssignment("x", 4)).toEqual([1]);
+  });
+
+  it("все сыры из таблицы продуктов — в списке сыров и в «Без молочного»", () => {
+    const cheesy = ingredients.filter((i) => /сыр|моцарелл|пармезан|фета|сулугуни|рикотт|горгонзол/i.test(i.name) && !/сырн|сырок|сыро[йе]|сырые|сырая/i.test(i.name));
+    for (const i of cheesy) expect(cheeseIds, i.name).toContain(i.id);
+    for (const id of cheeseIds) expect(dietIngredients.dairy.has(id), id).toBe(true);
   });
 });

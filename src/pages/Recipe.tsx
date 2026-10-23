@@ -5,6 +5,7 @@ import { categoryLabel, ingredientMap, per100Macros, portionGrams, recipeAliases
 import { makeSimilar } from "../lib/similar";
 import { isMyRecipe } from "../lib/myRecipes";
 import { askToCook } from "../lib/cookForMe";
+import { shareOrCopy } from "../lib/share";
 import { fitsDiet } from "../lib/diet";
 import { macroPercents, per100g, round, scale, scaleIngredients } from "../lib/nutrition";
 import { applySwaps, availableSwaps } from "../lib/swaps";
@@ -30,16 +31,7 @@ import type { Recipe } from "../types";
 function ShareButton({ recipe, onCopied }: { recipe: Recipe; onCopied: () => void }) {
   const share = async () => {
     const url = `${location.origin}${location.pathname}#/recipe/${recipe.id}`;
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: recipe.title, text: recipe.description, url });
-        return;
-      }
-      await navigator.clipboard.writeText(url);
-      onCopied();
-    } catch {
-      /* пользователь закрыл меню «Поделиться» */
-    }
+    await shareOrCopy({ title: recipe.title, text: recipe.description, url }, url, onCopied);
   };
   return (
     <button type="button" className="heart heart--big" aria-label={`Поделиться рецептом «${recipe.title}»`} onClick={share}>
@@ -94,7 +86,7 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
   });
   const [servings, setServings] = useState(resume?.servings ?? recipe.servings);
   const [together, setTogether] = useState(false);
-  const [partnerSteps, setPartnerSteps] = useState<Set<number>>(() => new Set(readAssignment(recipe.id)));
+  const [partnerSteps, setPartnerSteps] = useState<Set<number>>(() => new Set(readAssignment(recipe.id, recipe.steps.length)));
   const [checked, setChecked] = useState<Set<number>>(() => new Set(resume?.checked ?? []));
   const [cookStep, setCookStep] = useState(resume?.step ?? 0);
   // Готовка начинается с первой отметки продукта или с пошагового режима, а не с открытия рецепта.
