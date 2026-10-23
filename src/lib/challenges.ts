@@ -91,11 +91,13 @@ export const challenges: Challenge[] = [
 
 export const challengeMap = Object.fromEntries(challenges.map((c) => [c.id, c]));
 
-/** Прогресс задания: блюда, приготовленные с даты старта (каждое один раз). */
+/** Прогресс задания: блюда, приготовленные за 30 дней со старта (каждое один раз). */
 export function challengeProgress(journal: Journal, id: string, start: string): { value: number; target: number; done: boolean } {
   const c = challengeMap[id];
+  // После 30 дней не засчитываем: иначе проваленный месяц «доделывается» позже и вместо «Месяц прошёл» выходит открытка.
+  const inWindow = (d: string) => d >= start && daysSince(start, asDate(d)) < CHALLENGE_DAYS;
   const cooked = Object.entries(journal)
-    .filter(([rid, e]) => recipeMap[rid] && cookDates(e).some((d) => d >= start))
+    .filter(([rid, e]) => recipeMap[rid] && cookDates(e).some(inWindow))
     .map(([rid]) => recipeMap[rid]);
   // Новое — только если вся история известна и первая готовка уже после старта.
   const isNew = (rid: string) => fullHistory(journal[rid]) && [...cookDates(journal[rid])].sort()[0] >= start;

@@ -450,6 +450,14 @@ describe("исправления по ревью", () => {
     expect(challengeProgress(journal, "season", "2026-12-05").value).toBe(1);
   });
 
+  it("после 30 дней готовка в задание не засчитывается", () => {
+    const reels = recipes.filter((r) => r.video).slice(0, 3);
+    const late = Object.fromEntries(reels.map((r) => [r.id, { cooked: 1, dates: ["2026-11-25"] }]));
+    expect(challengeProgress(late, "reels", "2026-10-01").done).toBe(false);
+    const inTime = Object.fromEntries(reels.map((r) => [r.id, { cooked: 1, dates: ["2026-10-30"] }]));
+    expect(challengeProgress(inTime, "reels", "2026-10-01").done).toBe(true);
+  });
+
   it("«Новенькое» не считает старые записи без полной истории дат", () => {
     const [a] = recipes;
     expect(challengeProgress({ [a.id]: { cooked: 7, last: "2026-10-20" } }, "new", "2026-10-15").value).toBe(0);
