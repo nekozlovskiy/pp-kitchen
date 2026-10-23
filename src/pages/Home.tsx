@@ -182,6 +182,9 @@ function Surprise() {
       <button type="button" className="btn btn--accent surprise__go" onClick={pick}>
         Выбери за меня
       </button>
+      <Link to="/swipe" className="btn btn--ghost surprise__go surprise__swipe">
+        Полистать варианты
+      </Link>
     </section>
   );
 }

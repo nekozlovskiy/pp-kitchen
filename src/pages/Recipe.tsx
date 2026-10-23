@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { categoryLabel, ingredientMap, per100Macros, portionGrams, recipeAliases, recipeMap, recipes, servingMacros, sources } from "../data";
 import { makeSimilar } from "../lib/similar";
 import { isMyRecipe } from "../lib/myRecipes";
-import { cookForMeText } from "../lib/cookForMe";
+import { askToCook } from "../lib/cookForMe";
 import { fitsDiet } from "../lib/diet";
 import { macroPercents, per100g, round, scale, scaleIngredients } from "../lib/nutrition";
 import { applySwaps, availableSwaps } from "../lib/swaps";
@@ -48,25 +48,10 @@ function ShareButton({ recipe, onCopied }: { recipe: Recipe; onCopied: () => voi
   );
 }
 
-/** «Приготовь мне»: Анюта отправляет просьбу со ссылкой на рецепт через системное меню; без него текст копируется. */
+/** «Приготовь мне»: Анюта отправляет тебе просьбу со ссылкой на рецепт. */
 function CookForMeButton({ recipe, onCopied }: { recipe: Recipe; onCopied: () => void }) {
-  const ask = async () => {
-    const url = `${location.origin}${location.pathname}#/recipe/${recipe.id}`;
-    // Ссылка внутри текста: при отдельном поле url Telegram и WhatsApp отбрасывают text и присылают только ссылку.
-    const text = `${cookForMeText(recipe.title)}\n${url}`;
-    try {
-      if (navigator.share) {
-        await navigator.share({ text });
-        return;
-      }
-      await navigator.clipboard.writeText(text);
-      onCopied();
-    } catch {
-      /* пользователь закрыл меню «Поделиться» */
-    }
-  };
   return (
-    <button type="button" className="btn btn--ghost recipe__ask" onClick={ask}>
+    <button type="button" className="btn btn--ghost recipe__ask" onClick={() => askToCook(recipe, onCopied)}>
       Приготовь мне 🥺
     </button>
   );

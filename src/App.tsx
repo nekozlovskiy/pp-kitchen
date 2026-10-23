@@ -15,6 +15,7 @@ import { Pantry } from "./pages/Pantry";
 import { Week } from "./pages/Week";
 import { Transfer } from "./pages/Transfer";
 import { Kitchen } from "./pages/Kitchen";
+import { Swipe } from "./pages/Swipe";
 import { MyRecipeEditor, MyRecipes } from "./pages/MyRecipes";
 import { TimerDock } from "./components/TimerDock";
 import { CookingBanner } from "./components/CookingBanner";
@@ -74,6 +75,7 @@ export function App() {
           <Route path="/week" element={<Week />} />
           <Route path="/transfer" element={<Transfer />} />
           <Route path="/kitchen" element={<Kitchen />} />
+          <Route path="/swipe" element={<Swipe />} />
           <Route path="/my" element={<MyRecipes />} />
           <Route path="/my/new" element={<MyRecipeEditor />} />
           <Route path="/my/:id" element={<MyRecipeEditor key={location.pathname} />} />

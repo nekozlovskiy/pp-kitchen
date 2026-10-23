@@ -14,6 +14,8 @@ import { cleanMyRecipes, draftProblem, makeMyRecipe } from "./myRecipes";
 import { addUserRecipe, removeUserRecipe, userRecipeIds } from "../data";
 import { todayKey } from "./format";
 import { cookForMeText } from "./cookForMe";
+import { buildDeck, moods } from "./moodDeck";
+import { isProteinDense } from "../data";
 import { config } from "../config";
 
 const timers = (s: string) => splitStep(s).filter((p) => p.seconds).map((p) => [p.text, p.seconds]);
@@ -363,5 +365,23 @@ describe("«Приготовь мне»", () => {
       expect(text).toContain("«Хачапури»");
       expect(text).not.toContain("{блюдо}");
     });
+  });
+});
+
+describe("колода «Чего хочется?»", () => {
+  const ctx = (r: (typeof recipes)[number]) => ({ macros: servingMacros[r.id], proteinDense: isProteinDense(r.id) });
+  it("не больше 10 карт, только нужный раздел и настроение, без смахнутых", () => {
+    const skipped = new Set(recipes.filter((r) => r.category === "dessert").slice(0, 5).map((r) => r.id));
+    const deck = buildDeck(recipes, { category: "dessert", mood: "light", skipped, ctx });
+    expect(deck.length).toBe(10);
+    for (const r of deck) {
+      expect(r.category).toBe("dessert");
+      expect(servingMacros[r.id].kcal).toBeLessThanOrEqual(350);
+      expect(skipped.has(r.id)).toBe(false);
+    }
+    expect(new Set(deck.map((r) => r.id)).size).toBe(deck.length);
+  });
+  it("под каждое настроение хватает блюд на колоду", () => {
+    for (const m of moods) expect(buildDeck(recipes, { category: "all", mood: m.id, skipped: new Set(), ctx }).length).toBe(10);
   });
 });
