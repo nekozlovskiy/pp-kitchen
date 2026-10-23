@@ -6,6 +6,7 @@ import type { CookEvent } from "../lib/kitchen";
 import { Art } from "../art/Art";
 import { useStore } from "../hooks/useStore";
 import { usePhotoUrl } from "../hooks/usePhoto";
+import { ChallengeBlock } from "../components/Challenge";
 
 const dayFmt = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long" });
 const monthFmt = new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric" });
@@ -71,6 +72,8 @@ export function Kitchen() {
           <span>любимый раздел</span>
         </div>
       </section>
+
+      <ChallengeBlock />
 
       <section aria-labelledby="ach-title" className="kitchen__section">
         <h2 id="ach-title" className="menu__title">

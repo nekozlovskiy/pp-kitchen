@@ -1726,3 +1726,104 @@
 .together-page__full {
   margin: 24px 0 40px;
 }
+
+/* ---------- Челлендж месяца ---------- */
+.challenge__lead {
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.challenge__list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.challenge__pick {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: var(--r-lg);
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+.challenge__pick:hover {
+  border-color: var(--ink);
+}
+.challenge__pick b {
+  display: block;
+}
+.challenge__emoji {
+  font-size: 28px;
+  flex: none;
+}
+.challenge__hint {
+  display: block;
+  color: var(--muted);
+  font-size: 14px;
+}
+.challenge__done-badge {
+  margin-left: auto;
+  flex: none;
+  color: var(--accent);
+  font-weight: 700;
+}
+.challenge__card {
+  padding: 16px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.challenge__card--postcard {
+  background: var(--accent-soft);
+  border: 2px dashed var(--accent);
+  text-align: center;
+}
+.challenge__kicker {
+  color: var(--accent);
+  font-weight: 700;
+}
+.challenge__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  margin: 4px 0;
+}
+.challenge__note {
+  font-family: var(--font-hand);
+  font-size: 22px;
+  line-height: 1.35;
+  margin: 12px 0 16px;
+}
+.challenge__bar {
+  display: block;
+  margin-top: 12px;
+}
+.challenge__count {
+  margin-top: 6px;
+  font-weight: 600;
+}
+.challenge__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.challenge-strip {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+  max-width: 520px;
+}
+.challenge-strip span:nth-child(2) {
+  flex: 1;
+}

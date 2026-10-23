@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import { fitsDiet } from "../lib/diet";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { ChallengeStrip } from "../components/Challenge";
 import { config } from "../config";
 import { categories, categoryLabel, ingredientMap, isProteinDense, per100Macros, recipes, servingMacros } from "../data";
 import { round } from "../lib/nutrition";
@@ -81,6 +82,7 @@ function Masthead() {
           {noteOfTheDay()}
         </p>
       )}
+      <ChallengeStrip />
       <p className="masthead__lede">
         {recipes.length} {plural(recipes.length, ["ПП-рецепт", "ПП-рецепта", "ПП-рецептов"])} из редакционных подборок и рецептов Леди Mail.ru, Food.ru и журнала «Гастроном» и любимых рилсов. У каждого блюда посчитаны калории, белки, жиры и углеводы на порцию и на 100 г.
       </p>

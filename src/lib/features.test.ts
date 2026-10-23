@@ -17,6 +17,7 @@ import { cookForMeText } from "./cookForMe";
 import { buildDeck, moods } from "./moodDeck";
 import { isProteinDense } from "../data";
 import { parseTogether } from "./together";
+import { challengeProgress, challenges, cuisineOf } from "./challenges";
 import { config } from "../config";
 
 const timers = (s: string) => splitStep(s).filter((p) => p.seconds).map((p) => [p.text, p.seconds]);
@@ -394,5 +395,29 @@ describe("«Готовим вдвоём»: ссылка с его шагами",
   });
   it("без порций в ссылке — порции рецепта", () => {
     expect(parseTogether(new URLSearchParams("n=abc&s="), 5, 2)).toEqual({ servings: 2, steps: [] });
+  });
+});
+
+describe("челлендж месяца", () => {
+  const protBreakfast = recipes.filter((r) => r.category === "breakfast" && isProteinDense(r.id)).slice(0, 6);
+  it("считает только блюда, приготовленные с даты старта, каждое один раз", () => {
+    const journal = Object.fromEntries(protBreakfast.map((r, i) => [r.id, { cooked: 2, dates: i < 2 ? ["2026-09-01"] : ["2026-10-20", "2026-10-21"] }]));
+    expect(challengeProgress(journal, "protein-morning", "2026-10-15")).toEqual({ value: 4, target: 5, done: false });
+  });
+  it("«Новенькое» не засчитывает то, что готовила до старта", () => {
+    const [a, b] = recipes;
+    const journal = { [a.id]: { cooked: 2, dates: ["2026-09-01", "2026-10-20"] }, [b.id]: { cooked: 1, dates: ["2026-10-20"] } };
+    expect(challengeProgress(journal, "new", "2026-10-15").value).toBe(1);
+  });
+  it("у каждого задания хватает блюд на сайте", () => {
+    for (const c of challenges) {
+      const journal = Object.fromEntries(recipes.map((r) => [r.id, { cooked: 1, dates: ["2026-10-20"] }]));
+      expect(challengeProgress(journal, c.id, "2026-10-01").done, c.id).toBe(true);
+    }
+  });
+  it("кухни по названию", () => {
+    expect(cuisineOf("Творожные хачапури по-аджарски")).toBe("грузинская");
+    expect(cuisineOf("Хрустящие тако «Цезарь» с индейкой")).toBe("мексиканская");
+    expect(cuisineOf("Омлет со спаржей")).toBeNull();
   });
 });
