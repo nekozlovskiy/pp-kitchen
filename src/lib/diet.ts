@@ -17,22 +17,25 @@ const tagged: Record<DietTag, string[]> = {
   meat: [
     "chicken", "chicken_thigh", "chicken_liver", "chicken_mince", "chicken_boiled",
     "turkey", "turkey_mince", "turkey_smoked", "turkey_thigh", "beef", "beef_mince", "gelatin", "chicken_smoked", "pork_lean", "turkey_ham", "turkey_boiled", "beef_liver", "veal_mince", "beef_heart", "veal", "beef_tongue",
+    "chicken_hearts", "ham", "pepperoni", "bacon_cooked",
   ],
   fish: [
     "cod", "pollock", "salmon", "salmon_salted", "pink_salmon_boiled", "trout", "tuna", "tuna_fresh",
-    "shrimp", "squid", "crab_sticks", "mackerel", "mussels", "herring_salted", "salmon_hot_smoked", "tilapia", "trout_salted", "sockeye",
+    "shrimp", "squid", "crab_sticks", "mackerel", "mussels", "herring_salted", "salmon_hot_smoked", "tilapia", "trout_salted", "sockeye", "oyster_sauce",
   ],
   dairy: [
     "cottage0", "cottage2", "cottage5", "yogurt", "yogurt0", "yogurt_natural", "kefir", "milk", "milk25",
     "sour_cream", "sour_cream15", "cream10", "dry_milk", "butter", "cheese_light", "cheese_hard", "feta",
     "mozzarella", "parmesan", "ricotta", "cream_cheese", "suluguni", "protein", "yogurt_greek_fat", "ryazhenka",
     "cottage_grain", "pesto", "gorgonzola", "cottage9", "sour_cream20", "processed_cheese", "ghee", "yogurt6", "adyghe_cheese", "kefir25", "cream20",
+    "cheese_fat_free", "protein_pudding",
   ],
-  egg: ["egg", "egg_white", "egg_yolk", "quail_egg"],
+  egg: ["egg", "egg_white", "egg_yolk", "quail_egg", "mayo", "mayo_light", "egg_noodles"],
   gluten: [
     "wheat_flour", "whole_flour", "whole_bread", "lavash", "tortilla", "whole_pasta", "lasagna", "bulgur",
     "semolina", "soy_sauce", "crab_sticks", "oats", "oat_flour", "oat_bran", "granola", "rye_flour", "wheat_bran", "teriyaki",
     "burger_bun", "breadcrumbs", "spaghetti", "white_bread", "rye_crisps", "pearl_barley", "soba", "miso", "udon",
+    "pasta", "protein_pasta", "egg_noodles", "sourdough", "chebureki_dough", "chunjang", "corn_flakes", "unagi_sauce", "oyster_sauce",
   ],
 };
 
