@@ -7,6 +7,7 @@ import { useWakeLock } from "../hooks/useWakeLock";
 import { useStore } from "../hooks/useStore";
 import type { Recipe } from "../types";
 import { StepText } from "./StepText";
+import { config } from "../config";
 
 /**
  * Пошаговый режим: один шаг на экран крупным шрифтом, листается свайпом или кнопками.
@@ -19,6 +20,7 @@ export function CookMode({
   initialStep = 0,
   onStep,
   onFinish,
+  partnerSteps,
 }: {
   recipe: Recipe;
   servings: number;
@@ -28,6 +30,8 @@ export function CookMode({
   onStep?: (step: number) => void;
   /** «Готово!» на последнем шаге: готовка закончена. */
   onFinish?: () => void;
+  /** «Готовим вдвоём»: шаги (с нуля), которые делает он. */
+  partnerSteps?: ReadonlySet<number>;
 }) {
   const { markCooked, showToast } = useStore();
   const total = recipe.steps.length + 1;
@@ -129,8 +133,9 @@ export function CookMode({
           <>
             <p className="cook__kicker">
               Шаг {step} из {total - 1}
+              {partnerSteps?.has(step - 1) && ` · делает ${config.partnerName.toLowerCase()}`}
             </p>
-            <p className="cook__step">
+            <p className={`cook__step ${partnerSteps?.has(step - 1) ? "cook__step--partner" : ""}`}>
               <StepText text={recipe.steps[step - 1]} recipeTitle={recipe.title} />
             </p>
           </>

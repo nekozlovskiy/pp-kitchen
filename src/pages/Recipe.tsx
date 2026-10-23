@@ -18,6 +18,8 @@ import { useStore } from "../hooks/useStore";
 import { useWakeLock } from "../hooks/useWakeLock";
 import { usePhotoUrl } from "../hooks/usePhoto";
 import { CookMode } from "../components/CookMode";
+import { TogetherPanel } from "../components/TogetherPanel";
+import { readAssignment, saveAssignment } from "../lib/together";
 import { RecipeJournal } from "../components/RecipeJournal";
 import { StepText } from "../components/StepText";
 import { ReelEmbed } from "../components/ReelEmbed";
@@ -91,6 +93,8 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
     return c?.id === recipe.id ? c : null;
   });
   const [servings, setServings] = useState(resume?.servings ?? recipe.servings);
+  const [together, setTogether] = useState(false);
+  const [partnerSteps, setPartnerSteps] = useState<Set<number>>(() => new Set(readAssignment(recipe.id)));
   const [checked, setChecked] = useState<Set<number>>(() => new Set(resume?.checked ?? []));
   const [cookStep, setCookStep] = useState(resume?.step ?? 0);
   // Готовка начинается с первой отметки продукта или с пошагового режима, а не с открытия рецепта.
@@ -281,6 +285,11 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
             Начать заново
           </button>
         )}
+        {!isMyRecipe(recipe.id) && (
+          <button type="button" className="btn btn--ghost" aria-expanded={together} onClick={() => setTogether((v) => !v)}>
+            Готовим вдвоём
+          </button>
+        )}
         {wake.supported && (
           <label className="switch">
             <input type="checkbox" checked={keepAwake} onChange={(e) => setKeepAwake(e.target.checked)} />
@@ -288,7 +297,29 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
           </label>
         )}
       </div>
-      {cooking && <CookMode recipe={cooked} servings={servings} onClose={closeCook} initialStep={cookStep} onStep={onCookStep} onFinish={resetCooking} />}
+      {together && (
+        <TogetherPanel
+          recipe={recipe}
+          servings={servings}
+          partnerSteps={partnerSteps}
+          onChange={(steps) => {
+            setPartnerSteps(new Set(steps));
+            saveAssignment(recipe.id, steps);
+          }}
+          onCopied={() => showToast("Ссылка скопирована — отправь её в чат")}
+        />
+      )}
+      {cooking && (
+        <CookMode
+          recipe={cooked}
+          servings={servings}
+          onClose={closeCook}
+          initialStep={cookStep}
+          onStep={onCookStep}
+          onFinish={resetCooking}
+          partnerSteps={partnerSteps}
+        />
+      )}
 
       <section className="recipe__section">
         <div className="recipe__section-head">

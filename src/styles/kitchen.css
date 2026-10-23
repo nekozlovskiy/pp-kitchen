@@ -1625,3 +1625,104 @@
 .repeat-day p {
   color: var(--ink);
 }
+
+/* ---------- Готовим вдвоём ---------- */
+.together {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+.together__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+}
+.together__hint {
+  margin-top: 4px;
+  color: var(--muted);
+}
+.together__steps {
+  list-style: none;
+  padding: 0;
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+.together__step {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+}
+.together__step.is-his {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.together__who {
+  flex: none;
+  min-width: 72px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface);
+  font-weight: 700;
+  font-size: 13px;
+  text-align: center;
+}
+.together__step.is-his .together__who {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.together__send {
+  margin-top: 14px;
+  width: 100%;
+}
+.cook__step--partner {
+  opacity: 0.6;
+}
+.together-page__steps,
+.together-page__ingredients {
+  list-style: none;
+  padding: 0;
+}
+.together-page__step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 18px;
+}
+.together-page__step input {
+  width: 24px;
+  height: 24px;
+  margin-top: 4px;
+  flex: none;
+  accent-color: var(--accent);
+}
+.together-page__step b {
+  display: block;
+  font-size: 14px;
+  color: var(--muted);
+}
+.together-page__step.is-done > span {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.together-page__ingredients li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+.together-page__full {
+  margin: 24px 0 40px;
+}

@@ -16,6 +16,7 @@ import { todayKey } from "./format";
 import { cookForMeText } from "./cookForMe";
 import { buildDeck, moods } from "./moodDeck";
 import { isProteinDense } from "../data";
+import { parseTogether } from "./together";
 import { config } from "../config";
 
 const timers = (s: string) => splitStep(s).filter((p) => p.seconds).map((p) => [p.text, p.seconds]);
@@ -383,5 +384,15 @@ describe("колода «Чего хочется?»", () => {
   });
   it("под каждое настроение хватает блюд на колоду", () => {
     for (const m of moods) expect(buildDeck(recipes, { category: "all", mood: m.id, skipped: new Set(), ctx }).length).toBe(10);
+  });
+});
+
+describe("«Готовим вдвоём»: ссылка с его шагами", () => {
+  it("берёт порции и шаги из ссылки, отбрасывает мусор и чужие номера", () => {
+    const p = new URLSearchParams("n=3&s=4.0.2.2.x.99.-1");
+    expect(parseTogether(p, 5, 2)).toEqual({ servings: 3, steps: [0, 2, 4] });
+  });
+  it("без порций в ссылке — порции рецепта", () => {
+    expect(parseTogether(new URLSearchParams("n=abc&s="), 5, 2)).toEqual({ servings: 2, steps: [] });
   });
 });
