@@ -1071,6 +1071,11 @@ i.dot::before {
   flex: 1;
   min-height: 52px;
 }
+.recipe__ask {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 10px;
+}
 
 .recipe__section {
   margin-top: 34px;
@@ -1536,6 +1541,7 @@ i.dot::before {
   .sheet__grip,
   .sheet__close,
   .recipe__actions,
+  .recipe__ask,
   .recipe__tools,
   .similar,
   .ingredients__macros-toggle,

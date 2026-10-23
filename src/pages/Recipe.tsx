@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { categoryLabel, ingredientMap, per100Macros, portionGrams, recipeAliases, recipeMap, recipes, servingMacros, sources } from "../data";
 import { makeSimilar } from "../lib/similar";
 import { isMyRecipe } from "../lib/myRecipes";
+import { cookForMeText } from "../lib/cookForMe";
 import { fitsDiet } from "../lib/diet";
 import { macroPercents, per100g, round, scale, scaleIngredients } from "../lib/nutrition";
 import { applySwaps, availableSwaps } from "../lib/swaps";
@@ -43,6 +44,29 @@ function ShareButton({ recipe, onCopied }: { recipe: Recipe; onCopied: () => voi
       <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
         <path d="M12 15V4M8 8l4-4 4 4M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" />
       </svg>
+    </button>
+  );
+}
+
+/** «Приготовь мне»: Анюта отправляет просьбу со ссылкой на рецепт через системное меню; без него текст копируется. */
+function CookForMeButton({ recipe, onCopied }: { recipe: Recipe; onCopied: () => void }) {
+  const ask = async () => {
+    const url = `${location.origin}${location.pathname}#/recipe/${recipe.id}`;
+    const text = cookForMeText(recipe.title);
+    try {
+      if (navigator.share) {
+        await navigator.share({ text, url });
+        return;
+      }
+      await navigator.clipboard.writeText(`${text}\n${url}`);
+      onCopied();
+    } catch {
+      /* пользователь закрыл меню «Поделиться» */
+    }
+  };
+  return (
+    <button type="button" className="btn btn--ghost recipe__ask" onClick={ask}>
+      Приготовь мне 🥺
     </button>
   );
 }
@@ -257,6 +281,10 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
         <ShareButton recipe={recipe} onCopied={() => showToast("Ссылка на рецепт скопирована")} />
         <HeartButton id={recipe.id} title={recipe.title} className="heart--big" />
       </div>
+      {/* Свой рецепт живёт только на её телефоне: по ссылке он у тебя не откроется. */}
+      {!isMyRecipe(recipe.id) && (
+        <CookForMeButton recipe={recipe} onCopied={() => showToast("Просьба скопирована — отправь её в чат")} />
+      )}
 
       <div className="cook-bar">
         <button type="button" className="btn btn--ghost" onClick={() => setCooking(true)}>

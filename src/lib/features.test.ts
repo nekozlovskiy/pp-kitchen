@@ -13,6 +13,8 @@ import { cookEvents, kitchenStats } from "./kitchen";
 import { cleanMyRecipes, draftProblem, makeMyRecipe } from "./myRecipes";
 import { addUserRecipe, removeUserRecipe, userRecipeIds } from "../data";
 import { todayKey } from "./format";
+import { cookForMeText } from "./cookForMe";
+import { config } from "../config";
 
 const timers = (s: string) => splitStep(s).filter((p) => p.seconds).map((p) => [p.text, p.seconds]);
 
@@ -351,5 +353,15 @@ describe("обложка в index.html", () => {
     // ?raw — Vite отдаёт файл строкой; так тесту не нужны типы Node.
     const html = (await import("../../index.html?raw")).default;
     expect(html).toContain(`<p class="masthead__dedication">${config.dedication}</p>`);
+  });
+});
+
+describe("«Приготовь мне»", () => {
+  it("подставляет название блюда в каждый шаблон", () => {
+    config.cookForMe.forEach((_, i) => {
+      const text = cookForMeText("Хачапури", () => i / config.cookForMe.length);
+      expect(text).toContain("«Хачапури»");
+      expect(text).not.toContain("{блюдо}");
+    });
   });
 });
