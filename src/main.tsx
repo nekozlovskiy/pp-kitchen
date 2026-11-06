@@ -8,6 +8,7 @@ import { TimersProvider } from "./hooks/useTimers";
 import "./styles/tokens.css";
 import "./styles/global.css";
 import "./styles/kitchen.css";
+import "./styles/editorial.css";
 
 // Офлайн-режим и установка на экран телефона (только в собранной версии)
 if (import.meta.env.PROD && "serviceWorker" in navigator) {

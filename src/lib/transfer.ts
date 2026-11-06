@@ -1,4 +1,4 @@
-import { readJSON, writeJSON } from "./storage";
+import { notifyStorageChange, readJSON, retryStorageWrites, writeJSON } from "./storage";
 
 /** Что переносим на другое устройство. Таймеры не нужны, фото лежат отдельно и слишком тяжёлые. */
 export const TRANSFER_KEYS = [
@@ -22,11 +22,26 @@ export const TRANSFER_KEYS = [
 export type Bundle = { v: 1; at: string; data: Record<string, unknown> };
 
 const PREFIX = "PP1:";
+let pendingImport: Bundle | null = null;
+export const hasPendingImport = () => pendingImport !== null;
+
+/** Повторяем весь файл: старый экран между попытками мог изменить часть ключей. */
+export function retryPendingImport(): boolean {
+  if (!pendingImport) return false;
+  importBundle(pendingImport);
+  return retryStorageWrites();
+}
+
+export function startImport(bundle: Bundle): boolean {
+  pendingImport = bundle;
+  notifyStorageChange();
+  return retryPendingImport();
+}
 
 export function exportBundle(): Bundle {
   const data: Record<string, unknown> = {};
   for (const key of TRANSFER_KEYS) {
-    const value = readJSON<unknown>(key, undefined);
+    const value = pendingImport && key in pendingImport.data ? pendingImport.data[key] : readJSON<unknown>(key, undefined);
     if (value !== undefined) data[key] = value;
   }
   // Номер фото ссылается на хранилище этого телефона — на другом его нет.

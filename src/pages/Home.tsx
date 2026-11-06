@@ -1,30 +1,26 @@
 import { useEffect, useMemo, useState } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { fitsDiet } from "../lib/diet";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ChallengeStrip } from "../components/Challenge";
 import { config } from "../config";
-import { categories, categoryLabel, ingredientMap, isProteinDense, per100Macros, recipes, servingMacros } from "../data";
+import { categories, categoryLabel, ingredientMap, isProteinDense, per100Macros, recipeMap, recipes, servingMacros } from "../data";
 import { round } from "../lib/nutrition";
 import { formatTime, plural, todayKey } from "../lib/format";
 import { matches, searchText } from "../lib/search";
 import { Art } from "../art/Art";
-import { FilterBar, KCAL_MAX, defaultFilters } from "../components/FilterBar";
+import { FilterBar, RecipeSearch, KCAL_MAX, defaultFilters } from "../components/FilterBar";
 import type { Filters } from "../components/FilterBar";
 import type { Category } from "../types";
 import { RecipeCard } from "../components/RecipeCard";
 import { InstallHint } from "../components/InstallHint";
 import { useStore } from "../hooks/useStore";
 import { collectionMap, collections, hasProduct } from "../lib/collections";
+import { usePhotoUrl } from "../hooks/usePhoto";
+import { cookEvents } from "../lib/kitchen";
+import { dailyRecipe } from "../lib/daily";
 
 const texts = Object.fromEntries(recipes.map((r) => [r.id, searchText(r, ingredientMap)]));
-
-/** Рецепт дня: один и тот же весь день, завтра следующий. */
-function recipeOfTheDay() {
-  const d = new Date();
-  const days = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86_400_000);
-  return recipes[(days * 37) % recipes.length];
-}
 
 /** Записка дня: своя на каждый день, по кругу. Сдвиг, чтобы не совпадала по ритму с рецептом дня. В особые даты — своя. */
 function noteOfTheDay() {
@@ -64,10 +60,11 @@ function Snow() {
   );
 }
 
-function Masthead() {
+function Masthead({ children }: { children: ReactNode }) {
   return (
     <div className="masthead">
       {isWinterHoliday() && <Snow />}
+      <p className="masthead__eyebrow">Личная книга рецептов</p>
       <h1 className="masthead__title" aria-label="ПП-кухня">
         <span className="masthead__line">ПП‑</span>
         <span className="masthead__line">кухня</span>
@@ -82,22 +79,44 @@ function Masthead() {
           {noteOfTheDay()}
         </p>
       )}
+      {children}
       <ChallengeStrip />
       <p className="masthead__lede">
-        {recipes.length} {plural(recipes.length, ["ПП-рецепт", "ПП-рецепта", "ПП-рецептов"])} из редакционных подборок и рецептов Леди Mail.ru, Food.ru и журнала «Гастроном» и любимых рилсов. У каждого блюда посчитаны калории, белки, жиры и углеводы на порцию и на 100 г.
+        {recipes.length} {plural(recipes.length, ["ПП-рецепт", "ПП-рецепта", "ПП-рецептов"])} с составом, шагами и КБЖУ на порцию и на 100 г.
       </p>
     </div>
   );
 }
 
 function Feature() {
-  const r = recipeOfTheDay();
+  const { journal, exclude, dislikes } = useStore();
+  const r = dailyRecipe(recipes, exclude, dislikes);
+  const photo = usePhotoUrl(r?.id ?? "", r ? journal[r.id]?.photo : undefined);
   const location = useLocation();
+  if (!r) return (
+    <aside className="feature">
+      <h2 className="feature__title">Сегодня без случайных советов</h2>
+      <p className="feature__desc">С выбранными ограничениями рецепта дня пока нет. Можно проверить предпочтения или открыть свои рецепты.</p>
+      <button type="button" className="btn btn--ghost" onClick={() => {
+        const details = document.querySelector<HTMLDetailsElement>(".diet");
+        if (details) {
+          details.open = true;
+          const summary = details.querySelector("summary");
+          summary?.scrollIntoView({ block: "start" });
+          summary?.focus();
+        }
+      }}>Проверить предпочтения</button>
+      <Link to="/my" className="btn btn--text">Мои рецепты</Link>
+    </aside>
+  );
   const m = round(servingMacros[r.id]);
   return (
     <article className="feature">
       <p className="feature__kicker">Рецепт дня</p>
-      <Art className="feature__art" kind={r.art} category={r.category} seed={r.id} />
+      {photo ? (
+        <img className="feature__art feature__photo" src={photo} alt={`Моё фото: ${r.title}`} />
+      ) : <Art className="feature__art" kind={r.art} category={r.category} seed={r.id} />}
+      {photo && <p className="feature__photo-label">Приготовлено тобой 🤍</p>}
       <h2 className="feature__title">
         <Link to={`/recipe/${r.id}`} state={{ background: location }} className="card__link">
           {r.title}
@@ -116,6 +135,47 @@ function Feature() {
         </p>
       </div>
     </article>
+  );
+}
+
+function RecentCooking() {
+  const { journal, exclude, dislikes } = useStore();
+  const location = useLocation();
+  const seen = new Set<string>();
+  const recent = cookEvents(journal).filter(({ id }) => {
+    if (seen.has(id) || !fitsDiet(recipeMap[id], exclude, dislikes)) return false;
+    seen.add(id);
+    return true;
+  }).slice(0, 3);
+  if (!recent.length) return (
+    <div className="wrap recent-empty">
+      <Link to="/kitchen">Моя кухня — история блюд, фотографии и записки →</Link>
+    </div>
+  );
+  return (
+    <section className="wrap recent" aria-labelledby="recent-title">
+      <div className="recent__head">
+        <h2 id="recent-title" className="section-title">Ты готовила недавно</h2>
+        <Link to="/kitchen">Вся история →</Link>
+      </div>
+      <ul className="recent__list">
+        {recent.map(({ id, date }) => <RecentDish key={id} id={id} date={date} background={location} />)}
+      </ul>
+    </section>
+  );
+}
+
+function RecentDish({ id, date, background }: { id: string; date: string; background: ReturnType<typeof useLocation> }) {
+  const { journal } = useStore();
+  const r = recipeMap[id];
+  const photo = usePhotoUrl(id, journal[id]?.photo);
+  return (
+    <li>
+      <Link to={`/recipe/${id}`} state={{ background }} className="recent__dish">
+        {photo ? <img src={photo} alt="" loading="lazy" /> : <Art kind={r.art} category={r.category} seed={id} />}
+        <span><b>{r.title}</b><small>{new Date(`${date}T12:00:00`).toLocaleDateString("ru-RU", { day: "numeric", month: "long" })} · Повторить →</small></span>
+      </Link>
+    </li>
   );
 }
 
@@ -239,26 +299,48 @@ export function Home() {
   useEffect(() => setLimit(PAGE), [exclude, dislikes]);
 
   const touched = JSON.stringify(filters) !== JSON.stringify(defaultFilters);
+  const goToResults = () => {
+    const title = document.getElementById("catalog-results");
+    title?.scrollIntoView({ block: "start" });
+    title?.focus({ preventScroll: true });
+  };
 
   return (
-    <main className="home">
+    <main className={`home ${touched ? "home--searching" : ""}`}>
       <header className="cover wrap">
-        <Masthead />
-        <Feature />
-        <InstallHint />
+        <Masthead>
+          <form className="home-search" role="search" onSubmit={(e) => { e.preventDefault(); goToResults(); }}>
+            <div className="home-search__row">
+              <RecipeSearch value={filters.query} onChange={(query) => changeFilters({ ...filters, query })} />
+              <button type="submit" className="btn btn--accent">Найти</button>
+            </div>
+            <div className="toggles home-search__quick">
+              <button type="button" className={`toggle ${filters.quick ? "is-on" : ""}`} aria-pressed={filters.quick}
+                onClick={() => { changeFilters({ ...filters, quick: !filters.quick }); requestAnimationFrame(goToResults); }}>
+                До 20 минут
+              </button>
+              <Link to="/pantry" className="toggle">Из продуктов дома</Link>
+              {touched && <button type="button" className="btn btn--text" onClick={() => changeFilters(defaultFilters)}>Сбросить</button>}
+            </div>
+          </form>
+        </Masthead>
+        {!touched && <Feature />}
+        {!touched && <InstallHint />}
       </header>
 
-      <Collections
+      {!touched && <RecentCooking />}
+
+      {!touched && <Collections
         onPick={(id) => {
           changeFilters({ ...defaultFilters, collection: id });
           document.getElementById("catalog-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
         }}
-      />
+      />}
 
-      <Surprise />
+      {!touched && <Surprise />}
 
       <section className="catalog wrap" aria-labelledby="catalog-title">
-        <h2 id="catalog-title" className="section-title">
+        <h2 id="catalog-title" className="section-title" tabIndex={-1}>
           Все рецепты
         </h2>
         <Link to="/pantry" className="pantry-link">
@@ -269,7 +351,7 @@ export function Home() {
           <span aria-hidden="true">→</span>
         </Link>
         <FilterBar value={filters} onChange={changeFilters} />
-        <p className="count" aria-live="polite">
+        <p id="catalog-results" className="count" aria-live="polite" tabIndex={-1}>
           {list.length > 0
             ? `${plural(list.length, ["Нашёлся", "Нашлось", "Нашлось"])} ${list.length} ${plural(list.length, ["рецепт", "рецепта", "рецептов"])}`
             : ""}

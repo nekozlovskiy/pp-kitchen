@@ -31,7 +31,7 @@ export function Sheet({
       if (e.key === "Escape") onClose();
       if (e.key === "Tab" && panel.current) {
         const items = panel.current.querySelectorAll<HTMLElement>(
-          'a[href], button:not([disabled]), input, select, [tabindex]:not([tabindex="-1"])',
+          'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])',
         );
         if (!items.length) return;
         const first = items[0];

@@ -104,27 +104,31 @@ function DislikePicker() {
   );
 }
 
+export function RecipeSearch({ value, onChange }: { value: string; onChange: (query: string) => void }) {
+  return (
+    <label className="search">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" strokeWidth="2" />
+        <path d="m16 16 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+      <span className="visually-hidden">Поиск по рецептам</span>
+      <input
+        type="search"
+        placeholder="Курица, творог, суп…"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        enterKeyHint="search"
+      />
+    </label>
+  );
+}
+
 export function FilterBar({ value, onChange }: { value: Filters; onChange: (f: Filters) => void }) {
   const set = <K extends keyof Filters>(k: K, v: Filters[K]) => onChange({ ...value, [k]: v });
   const { exclude, toggleExclude, dislikes } = useStore();
   const limits = exclude.length + dislikes.length;
   return (
     <div className="filters">
-      <label className="search">
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-          <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" strokeWidth="2" />
-          <path d="m16 16 4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-        </svg>
-        <span className="visually-hidden">Поиск по рецептам</span>
-        <input
-          type="search"
-          placeholder="Курица, творог, суп…"
-          value={value.query}
-          onChange={(e) => set("query", e.target.value)}
-          enterKeyHint="search"
-        />
-      </label>
-
       <div className="chips" role="radiogroup" aria-label="Категория">
         {[{ id: "all" as const, plural: "Все" }, ...categories].map((c) => (
           <button

@@ -5,6 +5,7 @@ import { config } from "./config";
 import { recipeMap } from "./data";
 import { Nav } from "./components/Nav";
 import { Toast } from "./components/Toast";
+import { StorageNotice } from "./components/StorageNotice";
 import { Home } from "./pages/Home";
 import { RecipeSheet } from "./pages/Recipe";
 import { Day } from "./pages/Day";
@@ -105,6 +106,7 @@ export function App() {
       <AchievementWatcher />
       <SecretNoteWatcher />
       <Toast />
+      <StorageNotice />
     </>
   );
 }

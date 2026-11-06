@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { decodeBundle, encodeBundle, exportBundle, importBundle } from "../lib/transfer";
+import { decodeBundle, encodeBundle, exportBundle, hasPendingImport, retryPendingImport, startImport } from "../lib/transfer";
 import { useStore } from "../hooks/useStore";
 
 const FILE_NAME = "pp-kuhnya.json";
@@ -47,7 +47,10 @@ export function Transfer() {
       return;
     }
     if (!window.confirm("Заменить избранное, отметки и списки на этом устройстве перенесёнными?")) return;
-    importBundle(bundle);
+    if (!startImport(bundle)) {
+      setError("Перенос пока не сохранён. Скачайте копию или повторите сохранение, прежде чем обновлять страницу.");
+      return;
+    }
     window.location.reload();
   };
 
@@ -103,7 +106,10 @@ export function Transfer() {
             placeholder="PP1:…"
           />
         </label>
-        {error && <p className="transfer__error">{error}</p>}
+        {error && <p className="transfer__error" role="alert">{error}</p>}
+        {error && hasPendingImport() && <button type="button" className="btn btn--ghost" onClick={() => {
+          if (retryPendingImport()) window.location.reload();
+        }}>Повторить сохранение переноса</button>}
         <button type="button" className="btn btn--accent" disabled={!code.trim()} onClick={() => apply(code)}>
           Перенести
         </button>

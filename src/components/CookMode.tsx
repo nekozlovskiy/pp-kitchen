@@ -53,7 +53,7 @@ export function CookMode({
       else if (e.key === "ArrowRight") go(1);
       else if (e.key === "ArrowLeft") go(-1);
       else if (e.key === "Tab" && box.current) {
-        const items = box.current.querySelectorAll<HTMLElement>("button:not([disabled])");
+        const items = box.current.querySelectorAll<HTMLElement>('button:not([disabled]), a[href]');
         const first = items[0];
         const last = items[items.length - 1];
         if (e.shiftKey && document.activeElement === first) last.focus();

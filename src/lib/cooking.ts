@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { readJSON, writeJSON } from "./storage";
+import { readJSON, removeJSON, writeJSON } from "./storage";
 
 /** Рецепт, который готовится прямо сейчас: отмеченные продукты, шаг и число порций. */
 export type Cooking = { id: string; checked: number[]; step: number; servings: number; at: number };
@@ -27,11 +27,7 @@ export function saveCooking(c: Omit<Cooking, "at">): void {
 }
 
 export function clearCooking(): void {
-  try {
-    window.localStorage.removeItem(KEY);
-  } catch {
-    /* хранилище недоступно */
-  }
+  removeJSON(KEY);
   window.dispatchEvent(new Event(EVENT));
 }
 

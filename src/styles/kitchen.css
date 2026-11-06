@@ -1957,3 +1957,68 @@
 .order--status {
   padding-right: 60px; /* место под крестик листа */
 }
+
+/* Быстрый вход в каталог, рядом с личной запиской. */
+.home-search { margin-top: 20px; }
+.home-search__row { display: flex; gap: 8px; align-items: stretch; }
+.home-search__row .search { flex: 1; min-width: 0; }
+.home-search__row .btn { flex-shrink: 0; }
+.home-search__quick { margin-top: 10px; }
+.home-search__quick a { text-decoration: none; display: inline-flex; align-items: center; }
+.home--searching .masthead__lede { display: none; }
+.home--searching .cover { grid-template-columns: 1fr; padding-bottom: 24px; }
+@media (max-width: 899px) {
+  .masthead__title { font-size: clamp(38px, 10vw, 68px); line-height: 1.1; }
+  .masthead__line { display: inline; }
+  .masthead__line + .masthead__line { padding-left: 0; }
+  .masthead__dedication { font-size: 23px; max-width: 30ch; margin-top: 12px; }
+  .masthead__squiggle { width: 150px; }
+  .masthead__lede { font-size: 14px; margin-top: 18px; max-width: none; }
+}
+
+/* Сначала готовим; подробные расчёты открываются по желанию. */
+.recipe-jumps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.recipe-jumps button { min-height: 44px; }
+.nutrition-details { margin-top: 18px; border-radius: var(--r-md); background: var(--surface); }
+.nutrition-details > summary { padding: 16px; cursor: pointer; min-height: 56px; }
+.nutrition-details > summary b { font-size: 15px; }
+.nutrition-details > summary span { display: block; margin-top: 4px; color: var(--muted); font-size: 13px; }
+.nutrition-details .nutrition { margin-top: 0; }
+.recipe__section h2, .journal h2 { scroll-margin-top: 60px; }
+@media (max-width: 899px) {
+  .recipe__art:not(img) { width: 100px; float: right; margin: 0 0 8px 12px; }
+  .recipe__facts { clear: both; }
+  .recipe__photo { max-height: 160px; object-fit: cover; width: 100%; margin-bottom: 12px; }
+}
+@media print {
+  .recipe-jumps, .nutrition-details > summary { display: none; }
+  .nutrition-details::details-content { content-visibility: visible; }
+}
+
+.feature__photo { aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--r-md); margin-block: 16px 10px; }
+.feature__photo-label { font-family: var(--font-hand); color: var(--accent); font-size: 23px; margin-bottom: 10px; }
+.recipe__photo-hint { margin-top: 8px; font-size: 13px; }
+.recent, .recent-empty { margin-bottom: 32px; }
+.recent-empty a { display: inline-block; padding-block: 10px; color: var(--muted); text-underline-offset: 4px; }
+.recent__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.recent__head .section-title { margin: 0; }
+.recent__head a { color: var(--accent); text-underline-offset: 4px; }
+.recent__list { display: grid; gap: 12px; }
+.recent__dish { display: flex; align-items: center; gap: 12px; min-height: 100px; padding: 12px; border: 1px solid var(--line); border-radius: var(--r-md); text-decoration: none; background: var(--surface); }
+.recent__dish > img, .recent__dish > svg { width: 80px; height: 80px; flex-shrink: 0; object-fit: cover; border-radius: var(--r-sm); }
+.recent__dish b { display: block; line-height: 1.35; }
+.recent__dish small { display: block; margin-top: 6px; color: var(--muted); }
+@media (min-width: 900px) { .recent__list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.storage-notice { position: fixed; z-index: 150; inset: 8px 12px auto; max-width: 760px; margin-inline: auto; padding: 14px; background: var(--surface); color: var(--ink); border: 2px solid var(--accent); border-radius: var(--r-md); box-shadow: 0 4px 24px rgb(0 0 0 / .2); font-size: 14px; }
+.storage-notice > div { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.storage-notice .btn { min-height: 44px; padding: 8px 12px; font-size: 13px; }
+@media print { .storage-notice { display: none; } }
+
+@media (min-width: 900px) {
+  .cover { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: center; gap: 40px; }
+  .masthead { min-width: 0; }
+  .masthead__title { font-size: clamp(80px, 10vw, 128px); }
+  .masthead__dedication { font-size: 30px; max-width: 28ch; }
+}
+#catalog-results { scroll-margin-top: 24px; }

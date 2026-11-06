@@ -11,6 +11,7 @@ export function usePhotoUrl(id: string, version: number | undefined): string | n
     }
     let made: string | null = null;
     let alive = true;
+    setUrl(null);
     loadPhoto(id).then((blob) => {
       if (!alive || !blob) return;
       made = URL.createObjectURL(blob);

@@ -15,6 +15,12 @@ export function RecipeJournal({ recipe }: { recipe: Recipe }) {
   const photo = usePhotoUrl(recipe.id, entry.photo);
   const file = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const latestNote = useRef({ note, saved: entry.note ?? "", updateJournal });
+  latestNote.current = { note, saved: entry.note ?? "", updateJournal };
+  useEffect(() => () => {
+    const latest = latestNote.current;
+    if (latest.note !== latest.saved) latest.updateJournal(recipe.id, { note: latest.note.trim() ? latest.note : undefined });
+  }, [recipe.id]);
 
   // Заметка сохраняется сама через полсекунды после последнего нажатия.
   useEffect(() => {
@@ -38,7 +44,7 @@ export function RecipeJournal({ recipe }: { recipe: Recipe }) {
 
   return (
     <section className="recipe__section journal" aria-labelledby={`journal-${recipe.id}`}>
-      <h2 id={`journal-${recipe.id}`}>Мои отметки</h2>
+      <h2 id={`journal-${recipe.id}`} tabIndex={-1}>Мои отметки</h2>
 
       <div className="journal__row">
         <div className="stars" role="radiogroup" aria-label="Моя оценка">

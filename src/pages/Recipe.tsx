@@ -148,6 +148,11 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
         <p className="recipe__cat">{categoryLabel[recipe.category]}</p>
         <h1 className="recipe__title">{recipe.title}</h1>
         <p className="recipe__desc">{recipe.description}</p>
+        {!photo && <button type="button" className="btn btn--text recipe__photo-hint" onClick={() => {
+          const heading = document.getElementById(`journal-${recipe.id}`);
+          heading?.scrollIntoView({ block: "start" });
+          heading?.focus({ preventScroll: true });
+        }}>Добавить фото своего блюда</button>}
         <ul className="recipe__facts">
           <li>
             <span>Время</span>
@@ -168,111 +173,8 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
         </ul>
       </header>
 
-      {recipe.video && <ReelEmbed url={recipe.video} title={recipe.title} />}
-
-      <section className="nutrition" aria-label={myGrams ? `Пищевая ценность ${myGrams} г` : "Пищевая ценность одной порции"}>
-        <div className="my-portion">
-          <label className="grams-input">
-            <span>Моя порция</span>
-            <input
-              key={myGrams === null ? "base" : "own"}
-              type="number"
-              inputMode="numeric"
-              min={1}
-              max={3000}
-              defaultValue={myGrams ?? baseGrams}
-              onChange={(e) => {
-                const v = Math.round(Number(e.target.value));
-                if (v > 0 && v <= 3000) setMyGrams(v === baseGrams ? null : v);
-              }}
-              aria-label="Вес моей порции в граммах"
-            />
-            <span>г</span>
-          </label>
-          {myGrams ? (
-            <button type="button" className="btn btn--text" onClick={() => setMyGrams(null)}>
-              Как в рецепте, {baseGrams} г
-            </button>
-          ) : (
-            <small>Взвесьте тарелку и впишите свой вес</small>
-          )}
-        </div>
-        <MacroRing macros={serving} size={148} stroke={14}>
-          <span className="kcal kcal--ring">
-            <span className="kcal__num">{m.kcal}</span>
-            <span className="kcal__unit">ккал</span>
-          </span>
-        </MacroRing>
-        <dl className="macros">
-          <div className="macros__row">
-            <dt>
-              <i className="dot dot--p" /> Белки
-            </dt>
-            <dd>
-              <b>{m.p} г</b> <span>{pc.p}% калорий</span>
-            </dd>
-          </div>
-          <div className="macros__row">
-            <dt>
-              <i className="dot dot--f" /> Жиры
-            </dt>
-            <dd>
-              <b>{m.f} г</b> <span>{pc.f}% калорий</span>
-            </dd>
-          </div>
-          <div className="macros__row">
-            <dt>
-              <i className="dot dot--c" /> Углеводы
-            </dt>
-            <dd>
-              <b>{m.c} г</b> <span>{pc.c}% калорий</span>
-            </dd>
-          </div>
-        </dl>
-        <p className="per100">
-          <b>≈ {m100.kcal} ккал</b> в 100 г готового блюда
-          <span>
-            Б {m100.p} · Ж {m100.f} · У {m100.c} г
-          </span>
-        </p>
-        {goal > 0 && (
-          <p className="goal-share">
-            {myGrams ? `${myGrams} г` : "Порция"} — это <b>{Math.round((serving.kcal / goal) * 100)}%</b> цели на день по калориям
-            {proteinGoal > 0 && (
-              <>
-                {" "}и <b>{Math.round((serving.p / proteinGoal) * 100)}%</b> по белку
-              </>
-            )}
-          </p>
-        )}
-      </section>
-
-      <div className="recipe__actions">
-        <button
-          type="button"
-          className="btn btn--accent"
-          onClick={() => {
-            if (myGrams) {
-              addToDay(recipe.id, portionK, true);
-              showToast(`${myGrams} г добавлено в «Мой день»`);
-            } else {
-              addToDay(recipe.id, 1);
-              showToast("Порция добавлена в «Мой день»");
-            }
-          }}
-        >
-          В мой день
-        </button>
-        <ShareButton recipe={recipe} onCopied={() => showToast("Ссылка на рецепт скопирована")} />
-        <HeartButton id={recipe.id} title={recipe.title} className="heart--big" />
-      </div>
-      {/* Свой рецепт живёт только на её телефоне: по ссылке он у тебя не откроется. */}
-      {!isMyRecipe(recipe.id) && (
-        <CookForMeButton recipe={recipe} onCopied={() => showToast("Просьба скопирована — отправь её в чат")} />
-      )}
-
       <div className="cook-bar">
-        <button type="button" className="btn btn--ghost" onClick={() => setCooking(true)}>
+        <button type="button" className="btn btn--accent" onClick={() => setCooking(true)}>
           {cookStep > 0 ? `Продолжить с шага ${Math.min(cookStep, recipe.steps.length)}` : "Готовить по шагам"}
         </button>
         {(cookStep > 0 || checked.size > 0) && (
@@ -316,9 +218,129 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
         />
       )}
 
+      <nav className="recipe-jumps" aria-label="Разделы рецепта">
+        {[[`products-${recipe.id}`, "Продукты"], [`steps-${recipe.id}`, "Шаги"], [`journal-${recipe.id}`, "Мои заметки"]].map(([id, label]) => (
+          <button key={id} type="button" className="toggle" onClick={() => {
+            const heading = document.getElementById(id);
+            heading?.scrollIntoView({ block: "start" });
+            heading?.focus({ preventScroll: true });
+          }}>{label}</button>
+        ))}
+      </nav>
+
+      {recipe.video && <ReelEmbed url={recipe.video} title={recipe.title} />}
+
+      <details className="nutrition-details">
+        <summary>
+          <b>{m.kcal} ккал · Б {m.p} · Ж {m.f} · У {m.c} г</b>
+          <span>КБЖУ и моя порция</span>
+        </summary>
+        <section className="nutrition" aria-label={myGrams ? `Пищевая ценность ${myGrams} г` : "Пищевая ценность одной порции"}>
+          <div className="my-portion">
+            <label className="grams-input">
+              <span>Моя порция</span>
+              <input
+                key={myGrams === null ? "base" : "own"}
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={3000}
+                defaultValue={myGrams ?? baseGrams}
+                onChange={(e) => {
+                  const v = Math.round(Number(e.target.value));
+                  if (v > 0 && v <= 3000) setMyGrams(v === baseGrams ? null : v);
+                }}
+                aria-label="Вес моей порции в граммах"
+              />
+              <span>г</span>
+            </label>
+            {myGrams ? (
+              <button type="button" className="btn btn--text" onClick={() => setMyGrams(null)}>
+                Как в рецепте, {baseGrams} г
+              </button>
+            ) : (
+              <small>Взвесьте тарелку и впишите свой вес</small>
+            )}
+          </div>
+          <MacroRing macros={serving} size={148} stroke={14}>
+            <span className="kcal kcal--ring">
+              <span className="kcal__num">{m.kcal}</span>
+              <span className="kcal__unit">ккал</span>
+            </span>
+          </MacroRing>
+          <dl className="macros">
+            <div className="macros__row">
+              <dt>
+                <i className="dot dot--p" /> Белки
+              </dt>
+              <dd>
+                <b>{m.p} г</b> <span>{pc.p}% калорий</span>
+              </dd>
+            </div>
+            <div className="macros__row">
+              <dt>
+                <i className="dot dot--f" /> Жиры
+              </dt>
+              <dd>
+                <b>{m.f} г</b> <span>{pc.f}% калорий</span>
+              </dd>
+            </div>
+            <div className="macros__row">
+              <dt>
+                <i className="dot dot--c" /> Углеводы
+              </dt>
+              <dd>
+                <b>{m.c} г</b> <span>{pc.c}% калорий</span>
+              </dd>
+            </div>
+          </dl>
+          <p className="per100">
+            <b>≈ {m100.kcal} ккал</b> в 100 г готового блюда
+            <span>
+              Б {m100.p} · Ж {m100.f} · У {m100.c} г
+            </span>
+          </p>
+          {goal > 0 && (
+            <p className="goal-share">
+              {myGrams ? `${myGrams} г` : "Порция"} — это <b>{Math.round((serving.kcal / goal) * 100)}%</b> цели на день по калориям
+              {proteinGoal > 0 && (
+                <>
+                  {" "}и <b>{Math.round((serving.p / proteinGoal) * 100)}%</b> по белку
+                </>
+              )}
+            </p>
+          )}
+        </section>
+      </details>
+
+      <div className="recipe__actions">
+        <button
+          type="button"
+          className="btn btn--accent"
+          onClick={() => {
+            if (myGrams) {
+              addToDay(recipe.id, portionK, true);
+              showToast(`${myGrams} г добавлено в «Мой день»`);
+            } else {
+              addToDay(recipe.id, 1);
+              showToast("Порция добавлена в «Мой день»");
+            }
+          }}
+        >
+          В мой день
+        </button>
+        <ShareButton recipe={recipe} onCopied={() => showToast("Ссылка на рецепт скопирована")} />
+        <HeartButton id={recipe.id} title={recipe.title} className="heart--big" />
+      </div>
+      {/* Свой рецепт живёт только на её телефоне: по ссылке он у тебя не откроется. */}
+      {!isMyRecipe(recipe.id) && (
+        <CookForMeButton recipe={recipe} onCopied={() => showToast("Просьба скопирована — отправь её в чат")} />
+      )}
+
+
       <section className="recipe__section">
         <div className="recipe__section-head">
-          <h2>Продукты</h2>
+          <h2 id={`products-${recipe.id}`} tabIndex={-1}>Продукты</h2>
           <Stepper value={servings} onChange={setServings} label="Число порций" min={1} max={20} format={servingsLabel} />
         </div>
         <button type="button" className="btn btn--text ingredients__macros-toggle" aria-pressed={showMacros} onClick={() => setShowMacros((v) => !v)}>
@@ -412,7 +434,7 @@ function RecipeBody({ recipe }: { recipe: Recipe }) {
       </section>
 
       <section className="recipe__section">
-        <h2>Как готовить</h2>
+        <h2 id={`steps-${recipe.id}`} tabIndex={-1}>Как готовить</h2>
         <ol className="steps">
           {recipe.steps.map((s, i) => (
             <li key={i}>
