@@ -64,7 +64,6 @@ function Masthead({ children }: { children: ReactNode }) {
   return (
     <div className="masthead">
       {isWinterHoliday() && <Snow />}
-      <p className="masthead__eyebrow">Личная книга рецептов</p>
       <h1 className="masthead__title" aria-label="ПП-кухня">
         <span className="masthead__line">ПП‑</span>
         <span className="masthead__line">кухня</span>
@@ -82,7 +81,7 @@ function Masthead({ children }: { children: ReactNode }) {
       {children}
       <ChallengeStrip />
       <p className="masthead__lede">
-        {recipes.length} {plural(recipes.length, ["ПП-рецепт", "ПП-рецепта", "ПП-рецептов"])} с составом, шагами и КБЖУ на порцию и на 100 г.
+        {recipes.length} {plural(recipes.length, ["ПП-рецепт", "ПП-рецепта", "ПП-рецептов"])} из редакционных подборок и рецептов Леди Mail.ru, Food.ru и журнала «Гастроном» и любимых рилсов. У каждого блюда посчитаны калории, белки, жиры и углеводы на порцию и на 100 г.
       </p>
     </div>
   );

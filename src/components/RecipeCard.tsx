@@ -3,6 +3,7 @@ import type { Recipe } from "../types";
 import { categoryLabel, isProteinDense, per100Macros, servingMacros } from "../data";
 import { round } from "../lib/nutrition";
 import { formatTime } from "../lib/format";
+import { Art } from "../art/Art";
 import { MacroRing } from "./MacroRing";
 import { useStore } from "../hooks/useStore";
 import { usePhotoUrl } from "../hooks/usePhoto";
@@ -33,17 +34,23 @@ export function RecipeCard({ recipe, wide = false }: { recipe: Recipe; wide?: bo
   const m = round(servingMacros[recipe.id]);
   return (
     <article className={`card ${wide ? "card--wide" : ""}`}>
-      {photo && (
-        <div className="card__art">
+      <div className="card__art">
+        {photo ? (
           <img className="card__photo" src={photo} alt="" loading="lazy" />
-        </div>
-      )}
+        ) : (
+          <Art kind={recipe.art} category={recipe.category} seed={recipe.id} />
+        )}
+        {entry?.rating ? (
+          <span className="card__rating" aria-label={`Моя оценка ${entry.rating} из 5`}>
+            ★ {entry.rating}
+          </span>
+        ) : null}
+      </div>
       <div className="card__body">
         <p className="card__meta">
           {categoryLabel[recipe.category]}, {formatTime(recipe.timeMinutes)}
           {isProteinDense(recipe.id) && <span className="card__badge card__badge--protein">белок</span>}
           {recipe.video && <span className="card__badge">видео</span>}
-          {entry?.rating ? <span className="card__score" aria-label={`Моя оценка ${entry.rating} из 5`}>★ {entry.rating}</span> : null}
           {fresh.has(recipe.id) && <span className="card__badge card__badge--new">новое</span>}
         </p>
         <h3 className="card__title">
