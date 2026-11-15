@@ -22,10 +22,14 @@ async function run<T>(mode: IDBTransactionMode, fn: (s: IDBObjectStore) => IDBRe
   if (!db) return null;
   return new Promise((resolve) => {
     try {
-      const req = fn(db.transaction(STORE, mode).objectStore(STORE));
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => resolve(null);
+      const transaction = db.transaction(STORE, mode);
+      const req = fn(transaction.objectStore(STORE));
+      let result: T | null = null;
+      req.onsuccess = () => { result = req.result; };
+      transaction.oncomplete = () => { db.close(); resolve(result); };
+      transaction.onerror = transaction.onabort = () => { db.close(); resolve(null); };
     } catch {
+      db.close();
       resolve(null);
     }
   });

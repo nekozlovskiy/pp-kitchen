@@ -55,6 +55,10 @@ export function Kitchen() {
         </p>
       </header>
 
+      <div className="keepsake-links">
+        <Link to="/passport" className="keepsake-link keepsake-link--passport"><span aria-hidden="true">✦</span><div><b>Кулинарный паспорт</b><p>Штампы ваших вкусных открытий</p></div><span aria-hidden="true">→</span></Link>
+        <Link to="/memories" className="keepsake-link keepsake-link--memories"><span aria-hidden="true">♡</span><div><b>Наши воспоминания</b><p>Фото, вечера и маленькие истории</p></div><span aria-hidden="true">→</span></Link>
+      </div>
       <section aria-label="Цифры" className="kitchen__stats">
         <div className="kitchen__stat">
           <b>{stats.total}</b>

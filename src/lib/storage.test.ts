@@ -12,6 +12,21 @@ function storage() {
 }
 
 describe("ошибки сохранения", () => {
+  it("переносит любимые и воспоминания без ссылок на локальные фото", async () => {
+    storage();
+    const { writeJSON, readJSON } = await import("./storage");
+    const { exportBundle, importBundle } = await import("./transfer");
+    const memory = { id: "evening", recipeId: "banana-syrniki", date: "2026-11-16", caption: "Наш вечер" };
+    const likes = { "banana-syrniki": { anya: true, danya: true } };
+    writeJSON("pp.memories", [{ ...memory, photo: 123 }]);
+    writeJSON("pp.coupleLikes", likes);
+    const bundle = exportBundle();
+    expect(bundle.data["pp.memories"]).toEqual([memory]);
+    expect(bundle.data["pp.coupleLikes"]).toEqual(likes);
+    expect(readJSON("pp.memories", [])).toEqual([{ ...memory, photo: 123 }]);
+    importBundle({ v: 1, at: "2026-11-16", data: { "pp.memories": [{ ...memory, photo: 456 }] } });
+    expect(readJSON("pp.memories", [])).toEqual([memory]);
+  });
   it("сохраняет последнее изменение в памяти и делает его доступным для экспорта", async () => {
     const mock = storage();
     const { writeJSON, readJSON, hasUnsavedChanges } = await import("./storage");

@@ -3,6 +3,8 @@ import { notifyStorageChange, readJSON, retryStorageWrites, writeJSON } from "./
 /** Что переносим на другое устройство. Таймеры не нужны, фото лежат отдельно и слишком тяжёлые. */
 export const TRANSFER_KEYS = [
   "pp.favorites",
+  "pp.coupleLikes",
+  "pp.memories",
   "pp.journal",
   "pp.foundNotes",
   "pp.orders",
@@ -54,6 +56,13 @@ export function exportBundle(): Bundle {
       }),
     );
   }
+  if (Array.isArray(data["pp.memories"])) {
+    data["pp.memories"] = data["pp.memories"].map((entry: unknown) => {
+      if (!entry || typeof entry !== "object") return entry;
+      const { photo: _photo, ...rest } = entry as Record<string, unknown>;
+      return rest;
+    });
+  }
   return { v: 1, at: new Date().toISOString().slice(0, 10), data };
 }
 
@@ -91,7 +100,13 @@ export function importBundle(bundle: Bundle): number {
   let n = 0;
   for (const key of TRANSFER_KEYS) {
     if (key in bundle.data) {
-      writeJSON(key, bundle.data[key]);
+      const raw = bundle.data[key];
+      const value = key === "pp.memories" && Array.isArray(raw) ? raw.map((entry: unknown) => {
+        if (!entry || typeof entry !== "object") return entry;
+        const { photo: _photo, ...rest } = entry as Record<string, unknown>;
+        return rest;
+      }) : raw;
+      writeJSON(key, value);
       n++;
     }
   }

@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { ReactNode } from "react";
 import { readJSON, writeJSON } from "../lib/storage";
 import { todayKey } from "../lib/format";
+import { cleanCoupleLikes, cleanMemories, toggleCoupleLike, type CoupleLikes, type Memory, type Person } from "../lib/keepsakes";
 import { cookDates } from "../lib/kitchen";
 import { cleanHistory, withDay } from "../lib/history";
 import { freshIds, updateKnown } from "../lib/fresh";
@@ -34,6 +35,11 @@ export type JournalEntry = { note?: string; cooked?: number; last?: string; rati
 const KEEP_DATES = 50;
 
 type Store = {
+  coupleLikes: CoupleLikes;
+  toggleLove: (id: string, person: Person) => void;
+  memories: Memory[];
+  saveMemory: (memory: Memory) => void;
+  removeMemory: (id: string) => void;
   favorites: Set<string>;
   toggleFavorite: (id: string) => void;
   day: DayItem[];
@@ -132,6 +138,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [favorites, setFavorites] = useState<Set<string>>(
     () => new Set(readJSON<string[]>("pp.favorites", []).filter((id) => recipeMap[id])),
   );
+  const [coupleLikes, setCoupleLikes] = useState(() => cleanCoupleLikes(readJSON<unknown>("pp.coupleLikes", {})));
+  const [memories, setMemories] = useState(() => cleanMemories(readJSON<unknown>("pp.memories", [])));
+  useEffect(() => writeJSON("pp.coupleLikes", coupleLikes), [coupleLikes]);
+  useEffect(() => writeJSON("pp.memories", memories), [memories]);
   const [day, setDay] = useState<DayItem[]>(loadDay);
   const [foods, setFoods] = useState<FoodItem[]>(loadFoods);
   const [lastDay, setLastDay] = useState<LastDay | null>(loadLastDay);
@@ -252,6 +262,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<Store>(
     () => ({
+      coupleLikes,
+      toggleLove: (id, person) => setCoupleLikes((prev) => toggleCoupleLike(prev, id, person)),
+      memories,
+      saveMemory: (memory) => setMemories((prev) => cleanMemories([memory, ...prev.filter((m) => m.id !== memory.id)])),
+      removeMemory: (id) => setMemories((prev) => prev.filter((m) => m.id !== id)),
       favorites,
       toggleFavorite,
       day,
@@ -357,7 +372,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       servingFor: (recipeId) =>
         swaps[recipeId]?.length ? perServing(applySwaps(recipeMap[recipeId], swaps[recipeId]), ingredientMap) : servingMacros[recipeId],
     }),
-    [favorites, toggleFavorite, day, foods, lastDay, addToDay, goal, shopping, toast, showToast, journal, exclude, fresh, myRecipes, dislikes, pantry, proteinGoal, swaps, week, history],
+    [coupleLikes, memories, favorites, toggleFavorite, day, foods, lastDay, addToDay, goal, shopping, toast, showToast, journal, exclude, fresh, myRecipes, dislikes, pantry, proteinGoal, swaps, week, history],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

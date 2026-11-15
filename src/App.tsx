@@ -15,6 +15,9 @@ import { Shopping } from "./pages/Shopping";
 import { Pantry } from "./pages/Pantry";
 import { Week } from "./pages/Week";
 import { Transfer } from "./pages/Transfer";
+import { Memories } from "./pages/Memories";
+import { Passport } from "./pages/Passport";
+import { Surprise } from "./pages/Surprise";
 import { Kitchen } from "./pages/Kitchen";
 import { Swipe } from "./pages/Swipe";
 import { Together } from "./pages/Together";
@@ -32,7 +35,7 @@ function useTitle(location: Location) {
     const page =
       r?.title ??
       (location.pathname.startsWith("/my/") && location.pathname !== "/my/new" ? "Изменить рецепт" : undefined) ??
-      ({ "/day": "Мой день", "/favorites": "Избранное", "/shopping": "Покупки", "/pantry": "Из того, что есть", "/week": "Меню на неделю", "/transfer": "Перенос", "/kitchen": "Моя кухня", "/my": "Мои рецепты", "/my/new": "Новый рецепт", "/swipe": "Чего хочется?", "/buy": "Купить" } as Record<string, string>)[
+      ({ "/memories": "Наши воспоминания", "/passport": "Кулинарный паспорт", "/surprise": "Ужин-сюрприз", "/day": "Мой день", "/favorites": "Избранное", "/shopping": "Покупки", "/pantry": "Из того, что есть", "/week": "Меню на неделю", "/transfer": "Перенос", "/kitchen": "Моя кухня", "/my": "Мои рецепты", "/my/new": "Новый рецепт", "/swipe": "Чего хочется?", "/buy": "Купить" } as Record<string, string>)[
         location.pathname
       ];
     document.title = page ? `${page} | ПП-кухня` : `ПП-кухня ${config.herNameGenitive}`;
@@ -78,6 +81,9 @@ export function App() {
           <Route path="/pantry" element={<Pantry />} />
           <Route path="/week" element={<Week />} />
           <Route path="/transfer" element={<Transfer />} />
+          <Route path="/memories" element={<Memories />} />
+          <Route path="/passport" element={<Passport />} />
+          <Route path="/surprise" element={<Surprise />} />
           <Route path="/kitchen" element={<Kitchen />} />
           <Route path="/swipe" element={<Swipe />} />
           <Route path="/together/:id" element={<Together />} />

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "../hooks/useStore";
 import { usePhotoUrl } from "../hooks/usePhoto";
@@ -9,7 +10,7 @@ const dateFmt = new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long"
 
 /** Личные отметки к рецепту: оценка, сколько раз готовила, заметки и своё фото. */
 export function RecipeJournal({ recipe }: { recipe: Recipe }) {
-  const { journal, updateJournal, markCooked, showToast } = useStore();
+  const { journal, updateJournal, markCooked, showToast, coupleLikes, toggleLove } = useStore();
   const entry = journal[recipe.id] ?? {};
   const [note, setNote] = useState(entry.note ?? "");
   const photo = usePhotoUrl(recipe.id, entry.photo);
@@ -46,6 +47,17 @@ export function RecipeJournal({ recipe }: { recipe: Recipe }) {
     <section className="recipe__section journal" aria-labelledby={`journal-${recipe.id}`}>
       <h2 id={`journal-${recipe.id}`} tabIndex={-1}>Мои отметки</h2>
 
+      <div className="couple-likes">
+        <p className="keepsake-kicker">Наши любимые</p>
+        <div className="toggles" role="group" aria-label="Кто любит это блюдо">
+          {([['anya', 'Анюта любит'], ['danya', 'Даня любит']] as const).map(([person, label]) => (
+            <button key={person} type="button" className={`toggle ${coupleLikes[recipe.id]?.[person] ? 'is-on' : ''}`}
+              aria-pressed={!!coupleLikes[recipe.id]?.[person]} onClick={() => toggleLove(recipe.id, person)}>{label} ♡</button>
+          ))}
+        </div>
+        {coupleLikes[recipe.id]?.anya && coupleLikes[recipe.id]?.danya && <p className="couple-likes__both">Любим оба ♥</p>}
+        <Link to={`/memories?recipe=${encodeURIComponent(recipe.id)}`} className="btn btn--text">Сохранить воспоминание об этом блюде →</Link>
+      </div>
       <div className="journal__row">
         <div className="stars" role="radiogroup" aria-label="Моя оценка">
           {[1, 2, 3, 4, 5].map((n) => (
